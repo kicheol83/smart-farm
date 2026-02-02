@@ -7,6 +7,13 @@ import { NotifiactionSettingsModule } from './notifiaction-settings/notifiaction
 import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [MemberModule, PasswordResetModule, EmailVerificationsModule, MemberSettingsModule, NotifiactionSettingsModule, AuthModule]
+  imports: [
+    MemberModule,
+    PasswordResetModule,
+    EmailVerificationsModule,
+    MemberSettingsModule,
+    NotifiactionSettingsModule,
+    AuthModule,
+  ],
 })
 export class AccountContextModuleModule {}
