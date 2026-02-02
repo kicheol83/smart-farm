@@ -10,9 +10,20 @@ import { AccountContextModuleModule } from './account-context-module/account-con
 import { FarmContextModuleModule } from './farm-context-module/farm-context-module.module';
 import { IoTcontextModuleModule } from './io-tcontext-module/io-tcontext-module.module';
 import { OpsContextModuleModule } from './ops-context-module/ops-context-module.module';
+import { BullMqModule } from './bull-mq/bull-mq.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), DatabaseModule, GatewayModule, RedisModule, AccountContextModuleModule, FarmContextModuleModule, IoTcontextModuleModule, OpsContextModuleModule],
+  imports: [
+    ConfigModule.forRoot(),
+    DatabaseModule,
+    GatewayModule,
+    RedisModule,
+    AccountContextModuleModule,
+    FarmContextModuleModule,
+    IoTcontextModuleModule,
+    OpsContextModuleModule,
+    BullMqModule,
+  ],
   controllers: [AppController],
   providers: [AppService, AppResolver],
 })
