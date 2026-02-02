@@ -7,9 +7,10 @@ import { DatabaseModule } from './database/database.module';
 import { GatewayModule } from './gateway/gateway.module';
 import { RedisModule } from './redis/redis.module';
 import { AccountContextModuleModule } from './account-context-module/account-context-module.module';
+import { FarmContextModuleModule } from './farm-context-module/farm-context-module.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), DatabaseModule, GatewayModule, RedisModule, AccountContextModuleModule],
+  imports: [ConfigModule.forRoot(), DatabaseModule, GatewayModule, RedisModule, AccountContextModuleModule, FarmContextModuleModule],
   controllers: [AppController],
   providers: [AppService, AppResolver],
 })
