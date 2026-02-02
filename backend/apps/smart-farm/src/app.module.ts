@@ -9,9 +9,10 @@ import { RedisModule } from './redis/redis.module';
 import { AccountContextModuleModule } from './account-context-module/account-context-module.module';
 import { FarmContextModuleModule } from './farm-context-module/farm-context-module.module';
 import { IoTcontextModuleModule } from './io-tcontext-module/io-tcontext-module.module';
+import { OpsContextModuleModule } from './ops-context-module/ops-context-module.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), DatabaseModule, GatewayModule, RedisModule, AccountContextModuleModule, FarmContextModuleModule, IoTcontextModuleModule],
+  imports: [ConfigModule.forRoot(), DatabaseModule, GatewayModule, RedisModule, AccountContextModuleModule, FarmContextModuleModule, IoTcontextModuleModule, OpsContextModuleModule],
   controllers: [AppController],
   providers: [AppService, AppResolver],
 })
