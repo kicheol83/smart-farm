@@ -10,3 +10,13 @@ registerEnumType(SensorsType, {
   name: 'SensorsType',
   description: 'Types of sensors used in the smart farm system',
 });
+
+export enum CameraStatus {
+  ONLINE = 'online',
+  OFFLINE = 'offline',
+  MAINTENANCE = 'maintenance',
+}
+registerEnumType(CameraStatus, {
+  name: 'CameraStatus',
+  description: 'Status of the camera device',
+});
