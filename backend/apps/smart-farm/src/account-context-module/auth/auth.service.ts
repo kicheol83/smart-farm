@@ -1,7 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 import { T } from '../../libs/types/common';
-import { Member } from '../../libs/dto/member/member';
 import { JwtService } from '@nestjs/jwt';
 import { shapeIntoMongoObjectId } from '../../libs/config';
 import axios from 'axios';
@@ -10,6 +9,7 @@ import * as crypto from 'crypto';
 import { OAuth2Client } from 'google-auth-library';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { Member } from '../../libs/dto/account-context-dto/member/member';
 
 @Injectable()
 export class AuthService {

@@ -34,7 +34,7 @@ export class AuthGuard implements CanActivate {
       if (!authMember)
         throw new ForbiddenException(Message.ONLY_SPECIFIC_ROLES_ALLOWED);
 
-      const hasPermission = roles.includes(authMember.memberType);
+      const hasPermission = roles.includes(authMember.memberRole);
       if (!hasPermission)
         throw new ForbiddenException(Message.ONLY_SPECIFIC_ROLES_ALLOWED);
 
