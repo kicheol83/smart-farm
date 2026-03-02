@@ -17,12 +17,14 @@ import { Connection } from 'mongoose';
 })
 export class DatabaseModule {
   constructor(@InjectConnection() private readonly connection: Connection) {
+    const env =
+      process.env.NODE_ENV === 'production' ? 'production' : 'development';
+    const role = process.env.APP_ROLE ?? 'api';
+
     if (connection.readyState === 1) {
-      console.log(
-        `MongoDB is connection into ${process.env.NODE_ENV === 'production' ? 'production' : 'development'} db`,
-      );
+      console.log(`MongoDB is connected into ${env} ${role} db`);
     } else {
-      console.log('DB is not connected!');
+      console.log(`DB is not connected! (${env} ${role})`);
     }
   }
 }
