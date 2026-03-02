@@ -11,6 +11,7 @@ import { FarmContextModuleModule } from './farm-context-module/farm-context-modu
 import { IoTcontextModuleModule } from './io-tcontext-module/io-tcontext-module.module';
 import { OpsContextModuleModule } from './ops-context-module/ops-context-module.module';
 import { BullMqModule } from './bull-mq/bull-mq.module';
+import { AuthService } from './auth/auth.service';
 
 @Module({
   imports: [
@@ -25,6 +26,6 @@ import { BullMqModule } from './bull-mq/bull-mq.module';
     BullMqModule,
   ],
   controllers: [AppController],
-  providers: [AppService, AppResolver],
+  providers: [AppService, AppResolver, AuthService],
 })
 export class AppModule {}
