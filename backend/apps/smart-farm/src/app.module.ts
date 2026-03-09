@@ -24,8 +24,9 @@ import { AuthModule } from './account-context-module/auth/auth.module';
     IoTcontextModuleModule,
     OpsContextModuleModule,
     BullMqModule,
+    AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService, AppResolver, AuthModule],
+  providers: [AppService, AppResolver],
 })
 export class AppModule {}

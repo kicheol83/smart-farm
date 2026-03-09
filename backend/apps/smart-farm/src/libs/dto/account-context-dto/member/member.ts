@@ -13,7 +13,6 @@ export class Member {
   @Field(() => String)
   memberEmail: string;
 
-  @Field(() => String)
   memberPassword: string;
 
   @Field(() => String)

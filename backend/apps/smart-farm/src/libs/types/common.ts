@@ -68,6 +68,8 @@ export enum Message {
   ALERT_NOT_FOUND = 'No alert found!',
   ALERT_CREATE_FAILED = 'Failed to create alert!',
   ALERT_UPDATE_FAILED = 'Failed to update alert!',
+  USED_MEMBER_NICK_OR_PHONE = "USED_MEMBER_NICK_OR_PHONE",
+  NO_MEMBER_NICK = "NO_MEMBER_NICK",
 }
 
 
