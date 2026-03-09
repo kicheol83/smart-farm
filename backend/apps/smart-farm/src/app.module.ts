@@ -12,10 +12,30 @@ import { IoTcontextModuleModule } from './io-tcontext-module/io-tcontext-module.
 import { OpsContextModuleModule } from './ops-context-module/ops-context-module.module';
 import { BullMqModule } from './bull-mq/bull-mq.module';
 import { AuthModule } from './account-context-module/auth/auth.module';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver } from '@nestjs/apollo';
+import { T } from './libs/types/common';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    GraphQLModule.forRoot({
+      driver: ApolloDriver,
+      playground: true,
+      uploads: false,
+      autoSchemaFile: true,
+      formatError: (error: T) => {
+        console.log('error', error);
+        const graphQLFormattedError = {
+          code: error?.extensions.code,
+          message:
+            error?.extensions?.exception?.response?.message ||
+            error?.extensions?.response?.message ||
+            error?.message,
+        };
+        return graphQLFormattedError;
+      },
+    }),
     DatabaseModule,
     GatewayModule,
     RedisModule,
