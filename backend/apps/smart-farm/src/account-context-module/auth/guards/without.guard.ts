@@ -29,8 +29,8 @@ export class WithoutGuard implements CanActivate {
       } else request.body.authMember = null;
 
       console.log(
-        'memberNick[without] =>',
-        request.body.authMember?.memberNick ?? 'none',
+        'memberFullName[without] =>',
+        request.body.authMember?.memberFullName ?? 'none',
       );
       return true;
     }
