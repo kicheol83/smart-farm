@@ -1,10 +1,15 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { MemberService } from './member.service';
 import { AuthService } from '../auth/auth.service';
-import { Member } from '../../libs/dto/account-context-dto/member/member';
+import {
+  Member,
+  Members,
+} from '../../libs/dto/account-context-dto/member/member';
 import {
   CreateMemberInput,
   LoginMemberInput,
+  ManagerInquiry,
+  MembersInquiry,
 } from '../../libs/dto/account-context-dto/member/member.input';
 import { ObjectId } from 'mongoose';
 import { UseGuards } from '@nestjs/common';
@@ -79,5 +84,27 @@ export class MemberResolver {
   ): Promise<string> {
     console.log('Query: checkAuthRoles');
     return `hi ${authMember.memberFullName}, you are ${authMember.memberRole} (memberId: ${authMember._id})`;
+  }
+
+  @Roles(MemberRole.MANAGER)
+  @Query(() => Members)
+  public async getManagerMember(
+    @Args('input') input: ManagerInquiry,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Members> {
+    console.log('Query: getManagerMember');
+    return await this.memberService.getManagerMember(memberId, input);
+  }
+
+  /**  ADMIN  **/
+
+  @Roles(MemberRole.ADMIN)
+  @UseGuards(RolesGuard)
+  @Query(() => Members)
+  public async getAllMembersByAdmin(
+    @Args('input') input: MembersInquiry,
+  ): Promise<Members> {
+    console.log('Query: getAllMembersByAdmin');
+    return await this.memberService.getAllMembersByAdmin(input);
   }
 }
