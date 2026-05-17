@@ -4,16 +4,23 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Member } from '../../libs/dto/account-context-dto/member/member';
+import {
+  Member,
+  Members,
+} from '../../libs/dto/account-context-dto/member/member';
 import { Model, ObjectId } from 'mongoose';
 import { AuthService } from '../auth/auth.service';
 import {
   CreateMemberInput,
   LoginMemberInput,
+  ManagerInquiry,
+  MembersInquiry,
 } from '../../libs/dto/account-context-dto/member/member.input';
 import { Message, T } from '../../libs/types/common';
-import { MemberStatus } from '../../libs/enums/member.enum';
+import { MemberRole, MemberStatus } from '../../libs/enums/member.enum';
 import { MemberUpdateInput } from '../../libs/dto/account-context-dto/member/member.update';
+import { Direction } from '../../libs/enums/common.enum';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class MemberService {
@@ -32,7 +39,7 @@ export class MemberService {
 
       return result;
     } catch (err) {
-      console.log('Error signup', err.meessage);
+      console.log('Error signup', err);
       throw new BadRequestException(Message.USED_MEMBER_NICK_OR_PHONE);
     }
   }
@@ -69,6 +76,10 @@ export class MemberService {
     memberId: ObjectId,
     input: MemberUpdateInput,
   ): Promise<Member> {
+    if (input.memberPassword) {
+      input.memberPassword = await bcrypt.hash(input.memberPassword, 10);
+    }
+
     const result: Member = await this.memberModel
       .findOneAndUpdate(
         { _id: memberId, memberStatus: MemberStatus.ACTIVE },
@@ -98,5 +109,82 @@ export class MemberService {
       throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
     return targetMember;
+  }
+
+  public async getManagerMember(
+    memberId: ObjectId,
+    input: ManagerInquiry,
+  ): Promise<Members> {
+    const { text } = input.search;
+    const match: T = {
+      memberRole: MemberRole.WORKER,
+      memberStatus: MemberStatus.ACTIVE,
+    };
+    const sort: T = {
+      [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC,
+    };
+
+    if (text) match.memberFullName = { $regex: new RegExp(text, 'i') };
+    console.log('match:', match);
+    console.log('sort:', sort);
+
+    const result = await this.memberModel
+      .aggregate([
+        { $match: match },
+        { $sort: sort },
+        {
+          $facet: {
+            list: [
+              { $skip: (input.page - 1) * input.limit },
+              { $limit: input.limit },
+            ],
+            metaCounter: [{ $count: 'total' }],
+          },
+        },
+      ])
+      .exec();
+    console.log('result:', result);
+    if (!result.length)
+      throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+    return result[0];
+  }
+
+  public async getAllMembersByAdmin(input: MembersInquiry): Promise<Members> {
+    const { memberStatus, memberRole, text } = input.search;
+    const match: T = {};
+    const sort: T = {
+      [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC,
+    };
+
+    if (memberStatus) match.memberStatus = memberStatus;
+    if (memberRole) match.memberRole = memberRole;
+    if (text) match.memberFullName = { $regex: new RegExp(text, 'i') };
+    console.log('match:', match);
+
+    const result = await this.memberModel
+      .aggregate([
+        { $match: match },
+        { $sort: sort },
+        {
+          $facet: {
+            list: [
+              { $skip: (input.page - 1) * input.limit },
+              { $limit: input.limit },
+            ],
+            metaCounter: [{ $count: 'total' }],
+          },
+        },
+      ])
+      .exec();
+
+    console.log('page:', input.page);
+    console.log('limit:', input.limit);
+    console.log('result:', result);
+
+    if (!result.length)
+      throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+    return result[0];
   }
 }
