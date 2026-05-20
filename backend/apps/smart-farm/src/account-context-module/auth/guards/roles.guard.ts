@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthService } from '../auth.service';
-import { Message } from 'apps/smart-farm/src/libs/types/common';
+import { Message } from '../../../libs/types/common';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
