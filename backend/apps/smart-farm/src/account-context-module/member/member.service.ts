@@ -56,6 +56,10 @@ export class MemberService {
       throw new InternalServerErrorException(Message.NO_MEMBER_NICK);
     } else if (response.memberStatus === MemberStatus.BLOCK) {
       throw new InternalServerErrorException(Message.BLOCKED_USER);
+    } else if (response.memberStatus === MemberStatus.SUSPENDED) {
+      throw new InternalServerErrorException(Message.DEVICE_ALREADY_REGISTERED);
+    } else if (response.memberStatus === MemberStatus.INACTIVE) {
+      throw new InternalServerErrorException(Message.DEVICE_ALREADY_REGISTERED);
     }
 
     const isMatch = await this.authService.comparePassword(
@@ -186,5 +190,13 @@ export class MemberService {
       throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
     return result[0];
+  }
+
+  public async updateMemberByAdmin(input: MemberUpdateInput): Promise<Member> {
+    const result: Member = await this.memberModel
+      .findOneAndUpdate({ _id: input._id }, input, { new: true })
+      .exec();
+    if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
+    return result;
   }
 }
