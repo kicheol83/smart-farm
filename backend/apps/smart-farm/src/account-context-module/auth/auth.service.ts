@@ -159,6 +159,33 @@ export class AuthService {
     return { message: 'Password reset successfully.' };
   }
 
+  // ─── Signup OTP
+
+  /**
+   * Signup muvaffaqiyatli bo'lgandan keyin chaqiriladi.
+   * Member ID va email orqali OTP generatsiya qilib yuboradi.
+   * Xato bo'lsa signup ni bloklamaydi — faqat log qiladi.
+   */
+  public async sendOtpAfterSignup(
+    memberId: Types.ObjectId,
+    memberEmail: string,
+    memberFullName: string,
+  ): Promise<void> {
+    try {
+      const emailCode =
+        await this.emailVerificationService.generateAndSave(memberId);
+      await this.mailService.sendEmailVerificationOtp(
+        memberEmail,
+        memberFullName,
+        emailCode,
+      );
+      this.logger.log(`Signup OTP sent | ${memberEmail}`);
+    } catch (err) {
+      // OTP xatosi signup ni bekor qilmasin 
+      this.logger.error(`Signup OTP failed | ${memberEmail} | ${err}`);
+    }
+  }
+
   // ─── Private
   private async findMemberOrThrow(memberEmail: string): Promise<Member> {
     const member = await this.memberModel
