@@ -5,6 +5,7 @@ import { EmailVerificationsModule } from './email-verifications/email-verificati
 import { MemberSettingsModule } from './member-settings/member-settings.module';
 import { NotifiactionSettingsModule } from './notification-settings/notifiaction-settings.module';
 import { AuthModule } from './auth/auth.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { AuthModule } from './auth/auth.module';
     MemberSettingsModule,
     NotifiactionSettingsModule,
     AuthModule,
+    MailModule,
   ],
 })
 export class AccountContextModuleModule {}
