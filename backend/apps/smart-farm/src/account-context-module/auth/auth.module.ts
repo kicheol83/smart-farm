@@ -5,6 +5,10 @@ import { AUTH_TIMER } from '../../libs/config';
 import { JwtModule } from '@nestjs/jwt/dist/jwt.module';
 import MemberSchema from '../../schemas/account/Member.model';
 import { HttpModule } from '@nestjs/axios';
+import { AuthResolver } from './auth.resolver';
+import { MailModule } from '../mail/mail.module';
+import { EmailVerificationsModule } from '../email-verifications/email-verifications.module';
+import { PasswordResetModule } from '../password-reset/password-reset.module';
 
 @Module({
   imports: [
@@ -14,8 +18,11 @@ import { HttpModule } from '@nestjs/axios';
       secret: `${process.env.SECRET_TOKEN}`,
       signOptions: { expiresIn: `${AUTH_TIMER}d` },
     }),
+    MailModule,
+    EmailVerificationsModule,
+    PasswordResetModule,
   ],
-  providers: [AuthService],
+  providers: [AuthService, AuthResolver],
   exports: [AuthService],
 })
 export class AuthModule {}

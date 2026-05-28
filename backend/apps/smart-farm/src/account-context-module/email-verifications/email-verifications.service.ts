@@ -1,4 +1,131 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  ConflictException,
+  Logger,
+} from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, Types, Document, ObjectId } from 'mongoose';
+import { OTP } from '../../libs/types/common';
+import { Member } from '../../libs/dto/account-context-dto/member/member';
+
+// EmailVerificationSchema ga mos interface
+export interface IEmailVerification extends Document {
+  emailCode: string;
+  expiresAt: Date;
+  verifiedAt?: Date | null;
+  memberId: Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 @Injectable()
-export class EmailVerificationsService {}
+export class EmailVerificationService {
+  private readonly logger = new Logger(EmailVerificationService.name);
+
+  constructor(
+    @InjectModel('emailVerifications')
+    private readonly emailVerificationModel: Model<IEmailVerification>,
+  ) {}
+
+  /**
+   * Yangi 6 xonali OTP generatsiya qilib MongoDB ga saqlaydi.
+   * Avvalgi tasdiqlanmagan yozuvlarni o'chiradi.
+   * Generatsiya qilingan kodni qaytaradi (email yuborish uchun).
+   */
+  async generateAndSave(memberId: Types.ObjectId): Promise<string> {
+    // Avvalgi ishlatilmagan kodlarni tozalash
+    await this.emailVerificationModel.deleteMany({
+      memberId,
+      verifiedAt: null,
+    });
+
+    const emailCode = this.generateOtp();
+    const expiresAt = this.buildExpiresAt();
+
+    await this.emailVerificationModel.create({
+      emailCode,
+      expiresAt,
+      memberId,
+      verifiedAt: null,
+    });
+
+    this.logger.log(`Email verification OTP saved | memberId=${memberId}`);
+    return emailCode;
+  }
+
+  /**
+   * Yuborilgan emailCode ni tekshiradi.
+   * To'g'ri bo'lsa verifiedAt ni belgilaydi.
+   */
+  async verify(
+    memberId: Types.ObjectId,
+    emailCode: string,
+  ): Promise<Types.ObjectId> {
+    const record = await this.emailVerificationModel
+      .findOne({ memberId, verifiedAt: null })
+      .sort({ createdAt: -1 })
+      .exec();
+
+    if (!record) {
+      throw new BadRequestException(
+        'Verification code not found. Please request a new one.',
+      );
+    }
+
+    if (record.expiresAt < new Date()) {
+      throw new BadRequestException(
+        'Verification code has expired. Please request a new one.',
+      );
+    }
+
+    if (record.emailCode !== emailCode) {
+      throw new BadRequestException('Invalid verification code.');
+    }
+
+    record.verifiedAt = new Date();
+    await record.save();
+
+    this.logger.log(`Email verified | memberId=${memberId}`);
+    return record.memberId;
+  }
+
+  /**
+   * 60 soniyada bir marta yuborish chegarasi.
+   * Erta so'rov bo'lsa ConflictException tashlaydi.
+   */
+  public async checkCooldown(memberId: Types.ObjectId): Promise<Member> {
+    const last = await this.emailVerificationModel
+      .findOne({ memberId, verifiedAt: null })
+      .sort({ createdAt: -1 })
+      .select('createdAt')
+      .exec();
+
+    if (!last) return;
+
+    const secondsAgo = Math.floor(
+      (Date.now() - new Date(last.createdAt).getTime()) / 1000,
+    );
+
+    if (secondsAgo < OTP.RESEND_COOLDOWN_SECONDS) {
+      const wait = OTP.RESEND_COOLDOWN_SECONDS - secondsAgo;
+      throw new ConflictException(
+        `Please wait ${wait} seconds before requesting a new code.`,
+      );
+    }
+  }
+
+  // ─── Private helpers ──────────────────────────────────────────────────────
+
+  private generateOtp(): string {
+    const min = 10 ** (OTP.LENGTH - 1); // 100000
+    const max = 10 ** OTP.LENGTH - 1; // 999999
+    return String(Math.floor(min + Math.random() * (max - min + 1)));
+  }
+
+  private buildExpiresAt(): Date {
+    const date = new Date();
+    date.setMinutes(date.getMinutes() + OTP.TTL_MINUTES);
+    return date;
+  }
+}

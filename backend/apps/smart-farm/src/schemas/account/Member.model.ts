@@ -47,6 +47,4 @@ export const MemberSchema = new Schema(
   { timestamps: true, collection: 'members' },
 );
 
-MemberSchema.index({ memberEmail: 1 }, { unique: true });
-
 export default MemberSchema;

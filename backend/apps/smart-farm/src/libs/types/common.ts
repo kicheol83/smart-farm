@@ -68,13 +68,27 @@ export enum Message {
   ALERT_NOT_FOUND = 'No alert found!',
   ALERT_CREATE_FAILED = 'Failed to create alert!',
   ALERT_UPDATE_FAILED = 'Failed to update alert!',
-  USED_MEMBER_NICK_OR_PHONE = "USED_MEMBER_NICK_OR_PHONE",
-  NO_MEMBER_NICK = "NO_MEMBER_NICK",
+  USED_MEMBER_NICK_OR_PHONE = 'USED_MEMBER_NICK_OR_PHONE',
+  NO_MEMBER_NICK = 'NO_MEMBER_NICK',
 }
-
 
 export interface StatisticModifier {
   _id: ObjectId;
   targetKey: string;
   modifier: number;
 }
+
+export const QUEUES = {
+  EMAIL: 'email.queue',
+} as const;
+
+export const JOBS = {
+  SEND_EMAIL_VERIFICATION: 'send-email-verification',
+  SEND_PASSWORD_RESET: 'send-password-reset',
+} as const;
+
+export const OTP = {
+  TTL_MINUTES: 5,
+  LENGTH: 6,
+  RESEND_COOLDOWN_SECONDS: 60,
+} as const;

@@ -1,111 +1,174 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 import { T } from '../../libs/types/common';
 import { JwtService } from '@nestjs/jwt';
 import { shapeIntoMongoObjectId } from '../../libs/config';
 import axios from 'axios';
 import * as crypto from 'crypto';
+import { Schema } from 'mongoose';
 
 import { OAuth2Client } from 'google-auth-library';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Member } from '../../libs/dto/account-context-dto/member/member';
+import { EmailVerificationService } from '../email-verifications/email-verifications.service';
+import { PasswordResetService } from '../password-reset/password-reset.service';
+import { MailService } from '../mail/mail.service';
+import { MessageResponse } from '../../libs/dto/auth/auth';
 
 @Injectable()
 export class AuthService {
-	private googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-	@InjectModel('Member') private readonly memberModel: Model<Member>;
+  private googleClient: OAuth2Client;
+  private readonly logger = new Logger(AuthService.name);
 
-	constructor(private jwtService: JwtService) {
-		this.googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-	}
+  constructor(
+    private readonly jwtService: JwtService,
+    @InjectModel('Member') private readonly memberModel: Model<Member>,
+    private readonly emailVerificationService: EmailVerificationService,
+    private readonly passwordResetService: PasswordResetService,
+    private readonly mailService: MailService,
+  ) {
+    this.googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+  }
 
-	public async hashPassword(memberPassword: string): Promise<string> {
-		const salt = await bcrypt.genSalt();
-		return await bcrypt.hash(memberPassword, salt);
-	}
+  public async hashPassword(memberPassword: string): Promise<string> {
+    const salt = await bcrypt.genSalt();
+    return await bcrypt.hash(memberPassword, salt);
+  }
 
-	public async comparePassword(password: string, hashedPassword: string): Promise<boolean> {
-		return await bcrypt.compare(password, hashedPassword);
-	}
+  public async comparePassword(
+    password: string,
+    hashedPassword: string,
+  ): Promise<boolean> {
+    return await bcrypt.compare(password, hashedPassword);
+  }
 
-	public async createToken(member: Member): Promise<string> {
-		console.log('member:', member);
-		const payload: T = {};
+  public async createToken(member: Member): Promise<string> {
+    console.log('member:', member);
+    const payload: T = {};
 
-		Object.keys(member['_doc'] ? member['_doc'] : member).map((ele) => {
-			payload[`${ele}`] = member[`${ele}`];
-		});
-		delete payload.memberPassword;
-		console.log('payload:', payload);
-		return await this.jwtService.signAsync(payload);
-	}
+    Object.keys(member['_doc'] ? member['_doc'] : member).map((ele) => {
+      payload[`${ele}`] = member[`${ele}`];
+    });
+    delete payload.memberPassword;
+    console.log('payload:', payload);
+    const result = await this.jwtService.signAsync(payload);
+    return result;
+  }
 
-	public async verifyToken(token: string): Promise<Member> {
-		const member = await this.jwtService.verifyAsync(token);
-		member._id = shapeIntoMongoObjectId(member._id);
-		return member;
-	}
+  public async verifyToken(token: string): Promise<Member> {
+    const member = await this.jwtService.verifyAsync(token);
+    member._id = shapeIntoMongoObjectId(member._id);
+    return member;
+  }
 
-	// public async googleLogin(authCode: string): Promise<{ accessToken: string }> {
-	// 	const params = new URLSearchParams();
-	// 	params.append('code', authCode);
-	// 	params.append('client_id', process.env.GOOGLE_CLIENT_ID!);
-	// 	params.append('client_secret', process.env.GOOGLE_CLIENT_SECRET!);
-	// 	params.append('redirect_uri', process.env.GOOGLE_REDIRECT_URI!); // postmessage
-	// 	params.append('grant_type', 'authorization_code');
+  // Email Verification
 
-	// 	let tokenResponse;
-	// 	try {
-	// 		tokenResponse = await axios.post('https://oauth2.googleapis.com/token', params.toString(), {
-	// 			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-	// 		});
-	// 	} catch (error: any) {
-	// 		throw new UnauthorizedException('Failed to get token from Google');
-	// 	}
+  async sendEmailVerificationOtp(
+    memberEmail: string,
+  ): Promise<MessageResponse> {
+    const member = await this.findMemberOrThrow(memberEmail);
 
-	// 	const { id_token } = tokenResponse.data;
-	// 	if (!id_token) throw new UnauthorizedException('No id_token from Google');
+    await this.emailVerificationService.checkCooldown(member._id);
 
-	// 	const ticket = await this.googleClient.verifyIdToken({
-	// 		idToken: id_token,
-	// 		audience: process.env.GOOGLE_CLIENT_ID,
-	// 	});
+    const emailCode = await this.emailVerificationService.generateAndSave(
+      member._id,
+    );
 
-	// 	const payload = ticket.getPayload();
-	// 	if (!payload) throw new UnauthorizedException('Invalid Google token');
+    // BullMQ → Resend
+    await this.mailService.sendEmailVerificationOtp(
+      member.memberEmail,
+      member.memberFullName,
+      emailCode,
+    );
 
-	// 	const { email, sub: googleId, name, picture, sub: phone } = payload;
+    return { message: 'Verification code sent. Check your email.' };
+  }
 
-	// 	let member = await this.memberModel.findOne({ googleId });
-	// 	if (!member) {
-	// 		member = await this.memberModel.create({
-	// 			googleId,
-	// 			memberNick: name,
-	// 			memberEmail: email,
-	// 			memberImage: picture,
-	// 			memberAuthType: MemberAuthType.GOOGLE,
-	// 			memberPassword: crypto.randomBytes(16).toString('hex'),
-	// 			memberPhone: phone,
-	// 		});
-	// 	}
+  async verifyEmail(
+    memberEmail: string,
+    emailCode: string,
+  ): Promise<MessageResponse> {
+    const member = await this.findMemberOrThrow(memberEmail);
 
-	// 	const accessToken = this.jwtService.sign(
-	// 		{
-	// 			_id: member._id,
-	// 			googleId: googleId,
-	// 			memberPhone: member.memberPhone,
-	// 			memberEmail: member.memberEmail,
-	// 			memberNick: member.memberNick,
-	// 			memberImage: member.memberImage,
-	// 			memberType: member.memberType,
-	// 			memberStatus: member.memberStatus,
-	// 			memberAuthType: member.memberAuthType,
-	// 		},
-	// 		{ secret: process.env.JWT_SECRET, expiresIn: '7d' },
-	// 	);
-	// 	console.log('accessToken =>', accessToken);
+    // EmailVerificationSchema: emailCode, expiresAt, verifiedAt tekshiruvi
+    await this.emailVerificationService.verify(member._id, emailCode);
 
-	// 	return { accessToken };
-	// }
+    this.logger.log(`Email verified | ${memberEmail}`);
+    return { message: 'Email verified successfully.' };
+  }
+
+  // Password Reset
+
+  async forgotPassword(memberEmail: string): Promise<MessageResponse> {
+    const member = await this.memberModel
+      .findOne({ memberEmail: memberEmail.toLowerCase() })
+      .exec();
+
+    // Security: email mavjudligini oshkor qilmaymiz
+    if (!member) {
+      return { message: 'If this email exists, a reset code has been sent.' };
+    }
+    await this.passwordResetService.checkCooldown(member._id);
+    const passwordToken = await this.passwordResetService.generateAndSave(
+      member._id,
+    );
+
+    // BullMQ → Resend orqali yuborish
+    await this.mailService.sendPasswordResetOtp(
+      member.memberEmail,
+      member.memberFullName,
+      passwordToken,
+    );
+
+    return { message: 'If this email exists, a reset code has been sent.' };
+  }
+
+  async resetPassword(
+    memberEmail: string,
+    passwordToken: string,
+    newPassword: string,
+  ): Promise<MessageResponse> {
+    const member = await this.findMemberOrThrow(memberEmail);
+
+    // PasswordResetSchema: passwordToken, expiresAt, usedAt tekshiruvi
+    const resetRecord = await this.passwordResetService.verify(
+      member._id,
+      passwordToken,
+    );
+
+    // Yangi parolni hash qilish
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+    // MemberSchema: memberPassword yangilash
+    await this.memberModel.findByIdAndUpdate(member._id, {
+      memberPassword: hashedPassword,
+    });
+
+    // usedAt belgilash — tokenni bir martali qilish
+    await this.passwordResetService.markAsUsed(
+      resetRecord._id as Types.ObjectId,
+    );
+
+    this.logger.log(`Password reset completed | ${memberEmail}`);
+    return { message: 'Password reset successfully.' };
+  }
+
+  // ─── Private
+  private async findMemberOrThrow(memberEmail: string): Promise<Member> {
+    const member = await this.memberModel
+      .findOne({ memberEmail: memberEmail.toLowerCase() })
+      .exec();
+
+    if (!member) {
+      throw new NotFoundException(`Member not found: ${memberEmail}`);
+    }
+
+    return member;
+  }
 }
