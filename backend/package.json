@@ -23,6 +23,7 @@
   "dependencies": {
     "@apollo/server": "^5.4.0",
     "@as-integrations/express5": "^1.1.2",
+    "@nestjs-modules/ioredis": "^2.2.1",
     "@nestjs/apollo": "^13.2.4",
     "@nestjs/axios": "^4.0.1",
     "@nestjs/bullmq": "^11.0.4",
@@ -43,7 +44,8 @@
     "google-auth-library": "^10.6.1",
     "graphql": "^16.13.1",
     "graphql-upload": "^17.0.0",
-    "ioredis": "^5.10.1",
+    "ioredis": "^5.11.0",
+    "jwks-rsa": "^4.0.1",
     "moment": "^2.30.1",
     "mongoose": "^8.20.1",
     "nodemailer": "^8.0.7",
