@@ -188,10 +188,6 @@ export class MemberService {
       ])
       .exec();
 
-    console.log('page:', input.page);
-    console.log('limit:', input.limit);
-    console.log('result:', result);
-
     if (!result.length)
       throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 

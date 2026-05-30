@@ -9,6 +9,7 @@ import { MailModule } from './mail/mail.module';
 import { AppleModule } from './apple/apple.module';
 import { GoogleAuthModule } from './google-auth/google-auth.module';
 import { SocialModule } from './social/social.module';
+import { AccountModule } from './account/account.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { SocialModule } from './social/social.module';
     AppleModule,
     GoogleAuthModule,
     SocialModule,
+    AccountModule,
   ],
 })
 export class AccountContextModuleModule {}
