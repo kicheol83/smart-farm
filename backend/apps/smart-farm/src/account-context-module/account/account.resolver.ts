@@ -21,29 +21,32 @@ export class AccountResolver {
     description: 'Log out current member — invalidates refresh token',
   })
   @UseGuards(AuthGuard)
-  async logout(@CurrentUser() member: Member): Promise<MessageRespons> {
-    return this.accountService.logout(new Types.ObjectId(member._id));
+  public async logout(@CurrentUser() member: Member): Promise<MessageRespons> {
+    const result = await this.accountService.logout(new Types.ObjectId(member._id));
+    return result;
   }
 
   @Mutation(() => MessageRespons, {
     description: 'Soft delete current member account',
   })
   @UseGuards(AuthGuard)
-  async deleteAccount(
+  public async deleteAccount(
     @CurrentUser() member: Member,
     @Args('input') input: DeleteAccountInput,
   ): Promise<MessageRespons> {
-    return this.accountService.deleteAccount(
+    const result = await this.accountService.deleteAccount(
       new Types.ObjectId(member._id),
       input,
     );
+    return result;
   }
 
   @Query(() => [DeleteReasonOption], {
     description: 'Get all available reasons for deleting account',
   })
   @UseGuards(AuthGuard)
-  deleteAccountReasons(): DeleteReasonOption[] {
-    return this.accountService.getDeleteReasons();
+  public async deleteAccountReasons(): Promise<DeleteReasonOption[]> {
+    const result = await this.accountService.getDeleteReasons();
+    return result;
   }
 }

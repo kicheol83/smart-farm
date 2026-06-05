@@ -10,6 +10,7 @@ import { AppleModule } from './apple/apple.module';
 import { GoogleAuthModule } from './google-auth/google-auth.module';
 import { SocialModule } from './social/social.module';
 import { AccountModule } from './account/account.module';
+import { SensitiveUpdateModule } from './sensitive-update/sensitive-update.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { AccountModule } from './account/account.module';
     GoogleAuthModule,
     SocialModule,
     AccountModule,
+    SensitiveUpdateModule,
   ],
 })
 export class AccountContextModuleModule {}

@@ -6,6 +6,8 @@ import MemberSchema from '../../schemas/account/Member.model';
 import { MailModule } from '../mail/mail.module';
 import { AuthModule } from '../auth/auth.module';
 import { EmailVerificationsModule } from '../email-verifications/email-verifications.module';
+import { SensitiveUpdateService } from '../sensitive-update/sensitive-update.service';
+import { SensitiveUpdateResolver } from '../sensitive-update/sensitive-update.resolver';
 
 @Module({
   imports: [
@@ -14,7 +16,12 @@ import { EmailVerificationsModule } from '../email-verifications/email-verificat
     MailModule,
     AuthModule,
   ],
-  providers: [AccountService, AccountResolver],
+  providers: [
+    AccountService,
+    AccountResolver,
+    SensitiveUpdateService,
+    SensitiveUpdateResolver,
+  ],
   exports: [AccountService],
 })
 export class AccountModule {}
