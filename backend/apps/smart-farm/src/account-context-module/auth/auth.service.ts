@@ -181,7 +181,7 @@ export class AuthService {
       );
       this.logger.log(`Signup OTP sent | ${memberEmail}`);
     } catch (err) {
-      // OTP xatosi signup ni bekor qilmasin 
+      // OTP xatosi signup ni bekor qilmasin
       this.logger.error(`Signup OTP failed | ${memberEmail} | ${err}`);
     }
   }

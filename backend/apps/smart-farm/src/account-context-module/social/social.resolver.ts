@@ -21,9 +21,11 @@ export class SocialResolver {
   async googleAuth(
     @Args('input') input: GoogleAuthInput,
   ): Promise<SocialAuthResponse> {
-    return this.socialService.googleAuth(input.idToken, (member) =>
-      this.authService.createToken(member),
+    const result = await this.socialService.googleAuth(
+      input.idToken,
+      (member) => this.authService.createToken(member),
     );
+    return result;
   }
 
   @Mutation(() => SocialAuthResponse, {
@@ -33,10 +35,11 @@ export class SocialResolver {
   async appleAuth(
     @Args('input') input: AppleAuthInput,
   ): Promise<SocialAuthResponse> {
-    return this.socialService.appleAuth(
+    const result = await this.socialService.appleAuth(
       input.identityToken,
       input.fullName,
       (member) => this.authService.createToken(member),
     );
+    return result;
   }
 }
