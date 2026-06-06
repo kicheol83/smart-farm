@@ -15,7 +15,7 @@ export const DevicesSchema = new Schema(
     },
     deviceStatus: {
       type: String,
-      enum: Object.values(DeviceType),
+      enum: Object.values(DeviceStatus),
       default: DeviceStatus.OFFLINE,
       required: true,
     },
