@@ -21,7 +21,7 @@ export const TasksSchema = new Schema(
       enum: Object.values(TaskPiority),
       default: TaskPiority.MEDIUM,
     },
-    dueData: {
+    dueDate: {
       type: Date,
       required: true,
     },
