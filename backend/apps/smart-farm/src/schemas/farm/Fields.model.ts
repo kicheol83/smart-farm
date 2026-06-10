@@ -21,7 +21,11 @@ export const FieldsSchema = new Schema(
       required: true,
     },
 
-    // sections id
+    sectionId: {
+      type: Schema.Types.ObjectId,
+      ref: 'sections',
+      required: true,
+    },
   },
   { timestamps: true, collection: 'fields' },
 );
