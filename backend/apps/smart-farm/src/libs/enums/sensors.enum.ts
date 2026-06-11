@@ -1,22 +1,33 @@
 import { registerEnumType } from '@nestjs/graphql';
 
-export enum SensorsType {
-  TEMPERATURE = 'TEMPERATURE',
-  HUMIDITY = 'HUMIDITY',
-  SOIL_MOISTURE = 'SOIL_MOISTURE',
-  LIGHT_INTENSITY = 'LIGHT_INTENSITY',
-}
-registerEnumType(SensorsType, {
-  name: 'SensorsType',
-  description: 'Types of sensors used in the smart farm system',
-});
-
 export enum CameraStatus {
-  ONLINE = 'online',
-  OFFLINE = 'offline',
-  MAINTENANCE = 'maintenance',
+  ONLINE = 'ONLINE',
+  OFFLINE = 'OFFLINE',
+  MAINTENANCE = 'MAINTENANCE',
 }
 registerEnumType(CameraStatus, {
   name: 'CameraStatus',
   description: 'Status of the camera device',
+});
+
+export enum SensorsType {
+  TEMPERATURE = 'TEMPERATURE',
+  HUMIDITY = 'HUMIDITY',
+  PH = 'PH',
+  LIGHT = 'LIGHT',
+  CO2 = 'CO2',
+  SOIL_MOISTURE = 'SOIL_MOISTURE',
+}
+
+registerEnumType(SensorsType, {
+  name: 'SensorsType',
+  description: 'Sensor turlari',
+  valuesMap: {
+    TEMPERATURE: { description: 'Harorat (°C)' },
+    HUMIDITY: { description: 'Namlik (%)' },
+    PH: { description: 'pH qiymati' },
+    LIGHT: { description: "Yorug'lik (lux)" },
+    CO2: { description: 'CO2 (ppm)' },
+    SOIL_MOISTURE: { description: 'Tuproq namligi (%)' },
+  },
 });
