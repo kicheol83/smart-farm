@@ -9,6 +9,7 @@ import { AuthResolver } from './auth.resolver';
 import { MailModule } from '../mail/mail.module';
 import { EmailVerificationsModule } from '../email-verifications/email-verifications.module';
 import { PasswordResetModule } from '../password-reset/password-reset.module';
+import { GreenhouseModule } from '../../farm-context-module/greenhouse/greenhouse.module';
 
 @Module({
   imports: [

@@ -70,6 +70,10 @@ export enum Message {
   ALERT_UPDATE_FAILED = 'Failed to update alert!',
   USED_MEMBER_NICK_OR_PHONE = 'USED_MEMBER_NICK_OR_PHONE',
   NO_MEMBER_NICK = 'NO_MEMBER_NICK',
+
+  // Greenhouse
+  GREENHOUSE_NOT_FOUND = 'No greenhouse found!',
+  GREENHOUSE_ACCESS_DENIED = 'You do not have access to this greenhouse!',
 }
 
 export interface StatisticModifier {
