@@ -1,5 +1,6 @@
 import { ObjectType, InputType, Field, ID, Float } from '@nestjs/graphql';
 import { IsMongoId, IsNumber, IsPositive, IsOptional } from 'class-validator';
+import { Crops } from '../crops/crops';
 
 @ObjectType()
 export class FieldEntity {
@@ -9,11 +10,11 @@ export class FieldEntity {
   @Field(() => Float, { description: '(m²)' })
   fieldsArea: number;
 
-  @Field(() => ID)
-  cropsId: string;
+  @Field(() => Crops, {nullable: true})
+  cropsId?: Crops;
 
   @Field(() => ID, { nullable: true })
-  sectionsId?: string;
+  sectionId?: string;
 
   @Field()
   createdAt: Date;
@@ -36,7 +37,7 @@ export class CreateFieldInput {
   @Field(() => ID, { nullable: true })
   @IsOptional()
   @IsMongoId()
-  sectionsId?: string;
+  sectionId?: string;
 }
 
 @InputType()
@@ -55,5 +56,5 @@ export class UpdateFieldInput {
   @Field(() => ID, { nullable: true })
   @IsOptional()
   @IsMongoId()
-  sectionsId?: string;
+  sectionId?: string;
 }
