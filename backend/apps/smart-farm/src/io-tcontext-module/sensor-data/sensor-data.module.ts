@@ -25,5 +25,6 @@ import { GreenhouseModule } from '../../farm-context-module/greenhouse/greenhous
     GreenhouseModule,
   ],
   providers: [SensorDataResolver, SensorDataService],
+  exports: [SensorDataService],
 })
 export class SensorDataModule {}
