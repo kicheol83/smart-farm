@@ -11,6 +11,7 @@ import { ReportsResolver } from './reports.resolver';
 import { ReportsService } from './reports.service';
 import PlantHealthSchema from '../../schemas/farm/PlantHealth';
 import WaterUsageSchema from '../../schemas/farm/WaterUsage';
+import { AuthModule } from '../../account-context-module/auth/auth.module';
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -23,6 +24,7 @@ import WaterUsageSchema from '../../schemas/farm/WaterUsage';
       { name: 'alerts',       schema: AlertsSchema      },
       { name: 'reports',      schema: ReportsSchema     },
     ]),
+    AuthModule,
   ],
   providers: [ReportsService, ReportsResolver],
   exports: [ReportsService],
