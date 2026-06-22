@@ -1,8 +1,17 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  Logger,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types, Document } from 'mongoose';
-import { CreateGreenhouseInput, UpdateGreenhouseInput } from '../../libs/dto/farm-context-dto/greenhouse/greenhouse';
+import {
+  CreateGreenhouseInput,
+  UpdateGreenhouseInput,
+} from '../../libs/dto/farm-context-dto/greenhouse/greenhouse';
 import { Message } from '../../libs/types/common';
+import { IFarm } from '../farms/farms.service';
 
 export interface IGreenhouse extends Document {
   _id: Types.ObjectId;
@@ -21,9 +30,21 @@ export class GreenhouseService {
   constructor(
     @InjectModel('greenHouses')
     private readonly greenhouseModel: Model<IGreenhouse>,
+
+    @InjectModel('farms')
+    private readonly farmModel: Model<IFarm>,
   ) {}
 
   public async create(input: CreateGreenhouseInput): Promise<IGreenhouse> {
+    if (!Types.ObjectId.isValid(input.farmsId)) {
+      throw new BadRequestException('Invalid farmsId');
+    }
+
+    const farm = await this.farmModel.findById(input.farmsId);
+    if (!farm) {
+      throw new NotFoundException('Farm not found');
+    }
+
     const result = await this.greenhouseModel.create({
       ...input,
       farmsId: new Types.ObjectId(input.farmsId),
@@ -45,8 +66,13 @@ export class GreenhouseService {
     return result;
   }
 
-  public async update(id: string, input: UpdateGreenhouseInput): Promise<IGreenhouse> {
-    await this.greenhouseModel.findByIdAndUpdate(id, input, { new: true }).exec();
+  public async update(
+    id: string,
+    input: UpdateGreenhouseInput,
+  ): Promise<IGreenhouse> {
+    await this.greenhouseModel
+      .findByIdAndUpdate(id, input, { new: true })
+      .exec();
     const result = await this.greenhouseModel.findById(id).exec();
     if (!result) throw new NotFoundException(Message.GREENHOUSE_NOT_FOUND);
     return result;
