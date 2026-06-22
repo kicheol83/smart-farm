@@ -7,10 +7,10 @@ export class FieldEntity {
   @Field(() => ID)
   _id: string;
 
-  @Field(() => Float, { description: '(m²)' })
+  @Field(() => Float)
   fieldsArea: number;
 
-  @Field(() => Crops, {nullable: true})
+  @Field(() => Crops, { nullable: true })
   cropsId?: Crops;
 
   @Field(() => ID, { nullable: true })
@@ -27,7 +27,7 @@ export class FieldEntity {
 export class CreateFieldInput {
   @Field(() => Float)
   @IsNumber()
-  @IsPositive({ message: 'fieldsArea must be positive' })
+  @IsPositive()
   fieldsArea: number;
 
   @Field(() => ID)
