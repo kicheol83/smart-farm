@@ -1,7 +1,13 @@
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types, Document } from 'mongoose';
 import { CreatePlantHealthInput } from '../../libs/dto/farm-context-dto/plant-health/plant-health';
+import { IField } from '../fields/fields.service';
 
 export interface IPlantHealth extends Document {
   _id: Types.ObjectId;
@@ -20,9 +26,20 @@ export class PlanHealthService {
   constructor(
     @InjectModel('plantHealth')
     private readonly plantHealthModel: Model<IPlantHealth>,
+
+    @InjectModel('fields')
+    private fieldsModel: Model<IField>,
   ) {}
 
   public async create(input: CreatePlantHealthInput): Promise<IPlantHealth> {
+    if (!Types.ObjectId.isValid(input.fieldsId)) {
+      throw new BadRequestException('Invalid fieldsId');
+    }
+
+    const fields = await this.fieldsModel.findById(input.fieldsId);
+    if (!fields) {
+      throw new NotFoundException('Fields not found');
+    }
     const result = await this.plantHealthModel.create({
       ...input,
       recordeAt: new Date(input.recordeAt),

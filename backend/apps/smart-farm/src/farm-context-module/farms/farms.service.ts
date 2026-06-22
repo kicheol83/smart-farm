@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  Logger,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types, Document } from 'mongoose';
 import {
@@ -7,6 +12,7 @@ import {
 } from '../../libs/dto/farm-context-dto/farms/farm';
 import { MESSAGES } from '@nestjs/core/constants';
 import { Message } from '../../libs/types/common';
+import { Member } from '../../libs/dto/account-context-dto/member/member';
 
 export interface IFarm extends Document {
   _id: Types.ObjectId;
@@ -24,12 +30,23 @@ export class FarmsService {
   constructor(
     @InjectModel('farms')
     private readonly farmModel: Model<IFarm>,
+
+    @InjectModel('members')
+    private readonly memberModel: Model<Member>,
   ) {}
 
   public async create(
     memberId: Types.ObjectId,
     input: CreateFarmInput,
   ): Promise<IFarm> {
+    if (!Types.ObjectId.isValid(memberId)) {
+      throw new BadRequestException('Invalid memberId');
+    }
+
+    const member = await this.memberModel.findById(memberId);
+    if (!member) {
+      throw new NotFoundException('Member not found');
+    }
     console.log('memberId:', memberId);
 
     const result = await this.farmModel.create({ ...input, memberId });
