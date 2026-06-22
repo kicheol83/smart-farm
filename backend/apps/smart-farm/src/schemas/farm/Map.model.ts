@@ -47,7 +47,7 @@ export const MapSectorSchema = new Schema(
     },
     fieldId: {
       type: Schema.Types.ObjectId,
-      ref: 'fieldMaps',
+      ref: 'fields',
       required: true,
     },
     cropsId: {
