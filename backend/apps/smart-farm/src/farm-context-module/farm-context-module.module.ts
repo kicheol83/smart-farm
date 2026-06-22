@@ -6,6 +6,7 @@ import { CropsModule } from './crops/crops.module';
 import { PlanHealthModule } from './plan-health/plan-health.module';
 import { WaterUsageModule } from './water-usage/water-usage.module';
 import { SectionsModule } from './sections/sections.module';
+import { PlantHealthMonitoringModule } from './plant-health-monitoring/plant-health-monitoring.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { SectionsModule } from './sections/sections.module';
     PlanHealthModule,
     WaterUsageModule,
     SectionsModule,
+    PlantHealthMonitoringModule,
   ],
 })
 export class FarmContextModuleModule {}
