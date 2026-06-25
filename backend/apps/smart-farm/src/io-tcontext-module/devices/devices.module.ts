@@ -6,6 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { GreenHouseSchema } from '../../schemas/farm/GreenHouse.model';
 import DevicesSchema from '../../schemas/iot/Devices.model';
 import { AuthModule } from '../../account-context-module/auth/auth.module';
+import { ActionLogModule } from '../action-log/action-log.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { AuthModule } from '../../account-context-module/auth/auth.module';
       { name: 'sensors', schema: SensorsSchema },
     ]),
     AuthModule,
+    ActionLogModule,
   ],
   providers: [DevicesService, DevicesResolver],
   exports: [DevicesService],

@@ -15,6 +15,12 @@ import {
   GreenhouseDeviceOverview,
   DeviceWithSensors,
 } from '../../libs/dto/iot-context-dto/devices/device';
+import { Member } from '../../libs/dto/account-context-dto/member/member';
+import { ActionLogService, IActionLog } from '../action-log/action-log.service';
+import {
+  ActionResource,
+  ActionType,
+} from '../../libs/dto/iot-context-dto/action-log/action-log';
 
 export interface IDevice extends Document {
   _id: Types.ObjectId;
@@ -50,9 +56,14 @@ export class DevicesService {
 
     @InjectModel('sensors')
     private readonly sensorModel: Model<ISensor>,
+
+    private readonly actionLogService: ActionLogService,
   ) {}
 
-  public async create(input: CreateDeviceInput): Promise<IDevice> {
+  public async create(
+    input: CreateDeviceInput,
+    member: Member,
+  ): Promise<IDevice> {
     if (!Types.ObjectId.isValid(input.greenHouseId)) {
       throw new BadRequestException('Invalid greenHouseId');
     }
@@ -68,9 +79,20 @@ export class DevicesService {
       deviceStatus: DeviceStatus.OFFLINE,
       greenHouseId: new Types.ObjectId(input.greenHouseId),
     });
+
     this.logger.log(
       `Device created | ${device.deviceName} | type=${device.deviceType}`,
     );
+
+    await this.actionLogService.log({
+      actionType: ActionType.CREATE,
+      actionResource: ActionResource.DEVICE,
+      description: `Device "${device.deviceName}" created.`,
+      resourceId: device._id.toString(),
+      memberId: member._id.toString(),
+      memberFullName: member.memberFullName,
+    });
+
     return device;
   }
 

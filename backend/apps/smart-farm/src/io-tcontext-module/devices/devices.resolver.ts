@@ -11,42 +11,23 @@ import {
   DeviceStatus,
 } from '../../libs/dto/iot-context-dto/devices/device';
 import { DevicesService } from './devices.service';
+import { AuthMember } from '../../account-context-module/auth/decorators/authMember.decorator';
+import { Member } from '../../libs/dto/account-context-dto/member/member';
 
 @Resolver(() => Device)
 export class DevicesResolver {
   constructor(private readonly deviceService: DevicesService) {}
 
-  /**
-   * Figma: Add New Device modal
-   *
-   * mutation {
-   *   createDevice(input: {
-   *     deviceName: "Soil Moisture Bot 1040-PI"
-   *     deviceType: SENSOR_HUB
-   *     installedAt: "2026-01-15T00:00:00Z"
-   *     greenHouseId: "GH_ID"
-   *   }) { _id deviceName deviceType deviceStatus }
-   * }
-   */
   @Mutation(() => Device, { description: 'Figma: Add New Device modal' })
   @UseGuards(AuthGuard)
   public async createDevice(
     @Args('input') input: CreateDeviceInput,
+    @AuthMember() member: Member,
   ): Promise<Device> {
-    const result = await this.deviceService.create(input);
+    const result = await this.deviceService.create(input, member);
     return result as any;
   }
 
-  /**
-   * Bitta device (sensorlar bilan birga)
-   *
-   * query {
-   *   deviceWithSensors(id: "DEVICE_ID") {
-   *     _id deviceName deviceType deviceStatus installedAt
-   *     sensors { _id sensorType sensorsUnit }
-   *   }
-   * }
-   */
   @Query(() => DeviceWithSensors, { description: 'Device + uning sensorlari' })
   @UseGuards(AuthGuard)
   public async deviceWithSensors(
