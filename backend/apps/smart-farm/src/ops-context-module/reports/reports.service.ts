@@ -13,6 +13,8 @@ import {
   SensorTrendChart,
   ReportPeriod,
 } from '../../libs/dto/ops-context-dto/reports/report';
+import { IPlantHealth } from '../../farm-context-module/plan-health/plan-health.service';
+import { IWaterUsage } from '../../farm-context-module/water-usage/water-usage.service';
 
 interface IGreenhouse extends Document {
   greenHouseName: string;
