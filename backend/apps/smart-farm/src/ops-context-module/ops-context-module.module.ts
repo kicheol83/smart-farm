@@ -4,6 +4,8 @@ import { AlertNotificationsModule } from './alert-notifications/alert-notificati
 import { TasksModule } from './tasks/tasks.module';
 import { TaskAssigmentsModule } from './task-assigments/task-assigments.module';
 import { ReportModule } from './reports/reports.module';
+import { TaskResolver } from './task/task.resolver';
+import { TaskService } from './task/task.service';
 
 @Module({
   imports: [
@@ -13,5 +15,6 @@ import { ReportModule } from './reports/reports.module';
     TaskAssigmentsModule,
     ReportModule,
   ],
+  providers: [TaskResolver, TaskService],
 })
 export class OpsContextModuleModule {}
