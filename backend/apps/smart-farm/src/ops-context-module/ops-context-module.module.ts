@@ -6,6 +6,7 @@ import { TaskAssigmentsModule } from './task-assigments/task-assigments.module';
 import { ReportModule } from './reports/reports.module';
 import { TaskResolver } from './task/task.resolver';
 import { TaskService } from './task/task.service';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { TaskService } from './task/task.service';
     TasksModule,
     TaskAssigmentsModule,
     ReportModule,
+    UploadModule,
   ],
   providers: [TaskResolver, TaskService],
 })
