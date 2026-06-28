@@ -18,6 +18,7 @@ import { BullModule } from '@nestjs/bullmq';
 import { InjectRedis, RedisModule } from '@nestjs-modules/ioredis';
 import Redis from 'ioredis';
 import { AdminModule } from './admin/admin.module';
+import { IotModule } from './iot/iot.module';
 
 @Module({
   imports: [
@@ -73,6 +74,7 @@ import { AdminModule } from './admin/admin.module';
     BullMqModule,
     AuthModule,
     AdminModule,
+    IotModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],
