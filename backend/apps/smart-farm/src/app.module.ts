@@ -17,6 +17,7 @@ import { T } from './libs/types/common';
 import { BullModule } from '@nestjs/bullmq';
 import { InjectRedis, RedisModule } from '@nestjs-modules/ioredis';
 import Redis from 'ioredis';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -71,6 +72,7 @@ import Redis from 'ioredis';
     OpsContextModuleModule,
     BullMqModule,
     AuthModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],
