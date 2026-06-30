@@ -19,11 +19,11 @@ import { InjectRedis, RedisModule } from '@nestjs-modules/ioredis';
 import Redis from 'ioredis';
 import { AdminModule } from './admin/admin.module';
 import { IotModule } from './iot/iot.module';
-import { MqttModule } from './mqtt/mqtt.module';
-import { DeviceAuthModule } from './device-auth/device-auth.module';
-import { IotPipelineModule } from './iot-pipeline/iot-pipeline.module';
+import { MqttModule } from './iot/mqtt/mqtt.module';
+import { DeviceAuthModule } from './iot/device-auth/device-auth.module';
+import { IotPipelineModule } from './iot/iot-pipeline/iot-pipeline.module';
 import { HeartBeatModule } from './heart-beat/heart-beat.module';
-import { CommandModule } from './command/command.module';
+import { CommandModule } from './iot/command/command.module';
 
 @Module({
   imports: [

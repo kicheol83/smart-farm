@@ -138,8 +138,6 @@ export class ReportsService {
       .exec();
   }
 
-  // ─── Panel 1: Summary ─────────────────────────────────────────────────────
-
   private async buildSummary(
     greenHouseId: string,
     greenHouseName: string,
@@ -148,7 +146,6 @@ export class ReportsService {
   ): Promise<GreenhouseReportSummary> {
     const sensorIds = await this.getSensorIds(greenHouseId);
 
-    // Sensor turlari bo\'yicha o\'rtacha qiymatlar (MongoDB aggregation)
     const avgResult = await this.sensorDataModel.aggregate([
       {
         $match: {
@@ -176,11 +173,9 @@ export class ReportsService {
     const avgs: Record<string, number> = {};
     avgResult.forEach((r) => (avgs[r._id] = Math.round(r.avg * 10) / 10));
 
-    // Alert sonlari
     const totalAlerts = await this.countAlerts(sensorIds, from, to);
-    const unresolvedAlerts = totalAlerts; // Alert moduli tayyor bo\'lganda filter qo\'shiladi
+    const unresolvedAlerts = totalAlerts;
 
-    // Jami suv sarfi
     const waterResult = await this.waterUsageModel.aggregate([
       {
         $match: {
@@ -191,7 +186,6 @@ export class ReportsService {
       { $group: { _id: null, total: { $sum: '$waterAmount' } } },
     ]);
 
-    // O\'simlik sog\'ligi
     const latestHealth = await this.plantHealthModel
       .findOne()
       .sort({ recordeAt: -1 })
@@ -216,8 +210,6 @@ export class ReportsService {
       periodEnd: to,
     };
   }
-
-  // ─── Panel 2: Plant Health
 
   private async buildPlantHealth(
     from: Date,
@@ -249,7 +241,6 @@ export class ReportsService {
     };
   }
 
-  // ─── Panel 3: Soil Moisture Trend
   private async buildSoilMoisture(
     greenHouseId: string,
     from: Date,
@@ -303,8 +294,6 @@ export class ReportsService {
     };
   }
 
-  // ─── Panel 4: Water Usage
-
   private async buildWaterUsage(
     greenHouseId: string,
     from: Date,
@@ -330,7 +319,6 @@ export class ReportsService {
     const days = dailyResult.length || 1;
     const dailyAverage = Math.round((totalUsage / days) * 10) / 10;
 
-    // Oldingi davr
     const periodLen = to.getTime() - from.getTime();
     const prevFrom = new Date(from.getTime() - periodLen);
     const prevResult = await this.waterUsageModel.aggregate([
@@ -360,8 +348,6 @@ export class ReportsService {
     };
   }
 
-  // ─── Panel 5: Alerts Summary
-
   private async buildAlertsSummary(
     greenHouseId: string,
     from: Date,
@@ -382,7 +368,6 @@ export class ReportsService {
     const warning = alerts.filter((a) => a.alertsSeverity === 'WARNING').length;
     const info = alerts.filter((a) => a.alertsSeverity === 'INFO').length;
 
-    // Tur bo\'yicha guruhlash
     const grouped: Record<string, any> = {};
     for (const alert of alerts) {
       const key = `${alert.alertsType}_${alert.alertsSeverity}`;
@@ -408,8 +393,6 @@ export class ReportsService {
       items: Object.values(grouped),
     };
   }
-
-  // ─── Panel 6: Trend Charts
 
   private async buildTrendCharts(
     greenHouseId: string,
@@ -454,8 +437,6 @@ export class ReportsService {
 
     return charts;
   }
-
-  // ─── Helpers
 
   private async getSensorIds(greenHouseId: string): Promise<Types.ObjectId[]> {
     const devices = await this.deviceModel
