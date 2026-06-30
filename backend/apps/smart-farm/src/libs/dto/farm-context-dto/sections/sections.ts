@@ -19,7 +19,7 @@ import {
   Max,
 } from 'class-validator';
 
-// ─── Enums ────────────────────────────────────────────────────────────────────
+// ─── Enums
 
 export enum SectionStatus {
   HEALTHY = 'HEALTHY',
@@ -104,22 +104,22 @@ export class SectionHealthSummary {
   @Field(() => SectionStatus)
   sectionStatus: SectionStatus;
 
-  @Field(() => Float, { description: "Sog'lik indeksi 0-100" })
+  @Field(() => Float)
   healthIndex: number;
 
-  @Field(() => Float, { nullable: true, description: 'Harorat °C' })
+  @Field(() => Float)
   temperature?: number;
 
-  @Field(() => Float, { nullable: true, description: 'Namlik %' })
+  @Field(() => Float)
   humidity?: number;
 
-  @Field(() => Float, { nullable: true, description: 'Tuproq namligi %' })
+  @Field(() => Float)
   soilMoisture?: number;
 
-  @Field(() => Float, { nullable: true, description: 'pH' })
+  @Field(() => Float)
   ph?: number;
 
-  @Field({ description: 'Oxirgi yangilanish' })
+  @Field()
   lastUpdated: Date;
 }
 
