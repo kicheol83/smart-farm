@@ -18,6 +18,7 @@ import {
   Min,
   Max,
 } from 'class-validator';
+import { Crops } from '../crops/crops';
 
 // ─── Enums
 
@@ -54,6 +55,15 @@ registerEnumType(SectionType, {
     NFT: { description: 'Nutrient Film Technique' },
   },
 });
+
+@InputType()
+export class SectionGeometryInput {
+  @Field()
+  type: string;
+
+  @Field(() => [[[Float]]])
+  coordinates: number[][][];
+}
 
 @ObjectType()
 export class Section {
@@ -170,6 +180,9 @@ export class CreateSectionInput {
   @IsNumber()
   @IsPositive()
   plantCount: number;
+
+  @Field(() => SectionGeometryInput)
+  sectionGeometry: SectionGeometryInput;
 
   @Field(() => ID)
   @IsMongoId()

@@ -1,5 +1,8 @@
 import { Schema, Types } from 'mongoose';
-import { SectionStatus, SectionType } from '../../libs/dto/farm-context-dto/sections/sections';
+import {
+  SectionStatus,
+  SectionType,
+} from '../../libs/dto/farm-context-dto/sections/sections';
 
 export const SectionsSchema = new Schema(
   {
@@ -56,14 +59,14 @@ export const SectionsSchema = new Schema(
 
     greenHouseId: {
       type: Types.ObjectId,
-      ref: 'Greenhouse',
+      ref: 'greenHouses',
       required: true,
       index: true,
     },
 
     cropsId: {
       type: Types.ObjectId,
-      ref: 'Crop',
+      ref: 'crops',
       default: null,
       index: true,
     },
