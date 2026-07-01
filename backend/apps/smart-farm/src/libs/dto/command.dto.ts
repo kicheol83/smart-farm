@@ -70,7 +70,7 @@ export class DeviceCommand {
   @Field(() => ID)
   sentByMemberId: string;
 
-  @Field()
+  @Field({nullable: true})
   response?: string;
 
   @Field()

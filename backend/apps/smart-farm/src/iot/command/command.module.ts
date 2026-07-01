@@ -3,6 +3,10 @@ import { CommandService } from './command.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { DeviceCommandSchema } from '../../libs/dto/command.dto';
 import { MqttModule } from '../mqtt/mqtt.module';
+import { AuthModule } from '../../account-context-module/auth/auth.module';
+import { CommandResolver } from '../../iot/command/command.resolver';
+import { DevicesSchema } from '../../schemas/iot/Devices.model';
+import { DevicesModule } from '../../io-tcontext-module/devices/devices.module';
 
 @Module({
   imports: [
@@ -11,10 +15,16 @@ import { MqttModule } from '../mqtt/mqtt.module';
         name: 'deviceCommands',
         schema: DeviceCommandSchema,
       },
+      {
+        name: 'devices',
+        schema: DevicesSchema,
+      },
     ]),
-    MqttModule
+    MqttModule,
+    AuthModule,
+    DevicesModule,
   ],
-  providers: [CommandService],
+  providers: [CommandService, CommandResolver],
   exports: [CommandService],
 })
 export class CommandModule {}

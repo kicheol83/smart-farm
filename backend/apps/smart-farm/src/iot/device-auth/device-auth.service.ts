@@ -12,6 +12,7 @@ import {
   GenerateDeviceApiKeyInput,
   RevokeDeviceApiKeyInput,
 } from '../../libs/dto/device.auth.dto';
+import { IDevice } from '../../io-tcontext-module/devices/devices.service';
 
 export interface IDeviceApiKey extends Document {
   _id: Types.ObjectId;
@@ -31,16 +32,21 @@ export class DeviceAuthService {
   constructor(
     @InjectModel('deviceApiKeys')
     private readonly apiKeyModel: Model<IDeviceApiKey>,
+
+    @InjectModel('devices')
+    private readonly deviceModel: Model<IDevice>,
   ) {}
 
-  /**
-   * Qurilma uchun yangi API key generatsiya qilish.
-   * Avval mavjud key bo'lsa o'chirib, yangi yaratadi.
-   */
-  async generateApiKey(
+  public async generateApiKey(
     input: GenerateDeviceApiKeyInput,
   ): Promise<IDeviceApiKey> {
-    // Avvalgi keyni o'chirish
+    if (!Types.ObjectId.isValid(input.deviceId)) {
+      throw new ConflictException('Invalid deviceId.');
+    }
+    const device = await this.deviceModel.findById(input.deviceId).exec();
+    if (!device) {
+      throw new NotFoundException('Device not found.');
+    }
     await this.apiKeyModel.deleteOne({
       deviceId: new Types.ObjectId(input.deviceId),
     });
@@ -58,11 +64,7 @@ export class DeviceAuthService {
     return record;
   }
 
-  /**
-   * MQTT Broker yoki HTTP so'rov kelganda API keyni tekshiradi.
-   * Haqiqiy bo'lsa deviceId qaytaradi.
-   */
-  async validateApiKey(apiKey: string): Promise<Types.ObjectId> {
+  public async validateApiKey(apiKey: string): Promise<Types.ObjectId> {
     const record = await this.apiKeyModel
       .findOne({ apiKey, isActive: true })
       .exec();
@@ -71,13 +73,11 @@ export class DeviceAuthService {
       throw new UnauthorizedException('Invalid device API key.');
     }
 
-    // Muddati o'tgan
     if (record.expiresAt && record.expiresAt < new Date()) {
       await this.apiKeyModel.findByIdAndUpdate(record._id, { isActive: false });
       throw new UnauthorizedException('Device API key has expired.');
     }
 
-    // lastUsedAt yangilash
     await this.apiKeyModel.findByIdAndUpdate(record._id, {
       lastUsedAt: new Date(),
     });
@@ -85,10 +85,7 @@ export class DeviceAuthService {
     return record.deviceId;
   }
 
-  /**
-   * API keyni bekor qilish (qurilma o'g'irlangan, almashtirish kerak)
-   */
-  async revokeApiKey(input: RevokeDeviceApiKeyInput): Promise<boolean> {
+  public async revokeApiKey(input: RevokeDeviceApiKeyInput): Promise<boolean> {
     const result = await this.apiKeyModel.updateOne(
       { deviceId: new Types.ObjectId(input.deviceId) },
       { isActive: false },
@@ -99,16 +96,11 @@ export class DeviceAuthService {
     return true;
   }
 
-  /**
-   * Device API key ma'lumotini olish
-   */
-  async findByDevice(deviceId: string): Promise<IDeviceApiKey | null> {
+  public async findByDevice(deviceId: string): Promise<IDeviceApiKey | null> {
     return this.apiKeyModel
       .findOne({ deviceId: new Types.ObjectId(deviceId) })
       .exec();
   }
-
-  // ─── Private ─────────────────────────────────────────────────────────────
 
   private createApiKey(): string {
     // Format: sf_<32 hex chars> → "sf_a3f9d2c1..."

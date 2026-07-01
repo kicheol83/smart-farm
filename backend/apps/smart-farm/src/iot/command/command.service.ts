@@ -1,8 +1,14 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types, Document } from 'mongoose';
 import { MqttService } from '../mqtt/mqtt.service';
 import { CommandStatus, SendCommandInput } from '../../libs/dto/command.dto';
+import { IDevice } from '../../io-tcontext-module/devices/devices.service';
 
 export interface IDeviceCommand extends Document {
   _id: Types.ObjectId;
@@ -26,24 +32,22 @@ export class CommandService {
 
     @InjectModel('deviceCommands')
     private readonly commandModel: Model<IDeviceCommand>,
+
+    @InjectModel('devices')
+    private readonly deviceModel: Model<IDevice>,
   ) {}
 
-  /**
-   * Frontend → MQTT → Qurilma
-   *
-   * 1. Command ni MongoDB ga PENDING holida saqlash
-   * 2. MQTT orqali qurilmaga yuborish
-   * 3. Status SENT ga o'tkazish
-   *
-   * Qurilma bajarib bo'lgach MQTT orqali javob yuboradi:
-   * topic: sf/devices/{deviceId}/status
-   * payload: { "commandId": "...", "status": "EXECUTED", "response": "..." }
-   */
-  async sendCommand(
+ public async sendCommand(
     input: SendCommandInput,
-    memberId: string,
+    memberId: Types.ObjectId,
   ): Promise<IDeviceCommand> {
-    // 1. MongoDB ga saqlash
+    if (!Types.ObjectId.isValid(input.deviceId)) {
+      throw new ConflictException('Invalid deviceId.');
+    }
+    const device = await this.deviceModel.findById(input.deviceId).exec();
+    if (!device) {
+      throw new NotFoundException('Device not found.');
+    }
     const command = await this.commandModel.create({
       commandType: input.commandType,
       commandStatus: CommandStatus.PENDING,
@@ -52,7 +56,6 @@ export class CommandService {
       sentByMemberId: new Types.ObjectId(memberId),
     });
 
-    // 2. MQTT orqali qurilmaga yuborish
     const mqttPayload = {
       commandId: String(command._id),
       commandType: input.commandType,
@@ -65,7 +68,6 @@ export class CommandService {
       mqttPayload,
     );
 
-    // 3. Status SENT
     const updated = await this.commandModel
       .findByIdAndUpdate(
         command._id,
@@ -81,11 +83,7 @@ export class CommandService {
     return updated!;
   }
 
-  /**
-   * Qurilma javob yuborganda status yangilash.
-   * Bu MQTT handler dan chaqiriladi.
-   */
-  async updateCommandResult(
+ public async updateCommandResult(
     commandId: string,
     status: CommandStatus,
     response?: string,
@@ -99,10 +97,7 @@ export class CommandService {
     this.logger.log(`Command result | id=${commandId} | status=${status}`);
   }
 
-  /**
-   * Device bo'yicha command tarixi
-   */
-  async findByDevice(deviceId: string, limit = 20): Promise<IDeviceCommand[]> {
+  public async findByDevice(deviceId: string, limit = 20): Promise<IDeviceCommand[]> {
     return this.commandModel
       .find({ deviceId: new Types.ObjectId(deviceId) })
       .sort({ createdAt: -1 })
@@ -110,7 +105,7 @@ export class CommandService {
       .exec();
   }
 
-  async findOne(id: string): Promise<IDeviceCommand> {
+  public async findOne(id: string): Promise<IDeviceCommand> {
     const cmd = await this.commandModel.findById(id).exec();
     if (!cmd) throw new NotFoundException('Command not found.');
     return cmd;
