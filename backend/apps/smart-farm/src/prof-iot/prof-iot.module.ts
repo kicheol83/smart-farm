@@ -5,6 +5,11 @@ import { IotErrorHandlerModule } from './iot-error-handler/iot-error-handler.mod
 import { HealthModule } from './health/health.module';
 
 @Module({
-  imports: [IotRateLimiterModule, DataAggregationModule, IotErrorHandlerModule, HealthModule]
+  imports: [
+    IotRateLimiterModule,
+    DataAggregationModule,
+    IotErrorHandlerModule,
+    HealthModule,
+  ],
 })
 export class ProfIotModule {}
