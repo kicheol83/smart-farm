@@ -6,13 +6,18 @@ import * as express from 'express';
 import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs';
 
 async function bootstrap() {
+  // setupProcessHandlers();
   const app = await NestFactory.create(AppModule);
   await app.listen(process.env.PORT_API ?? 3000);
 
   app.useGlobalPipes(new ValidationPipe());
 
   app.useGlobalInterceptors(new LoggingInterceptor());
-  app.enableCors({ origin: true, credentials: true });
+  app.enableCors({
+    origin: process.env.ALLOWED_ORIGINS?.split(',') ?? '*',
+    credentials: true,
+  });
+  app.enableShutdownHooks();
 
   app.use(graphqlUploadExpress({ maxFileSize: 10_000_000, maxFiles: 5 }));
   app.use('/uploads', express.static('./uploads'));
