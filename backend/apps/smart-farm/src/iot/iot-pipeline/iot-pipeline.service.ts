@@ -92,7 +92,6 @@ export class IotPipelineService implements OnModuleInit {
   ) {}
 
   onModuleInit(): void {
-    // MQTT handlerlarni ro'yxatdan o'tkazish
     this.mqttService.registerHandler(
       MqttService.TOPICS.ALL_SENSORS,
       this.handleSensorData.bind(this),
@@ -104,20 +103,12 @@ export class IotPipelineService implements OnModuleInit {
     );
   }
 
-  /** WebSocket server ni pipeline ga ulash (gateway dan chaqiriladi) */
   setWsServer(server: Server): void {
     this.wsServer = server;
   }
 
-  // ─── MQTT Handler: Sensor Data ────────────────────────────────────────────
 
-  /**
-   * Qurilmadan sensor data keldi:
-   * 1. API key tekshirish
-   * 2. MongoDB ga saqlash
-   * 3. Alert threshold tekshirish
-   * 4. WebSocket orqali broadcast
-   */
+  
   private async handleSensorData(
     topic: string,
     payloadBuffer: Buffer,
@@ -131,7 +122,6 @@ export class IotPipelineService implements OnModuleInit {
       return;
     }
 
-    // 1. API Key tekshirish
     try {
       await this.deviceAuthService.validateApiKey(payload.apiKey);
     } catch {
@@ -149,10 +139,8 @@ export class IotPipelineService implements OnModuleInit {
       .findById(device.greenHouseId)
       .exec();
 
-    // 2. Har bir sensor reading ni parallel saqlash
     await Promise.all(
       payload.readings.map(async (reading) => {
-        // MongoDB ga saqlash
         await this.sensorDataModel.create({
           sensorDataName: reading.type,
           sensorDataValue: reading.value,
@@ -160,7 +148,6 @@ export class IotPipelineService implements OnModuleInit {
           sensorId: new Types.ObjectId(reading.sensorId),
         });
 
-        // 3. Alert threshold tekshirish
         await this.checkAndCreateAlert(
           reading.sensorId,
           reading.value,
@@ -169,7 +156,6 @@ export class IotPipelineService implements OnModuleInit {
           greenhouse,
         );
 
-        // 4. WebSocket broadcast
         this.broadcastSensorUpdate({
           type: 'SENSOR_UPDATE',
           greenHouseId: String(device.greenHouseId),
@@ -188,14 +174,8 @@ export class IotPipelineService implements OnModuleInit {
     );
   }
 
-  // ─── MQTT Handler: Device Status ─────────────────────────────────────────
 
-  /**
-   * Qurilma status o'zgardi (ONLINE/OFFLINE/ERROR):
-   * 1. API key tekshirish
-   * 2. Device status yangilash
-   * 3. WebSocket broadcast
-   */
+ 
   private async handleDeviceStatus(
     topic: string,
     payloadBuffer: Buffer,
@@ -237,7 +217,6 @@ export class IotPipelineService implements OnModuleInit {
     });
   }
 
-  // ─── Alert threshold tekshirish ───────────────────────────────────────────
 
   private async checkAndCreateAlert(
     sensorId: string,
@@ -254,7 +233,6 @@ export class IotPipelineService implements OnModuleInit {
       const breached = this.isBreached(value, alert);
       if (!breached) continue;
 
-      // Greenhouse egasini topib notification yuborish
       const farm = greenhouse
         ? await this.farmModel.findById(greenhouse.farmsId).exec()
         : null;
@@ -273,7 +251,6 @@ export class IotPipelineService implements OnModuleInit {
         });
       }
 
-      // WebSocket orqali real-time alert
       this.broadcastAlert({
         type: 'ALERT',
         greenHouseId: String(device.greenHouseId),
@@ -300,7 +277,6 @@ export class IotPipelineService implements OnModuleInit {
     return false;
   }
 
-  // ─── WebSocket broadcast ──────────────────────────────────────────────────
 
   private broadcastSensorUpdate(event: WsSensorUpdateEvent): void {
     if (!this.wsServer) return;

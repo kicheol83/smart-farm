@@ -142,7 +142,6 @@ export class PlantHealthMonitoringService {
       .find({ greenHouseId: new Types.ObjectId(greenHouseId) })
       .exec();
 
-    // Har bir section uchun trend ma'lumotlari
     const sectionTrends = await Promise.all(
       sections.map((s) => this.getSectionTrend({ sectionId: String(s._id) })),
     );

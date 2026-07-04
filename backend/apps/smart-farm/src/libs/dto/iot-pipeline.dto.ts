@@ -1,41 +1,3 @@
-/**
- * Qurilma (ESP32/Raspberry Pi) MQTT orqali yuboradigan payload formatlar.
- *
- * ─── Sensor data payload ──────────────────────────────────────────────────
- * Topic: sf/devices/{deviceId}/sensors
- *
- * {
- *   "apiKey": "sf_a3f9d2c1...",
- *   "deviceId": "64abc...",
- *   "timestamp": "2026-06-07T10:00:00.000Z",
- *   "readings": [
- *     { "sensorId": "64xyz...", "type": "TEMPERATURE", "value": 24.5, "unit": "°C" },
- *     { "sensorId": "64abc...", "type": "HUMIDITY",    "value": 78.2, "unit": "%" }
- *   ]
- * }
- *
- * ─── Heartbeat payload ───────────────────────────────────────────────────
- * Topic: sf/devices/{deviceId}/heartbeat
- *
- * {
- *   "apiKey": "sf_a3f9d2c1...",
- *   "deviceId": "64abc...",
- *   "timestamp": "2026-06-07T10:00:00.000Z",
- *   "uptime": 3600,
- *   "freeMemory": 45000
- * }
- *
- * ─── Status payload ──────────────────────────────────────────────────────
- * Topic: sf/devices/{deviceId}/status
- *
- * {
- *   "apiKey": "sf_a3f9d2c1...",
- *   "deviceId": "64abc...",
- *   "status": "ONLINE" | "OFFLINE" | "MAINTENANCE" | "ERROR",
- *   "reason": "Power failure"
- * }
- */
-
 export interface MqttSensorReading {
   sensorId: string;
   type: string;
@@ -54,9 +16,9 @@ export interface MqttHeartbeatPayload {
   apiKey: string;
   deviceId: string;
   timestamp: string;
-  uptime: number; // soniya
-  freeMemory: number; // byte
-  signalStrength?: number; // dBm (WiFi signal kuchi)
+  uptime: number;
+  freeMemory: number;
+  signalStrength?: number;
 }
 
 export interface MqttStatusPayload {
@@ -66,9 +28,6 @@ export interface MqttStatusPayload {
   reason?: string;
 }
 
-/**
- * WebSocket orqali frontendga yuboriladigan real-time event
- */
 export interface WsSensorUpdateEvent {
   type: 'SENSOR_UPDATE';
   greenHouseId: string;

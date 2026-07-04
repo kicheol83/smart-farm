@@ -6,7 +6,6 @@ import { ConfigService } from '@nestjs/config';
 import { QUEUES, JOBS } from '../../libs/types/common';
 import { EmailJobData } from './mail.service';
 
-
 @Processor(QUEUES.EMAIL)
 export class EmailProcessor extends WorkerHost {
   private readonly logger = new Logger(EmailProcessor.name);
@@ -48,8 +47,6 @@ export class EmailProcessor extends WorkerHost {
     }
   }
 
-  // ─── Private ─────────────────────────────────────────────────────────────
-
   private async send(to: string, subject: string, html: string): Promise<void> {
     const { error } = await this.resend.emails.send({
       from: this.from,
@@ -60,7 +57,7 @@ export class EmailProcessor extends WorkerHost {
 
     if (error) {
       this.logger.error(`Resend error → ${to}: ${error.message}`);
-      throw new Error(error.message); // BullMQ retry uchun
+      throw new Error(error.message);
     }
 
     this.logger.log(`Email sent → ${to}`);

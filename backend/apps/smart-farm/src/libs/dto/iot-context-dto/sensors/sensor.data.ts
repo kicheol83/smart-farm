@@ -75,7 +75,6 @@ export class CreateSensorDataInput {
   sensorId: string;
 }
 
-// IoT qurilma WebSocket orqali bulk yuboradi
 @InputType()
 export class IotSensorDataInput extends CreateSensorDataInput {
   @Field(() => ID, { description: 'Real-time broadcast uchun greenhouse ID' })

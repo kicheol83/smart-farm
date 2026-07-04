@@ -145,7 +145,6 @@ export class AlertsService {
       console.log('breached =', breached);
 
       if (breached) {
-        // Notification yaratish
         await this.createNotificationForAlert(config, input.currentValue);
         this.logger.log(
           `Threshold breached | sensor=${input.sensorsId} | value=${input.currentValue} | threshold=${config.alertsThreshold}`,

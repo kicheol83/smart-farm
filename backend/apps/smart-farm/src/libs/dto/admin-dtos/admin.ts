@@ -16,7 +16,6 @@ import {
 } from 'class-validator';
 import { MemberRole, MemberStatus } from '../../../libs/enums/member.enum';
 
-// Re-export for resolver convenience
 export { MemberRole, MemberStatus };
 
 @ObjectType()

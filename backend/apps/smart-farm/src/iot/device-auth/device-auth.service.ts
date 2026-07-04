@@ -103,7 +103,6 @@ export class DeviceAuthService {
   }
 
   private createApiKey(): string {
-    // Format: sf_<32 hex chars> → "sf_a3f9d2c1..."
     return `sf_${randomBytes(16).toString('hex')}`;
   }
 }

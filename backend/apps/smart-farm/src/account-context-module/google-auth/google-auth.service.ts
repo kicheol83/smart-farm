@@ -36,7 +36,7 @@ export class GoogleAuthService {
       return {
         googleId: payload.sub, // Google unique ID
         memberEmail: payload.email!,
-        memberFullName: payload.name ?? payload.email!, // ism bo'lmasa email
+        memberFullName: payload.name ?? payload.email!,
         memberAvatar: payload.picture ?? '',
       };
     } catch (err) {
