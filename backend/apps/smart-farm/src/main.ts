@@ -4,9 +4,10 @@ import { ValidationPipe } from '@nestjs/common/pipes/validation.pipe';
 import { LoggingInterceptor } from './libs/interceptor/Logging.interceptor';
 import * as express from 'express';
 import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs';
+import { setupProcessHandlers } from './prof-iot/iot-error-handler/iot-error-handler.service';
 
 async function bootstrap() {
-  // setupProcessHandlers();
+  setupProcessHandlers();
   const app = await NestFactory.create(AppModule);
   await app.listen(process.env.PORT_API ?? 3000);
 
