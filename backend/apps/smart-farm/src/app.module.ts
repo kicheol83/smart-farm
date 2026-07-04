@@ -25,6 +25,7 @@ import { IotPipelineModule } from './iot/iot-pipeline/iot-pipeline.module';
 import { HeartBeatModule } from './heart-beat/heart-beat.module';
 import { CommandModule } from './iot/command/command.module';
 import { ProfIotModule } from './prof-iot/prof-iot.module';
+import { MidIotModule } from './mid-iot/mid-iot.module';
 
 @Module({
   imports: [
@@ -87,6 +88,7 @@ import { ProfIotModule } from './prof-iot/prof-iot.module';
     HeartBeatModule,
     CommandModule,
     ProfIotModule,
+    MidIotModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],
