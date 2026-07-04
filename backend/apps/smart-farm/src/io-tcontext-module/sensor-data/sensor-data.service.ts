@@ -65,7 +65,6 @@ export class SensorDataService {
     return result;
   }
 
-  /** Sensor bo'yicha oxirgi o'lchovlar */
   public async findBySensor(
     sensorId: string,
     limit = 20,
@@ -84,15 +83,12 @@ export class SensorDataService {
   ): Promise<GreenhouseSensorSummary> {
     const greenhouse = await this.greenhouseModel.findById(greenHouseId).exec();
 
-    // Greenhouse dagi qurilmalar
     const devices = await this.deviceModel
       .find({ greenHouseId: new Types.ObjectId(greenHouseId) })
       .select('_id')
       .exec();
 
     const deviceIds = devices.map((d) => d._id);
-
-    // Qurilmalardagi sensorlar
     const sensors = await this.sensorModel
       .find({ deviceId: { $in: deviceIds } })
       .exec();
@@ -103,7 +99,6 @@ export class SensorDataService {
       lastUpdated: new Date(),
     };
 
-    // Har bir sensordan oxirgi qiymat
     for (const sensor of sensors) {
       const result = await this.sensorDataModel
         .findOne({ sensorId: sensor._id })
@@ -141,7 +136,6 @@ export class SensorDataService {
     return summary as GreenhouseSensorSummary;
   }
 
-  /** Grafik uchun sensor tarixi */
   public async getHistory(
     sensorId: string,
     from: Date,

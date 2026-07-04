@@ -119,7 +119,6 @@ export class FieldMapService {
     const result = await this.fieldMapModel.deleteOne({ _id: id }).exec();
     if (result.deletedCount === 0)
       throw new NotFoundException('FieldMap not found.');
-    // Bog'liq sectorlarni ham o'chirish
     await this.sectorModel.deleteMany({ fieldId: new Types.ObjectId(id) });
     return true;
   }
@@ -260,7 +259,6 @@ export class FieldMapService {
     const resolvedFrom = from ?? this.daysAgo(30);
     const resolvedTo = to ?? new Date();
 
-    // Kunlik NDVI tarix (grafik uchun)
     const history = await this.ndviModel.aggregate([
       {
         $match: {

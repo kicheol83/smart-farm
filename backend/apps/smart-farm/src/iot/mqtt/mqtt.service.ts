@@ -8,19 +8,6 @@ import { ConfigService } from '@nestjs/config';
 import * as mqtt from 'mqtt';
 import { MqttClient } from 'mqtt';
 
-/**
- * MQTT Topic strukturasi:
- *
- * Qurilmadan keluvchi (subscribe):
- *   sf/devices/{deviceId}/sensors     → sensor data
- *   sf/devices/{deviceId}/heartbeat   → ping (qurilma tirik)
- *   sf/devices/{deviceId}/status      → holat o'zgarishi
- *
- * Qurilmaga ketuvchi (publish):
- *   sf/devices/{deviceId}/commands    → buyruq yuborish
- *   sf/devices/{deviceId}/config      → konfiguratsiya
- */
-
 export type MqttMessageHandler = (
   topic: string,
   payload: Buffer,
@@ -32,14 +19,12 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
   private client!: MqttClient;
   private readonly handlers = new Map<string, MqttMessageHandler>();
 
-  // Topic patterns
   static readonly TOPICS = {
     SENSOR_DATA: (deviceId: string) => `sf/devices/${deviceId}/sensors`,
     HEARTBEAT: (deviceId: string) => `sf/devices/${deviceId}/heartbeat`,
     STATUS: (deviceId: string) => `sf/devices/${deviceId}/status`,
     COMMAND: (deviceId: string) => `sf/devices/${deviceId}/commands`,
     CONFIG: (deviceId: string) => `sf/devices/${deviceId}/config`,
-    // Wildcard — barcha qurilmalarni tinglamoq uchun
     ALL_SENSORS: 'sf/devices/+/sensors',
     ALL_HEARTBEATS: 'sf/devices/+/heartbeat',
     ALL_STATUS: 'sf/devices/+/status',
@@ -56,8 +41,6 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
     this.logger.log('MQTT disconnected');
   }
 
-  // ─── Connect ─────────────────────────────────────────────────────────────
-
   private async connect(): Promise<void> {
     const brokerUrl = this.config.getOrThrow<string>('MQTT_BROKER_URL');
     const username = this.config.get<string>('MQTT_USERNAME');
@@ -69,10 +52,9 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
       username,
       password,
       clean: true,
-      reconnectPeriod: 5000, // 5 soniyada qayta ulanish
-      connectTimeout: 10000, // 10 soniya timeout
+      reconnectPeriod: 5000,
+      connectTimeout: 10000,
       will: {
-        // Server o'chib qolsa broker ga xabar
         topic: 'sf/server/status',
         payload: JSON.stringify({ status: 'offline', clientId }),
         qos: 1,
@@ -104,8 +86,6 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
     });
   }
 
-  // ─── Subscribe ────────────────────────────────────────────────────────────
-
   private subscribeToAllDevices(): void {
     const topics = [
       MqttService.TOPICS.ALL_SENSORS,
@@ -122,20 +102,11 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
     });
   }
 
-  /**
-   * Dinamik handler ro'yxatdan o'tkazish.
-   * IotPipelineService, HeartbeatService shu orqali MQTT xabarlarni oladi.
-   */
   registerHandler(topicPattern: string, handler: MqttMessageHandler): void {
     this.handlers.set(topicPattern, handler);
     this.logger.log(`Handler registered | topic=${topicPattern}`);
   }
 
-  // ─── Publish ──────────────────────────────────────────────────────────────
-
-  /**
-   * Qurilmaga xabar yuborish (command, config)
-   */
   publish(topic: string, payload: object): void {
     if (!this.client?.connected) {
       this.logger.warn(`MQTT not connected — cannot publish to ${topic}`);
@@ -162,7 +133,6 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
     return this.client?.connected ?? false;
   }
 
-  // ─── Dispatch ─────────────────────────────────────────────────────────────
 
   private async dispatch(topic: string, payload: Buffer): Promise<void> {
     for (const [pattern, handler] of this.handlers) {
@@ -178,11 +148,7 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
     this.logger.debug(`No handler for topic: ${topic}`);
   }
 
-  /**
-   * MQTT wildcard matching:
-   * '+' — bir darajali (sf/devices/+/sensors)
-   * '#' — ko'p darajali (sf/devices/#)
-   */
+ 
   private matchTopic(pattern: string, topic: string): boolean {
     if (pattern === topic) return true;
 

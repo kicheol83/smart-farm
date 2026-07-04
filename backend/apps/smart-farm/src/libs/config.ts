@@ -2,7 +2,6 @@ import { ObjectId } from 'bson';
 export const AUTH_TIMER = 30;
 export const CREATE_JOB_LIMIT = 3;
 
-/** IMAGE CONFIGURATION **/
 import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 

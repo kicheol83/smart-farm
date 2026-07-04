@@ -27,9 +27,6 @@ export class AuthResolver {
     return result;
   }
 
-  /**
-   * Email OTP ni tekshirish
-   */
   @Mutation(() => MessageResponse, {
     description: 'Verify member email using OTP code',
   })
@@ -44,9 +41,6 @@ export class AuthResolver {
     return result;
   }
 
-  /**
-   * Parol tiklash uchun OTP yuborish
-   */
   @Mutation(() => MessageResponse, {
     description: 'Send password reset OTP to member email',
   })
@@ -58,9 +52,6 @@ export class AuthResolver {
     return result;
   }
 
-  /**
-   * OTP bilan yangi parol o'rnatish
-   */
   @Mutation(() => MessageResponse, {
     description: 'Reset member password using OTP code',
   })

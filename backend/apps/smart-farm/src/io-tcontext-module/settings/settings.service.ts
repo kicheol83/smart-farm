@@ -70,7 +70,6 @@ export class SettingsService {
     if (input.language) updateData.language = input.language;
     if (input.timezone) updateData.timezone = input.timezone;
 
-    // Units — deep merge
     if (input.units) {
       const current = await this.getOrCreate(memberId);
       updateData.units = {

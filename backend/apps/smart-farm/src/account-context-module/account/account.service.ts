@@ -65,7 +65,7 @@ export class AccountService {
 
     await this.memberModel.findByIdAndUpdate(memberId, {
       memberStatus: MemberStatus.DELETE,
-      refreshToken: null, // sessionni ham o'chirish
+      refreshToken: null,
     });
 
     this.logger.log(

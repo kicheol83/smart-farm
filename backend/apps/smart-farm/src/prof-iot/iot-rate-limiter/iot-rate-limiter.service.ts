@@ -29,7 +29,6 @@ export class IotRateLimiterService {
     const now = Date.now();
     const windowMs = windowSec * 1000;
 
-    // Sliding window — Redis ZADD + ZREMRANGEBYSCORE + ZCARD
     const pipeline = this.redis.pipeline();
     pipeline.zadd(key, now, `${now}-${Math.random()}`);
     pipeline.zremrangebyscore(key, 0, now - windowMs);

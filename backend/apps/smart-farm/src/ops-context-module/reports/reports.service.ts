@@ -77,7 +77,6 @@ export class ReportsService {
     private readonly reportModel: Model<IReport>,
   ) {}
 
-  // ─── Main: Full Report (barcha 6 panel) ──────────────────────────────────
 
   async getFullReport(input: GetReportInput): Promise<FullGreenhouseReport> {
     const { from, to } = this.resolvePeriod(input);
@@ -86,8 +85,6 @@ export class ReportsService {
       .findById(input.greenHouseId)
       .exec();
     if (!greenhouse) throw new NotFoundException('Greenhouse not found.');
-
-    // Parallel — barcha panellarni bir vaqtda hisoblash
     const [
       summary,
       plantHealth,
@@ -119,7 +116,6 @@ export class ReportsService {
     };
   }
 
-  /** Report ni MongoDB ga saqlash */
   async saveReport(input: SaveReportInput): Promise<IReport> {
     const report = await this.reportModel.create({
       reportsType: input.reportsType,
@@ -130,7 +126,6 @@ export class ReportsService {
     return report;
   }
 
-  /** Saqlangan reportlar tarixi */
   async findReports(greenHouseId: string): Promise<IReport[]> {
     return this.reportModel
       .find({ greenHousesId: new Types.ObjectId(greenHouseId) })
@@ -265,7 +260,6 @@ export class ReportsService {
       ? Math.round((total / values.length) * 10) / 10
       : 0;
 
-    // Oldingi davr bilan solishtirish
     const periodLen = to.getTime() - from.getTime();
     const prevFrom = new Date(from.getTime() - periodLen);
     const prevRecords = await this.sensorDataModel

@@ -20,7 +20,6 @@ import {
 } from 'class-validator';
 import { Crops } from '../crops/crops';
 
-// ─── Enums
 
 export enum SectionStatus {
   HEALTHY = 'HEALTHY',

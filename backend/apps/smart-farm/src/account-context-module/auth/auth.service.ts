@@ -67,8 +67,6 @@ export class AuthService {
     return member;
   }
 
-  // Email Verification
-
   async sendEmailVerificationOtp(
     memberEmail: string,
   ): Promise<MessageResponse> {
@@ -80,7 +78,6 @@ export class AuthService {
       member._id,
     );
 
-    // BullMQ → Resend
     await this.mailService.sendEmailVerificationOtp(
       member.memberEmail,
       member.memberFullName,
@@ -96,21 +93,17 @@ export class AuthService {
   ): Promise<MessageResponse> {
     const member = await this.findMemberOrThrow(memberEmail);
 
-    // EmailVerificationSchema: emailCode, expiresAt, verifiedAt tekshiruvi
     await this.emailVerificationService.verify(member._id, emailCode);
 
     this.logger.log(`Email verified | ${memberEmail}`);
     return { message: 'Email verified successfully.' };
   }
 
-  // Password Reset
-
   async forgotPassword(memberEmail: string): Promise<MessageResponse> {
     const member = await this.memberModel
       .findOne({ memberEmail: memberEmail.toLowerCase() })
       .exec();
 
-    // Security: email mavjudligini oshkor qilmaymiz
     if (!member) {
       return { message: 'If this email exists, a reset code has been sent.' };
     }
@@ -119,7 +112,6 @@ export class AuthService {
       member._id,
     );
 
-    // BullMQ → Resend orqali yuborish
     await this.mailService.sendPasswordResetOtp(
       member.memberEmail,
       member.memberFullName,
@@ -136,21 +128,17 @@ export class AuthService {
   ): Promise<MessageResponse> {
     const member = await this.findMemberOrThrow(memberEmail);
 
-    // PasswordResetSchema: passwordToken, expiresAt, usedAt tekshiruvi
     const resetRecord = await this.passwordResetService.verify(
       member._id,
       passwordToken,
     );
 
-    // Yangi parolni hash qilish
     const hashedPassword = await bcrypt.hash(newPassword, 12);
 
-    // MemberSchema: memberPassword yangilash
     await this.memberModel.findByIdAndUpdate(member._id, {
       memberPassword: hashedPassword,
     });
 
-    // usedAt belgilash — tokenni bir martali qilish
     await this.passwordResetService.markAsUsed(
       resetRecord._id as Types.ObjectId,
     );
@@ -159,13 +147,6 @@ export class AuthService {
     return { message: 'Password reset successfully.' };
   }
 
-  // ─── Signup OTP
-
-  /**
-   * Signup muvaffaqiyatli bo'lgandan keyin chaqiriladi.
-   * Member ID va email orqali OTP generatsiya qilib yuboradi.
-   * Xato bo'lsa signup ni bloklamaydi — faqat log qiladi.
-   */
   public async sendOtpAfterSignup(
     memberId: Types.ObjectId,
     memberEmail: string,
@@ -181,12 +162,10 @@ export class AuthService {
       );
       this.logger.log(`Signup OTP sent | ${memberEmail}`);
     } catch (err) {
-      // OTP xatosi signup ni bekor qilmasin
       this.logger.error(`Signup OTP failed | ${memberEmail} | ${err}`);
     }
   }
 
-  // ─── Private
   private async findMemberOrThrow(memberEmail: string): Promise<Member> {
     const member = await this.memberModel
       .findOne({ memberEmail: memberEmail.toLowerCase() })

@@ -57,7 +57,6 @@ export class SensitiveUpdateService {
       }
     }
 
-    // O'zgarishni Redis ga saqlash (confirm qilguncha)
     const pendingData: Record<string, string> = {};
     if (input.newEmail) {
       pendingData.newEmail = input.newEmail.toLowerCase();
@@ -131,7 +130,6 @@ export class SensitiveUpdateService {
       throw new NotFoundException('Member not found.');
     }
 
-    // 4. Redis dan pending data o'chirish
     await this.redis.del(`${PENDING_PREFIX}${memberId}`);
     const accessToken = await this.authService.createToken(updatedMember);
     this.logger.log(

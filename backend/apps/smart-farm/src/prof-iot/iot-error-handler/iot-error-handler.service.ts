@@ -83,9 +83,6 @@ export class IotErrorHandlerService {
     });
   }
 
-  /**
-   * Sensor data saqlash xatosi
-   */
   public async handleSensorSaveError(
     deviceId: string,
     sensorId: string,
@@ -104,9 +101,6 @@ export class IotErrorHandlerService {
     });
   }
 
-  /**
-   * WebSocket broadcast xatosi
-   */
   public async handleWsError(
     greenHouseId: string,
     event: string,
@@ -123,9 +117,6 @@ export class IotErrorHandlerService {
     });
   }
 
-  /**
-   * Xato log larini olish (admin panel uchun)
-   */
   public async getRecentErrors(limit = 50): Promise<ISystemErrorLog[]> {
     return this.errorLogModel
       .find()
@@ -134,15 +125,10 @@ export class IotErrorHandlerService {
       .exec();
   }
 
-  /**
-   * Hal qilingan deb belgilash
-   */
   async markResolved(id: string): Promise<void> {
     await this.errorLogModel.findByIdAndUpdate(id, { resolvedAt: new Date() });
   }
 }
-
-// ─── GraphQL Exception Filter ─────────────────────────────────────────────────
 
 @Catch(HttpException)
 export class GqlHttpExceptionFilter implements GqlExceptionFilter {
@@ -185,19 +171,6 @@ export class GqlHttpExceptionFilter implements GqlExceptionFilter {
   }
 }
 
-// ─── Global Uncaught Exception Handler ───────────────────────────────────────
-
-/**
- * main.ts ga qo'shing — butun NestJS crash qilmasin
- *
- * process.on('uncaughtException', (err) => {
- *   console.error('Uncaught Exception:', err);
- * });
- *
- * process.on('unhandledRejection', (reason) => {
- *   console.error('Unhandled Rejection:', reason);
- * });
- */
 export const setupProcessHandlers = () => {
   const logger = new Logger('Process');
 

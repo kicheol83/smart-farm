@@ -9,7 +9,6 @@ import { Model, Types, Document } from 'mongoose';
 import { OTP } from '../../libs/types/common';
 import { Member } from '../../libs/dto/account-context-dto/member/member';
 
-// PasswordResetSchema ga mos interface
 export interface IPasswordReset extends Document {
   passwordToken: string;
   expiresAt: Date;
@@ -28,13 +27,7 @@ export class PasswordResetService {
     private readonly passwordResetModel: Model<IPasswordReset>,
   ) {}
 
-  /**
-   * Yangi 6 xonali OTP generatsiya qilib MongoDB ga saqlaydi.
-   * Avvalgi ishlatilmagan tokenlarni o'chiradi.
-   * Generatsiya qilingan tokenni qaytaradi.
-   */
-  async generateAndSave(memberId: Types.ObjectId): Promise<string> {
-    // Avvalgi ishlatilmagan tokenlarni tozalash
+  public async generateAndSave(memberId: Types.ObjectId): Promise<string> {
     await this.passwordResetModel.deleteMany({
       memberId,
       usedAt: null,
@@ -54,11 +47,7 @@ export class PasswordResetService {
     return passwordToken;
   }
 
-  /**
-   * passwordToken ni tekshiradi.
-   * To'g'ri bo'lsa record ni qaytaradi — markAsUsed uchun kerak.
-   */
-  async verify(
+  public async verify(
     memberId: Types.ObjectId,
     passwordToken: string,
   ): Promise<IPasswordReset> {
@@ -86,10 +75,6 @@ export class PasswordResetService {
     return record;
   }
 
-  /**
-   * Tokenni bir martalik qilish uchun usedAt ni belgilaydi.
-   * resetPassword dan keyin chaqiriladi.
-   */
   async markAsUsed(recordId: Types.ObjectId): Promise<void> {
     await this.passwordResetModel.findByIdAndUpdate(recordId, {
       usedAt: new Date(),
@@ -97,10 +82,7 @@ export class PasswordResetService {
     this.logger.log(`Password reset token marked as used | id=${recordId}`);
   }
 
-  /**
-   * 60 soniyada bir marta yuborish chegarasi.
-   */
-  async checkCooldown(memberId: Types.ObjectId): Promise<Member> {
+  public async checkCooldown(memberId: Types.ObjectId): Promise<Member> {
     const last = await this.passwordResetModel
       .findOne({ memberId, usedAt: null })
       .sort({ createdAt: -1 })
@@ -121,7 +103,6 @@ export class PasswordResetService {
     }
   }
 
-  // ─── Private helpers
   private generateOtp(): string {
     const min = 10 ** (OTP.LENGTH - 1); // 100000
     const max = 10 ** OTP.LENGTH - 1; // 999999

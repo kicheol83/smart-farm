@@ -84,7 +84,6 @@ export class DataAggregationService {
 
     await this.aggregate('DAILY', from, to);
 
-    // Hourly aggregate: 30 kundan eski bo'lsa o'chir
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - 30);
     await this.aggModel.deleteMany({

@@ -173,8 +173,6 @@ export class DevicesService {
       .find({ greenHouseId: new Types.ObjectId(greenHouseId) })
       .sort({ installedAt: -1 })
       .exec();
-
-    // Status sonlari
     const statusCounts = {
       total: devices.length,
       online: devices.filter((d) => d.deviceStatus === DeviceStatus.ONLINE)
@@ -188,7 +186,6 @@ export class DevicesService {
         .length,
     };
 
-    // Tur bo'yicha sonlar
     const typeMap: Record<string, number> = {};
     for (const d of devices) {
       typeMap[d.deviceType] = (typeMap[d.deviceType] ?? 0) + 1;

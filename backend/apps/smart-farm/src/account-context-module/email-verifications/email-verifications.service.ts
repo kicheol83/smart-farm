@@ -9,7 +9,6 @@ import { Model, Types, Document, ObjectId } from 'mongoose';
 import { OTP } from '../../libs/types/common';
 import { Member } from '../../libs/dto/account-context-dto/member/member';
 
-// EmailVerificationSchema ga mos interface
 export interface IEmailVerification extends Document {
   emailCode: string;
   expiresAt: Date;
@@ -28,13 +27,7 @@ export class EmailVerificationService {
     private readonly emailVerificationModel: Model<IEmailVerification>,
   ) {}
 
-  /**
-   * Yangi 6 xonali OTP generatsiya qilib MongoDB ga saqlaydi.
-   * Avvalgi tasdiqlanmagan yozuvlarni o'chiradi.
-   * Generatsiya qilingan kodni qaytaradi (email yuborish uchun).
-   */
   async generateAndSave(memberId: Types.ObjectId): Promise<string> {
-    // Avvalgi ishlatilmagan kodlarni tozalash
     await this.emailVerificationModel.deleteMany({
       memberId,
       verifiedAt: null,
@@ -54,10 +47,6 @@ export class EmailVerificationService {
     return emailCode;
   }
 
-  /**
-   * Yuborilgan emailCode ni tekshiradi.
-   * To'g'ri bo'lsa verifiedAt ni belgilaydi.
-   */
   async verify(
     memberId: Types.ObjectId,
     emailCode: string,
@@ -90,10 +79,6 @@ export class EmailVerificationService {
     return record.memberId;
   }
 
-  /**
-   * 60 soniyada bir marta yuborish chegarasi.
-   * Erta so'rov bo'lsa ConflictException tashlaydi.
-   */
   public async checkCooldown(memberId: Types.ObjectId): Promise<Member> {
     const last = await this.emailVerificationModel
       .findOne({ memberId, verifiedAt: null })
@@ -114,8 +99,6 @@ export class EmailVerificationService {
       );
     }
   }
-
-  // ─── Private helpers ──────────────────────────────────────────────────────
 
   private generateOtp(): string {
     const min = 10 ** (OTP.LENGTH - 1); // 100000

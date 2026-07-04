@@ -1,7 +1,6 @@
 import { InputType, ObjectType, Field } from '@nestjs/graphql';
 import { IsNotEmpty, IsString } from 'class-validator';
 
-// ─── Inputs ───────────────────────────────────────────────────────────────────
 
 @InputType()
 export class GoogleAuthInput {
@@ -31,7 +30,6 @@ export class AppleAuthInput {
   fullName?: string;
 }
 
-// ─── Response ─────────────────────────────────────────────────────────────────
 
 @ObjectType()
 export class SocialAuthResponse {
