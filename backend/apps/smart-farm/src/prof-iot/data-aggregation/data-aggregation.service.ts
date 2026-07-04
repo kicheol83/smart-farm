@@ -70,7 +70,7 @@ export class DataAggregationService {
   }
 
   @Cron('0 0 * * *')
- public async aggregateDaily(): Promise<void> {
+  public async aggregateDaily(): Promise<void> {
     const now = new Date();
     const to = new Date(now);
     to.setHours(0, 0, 0, 0);
@@ -93,7 +93,7 @@ export class DataAggregationService {
   }
 
   @Cron('0 1 1 * *')
- public async aggregateMonthly(): Promise<void> {
+  public async aggregateMonthly(): Promise<void> {
     const now = new Date();
     const to = new Date(now.getFullYear(), now.getMonth(), 1);
     const from = new Date(now.getFullYear(), now.getMonth() - 1, 1);
@@ -105,7 +105,7 @@ export class DataAggregationService {
     await this.aggregate('MONTHLY', from, to);
   }
 
- public async getAggregated(
+  public async getAggregated(
     sensorId: string,
     period: 'HOURLY' | 'DAILY' | 'MONTHLY',
     from: Date,
@@ -121,7 +121,7 @@ export class DataAggregationService {
       })
       .sort({ periodStart: 1 })
       .exec();
-    console.log('getAggregated result:', result); // Debugging log
+    console.log('getAggregated result:', result);
     return result;
   }
 
