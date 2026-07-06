@@ -1,4 +1,45 @@
-import { Resolver } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, ID, Float } from '@nestjs/graphql';
+import { CalibrationService } from './calibration.service';
+import {
+  CalibrationResult,
+  SensorCalibration,
+  SetCalibrationInput,
+} from '../../libs/dto/mid-iot/calibration';
 
 @Resolver()
-export class CalibrationResolver {}
+export class CalibrationResolver {
+  constructor(private readonly calibService: CalibrationService) {}
+
+  @Mutation(() => SensorCalibration)
+  public async setSensorCalibration(
+    @Args('input') input: SetCalibrationInput,
+    @Args('memberId', { type: () => ID }) memberId: string,
+  ): Promise<SensorCalibration> {
+    return this.calibService.setCalibration(input, memberId) as any;
+  }
+
+  @Query(() => CalibrationResult)
+  public async calibrationPreview(
+    @Args('sensorId', { type: () => ID }) sensorId: string,
+    @Args('rawValue', { type: () => Float }) rawValue: number,
+  ): Promise<CalibrationResult> {
+    return this.calibService.preview(sensorId, rawValue);
+  }
+
+  @Query(() => SensorCalibration, {
+    nullable: true,
+  })
+  public async sensorCalibration(
+    @Args('sensorId', { type: () => ID }) sensorId: string,
+  ): Promise<SensorCalibration | null> {
+    return this.calibService.findBySensor(sensorId) as any;
+  }
+
+  @Mutation(() => Boolean)
+  public async disableCalibration(
+    @Args('sensorId', { type: () => ID }) sensorId: string,
+  ): Promise<boolean> {
+    await this.calibService.disable(sensorId);
+    return true;
+  }
+}
