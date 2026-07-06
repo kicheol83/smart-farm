@@ -40,7 +40,7 @@ export interface WsSensorUpdateEvent {
 }
 
 export interface WsAlertEvent {
-  type: 'ALERT';
+  type: 'ALERT' | 'ANOMALY';
   greenHouseId: string;
   alertId: string;
   alertType: string;
@@ -58,3 +58,4 @@ export interface WsDeviceStatusEvent {
   status: string;
   timestamp: string;
 }
+
