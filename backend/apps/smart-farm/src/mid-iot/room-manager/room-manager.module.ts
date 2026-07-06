@@ -3,6 +3,7 @@ import { RoomManagerService } from './room-manager.service';
 import { RoomManagerResolver } from './room-manager.resolver';
 
 @Module({
-  providers: [RoomManagerService, RoomManagerResolver]
+  providers: [RoomManagerService, RoomManagerResolver],
+  exports: [RoomManagerService],
 })
 export class RoomManagerModule {}
