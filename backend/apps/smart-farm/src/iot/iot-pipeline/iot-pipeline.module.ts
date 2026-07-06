@@ -10,6 +10,12 @@ import AlertsSchema from '../../schemas/ops/Alerts.model';
 import AlertNotificationsSchema from '../../schemas/ops/AlertNotifications.model';
 import { MqttModule } from '../mqtt/mqtt.module';
 import { DeviceAuthModule } from '../device-auth/device-auth.module';
+import { CalibrationModule } from '../../mid-iot/calibration/calibration.module';
+import { AnomalyDetectionModule } from '../../mid-iot/anomaly-detection/anomaly-detection.module';
+import { MessageBuffersModule } from '../../mid-iot/message-buffers/message-buffers.module';
+import { TimeseriesModule } from '../../mid-iot/timeseries/timeseries.module';
+import { IotRateLimiterModule } from '../../prof-iot/iot-rate-limiter/iot-rate-limiter.module';
+import { IotErrorHandlerModule } from '../../prof-iot/iot-error-handler/iot-error-handler.module';
 
 @Module({
   imports: [
@@ -23,7 +29,13 @@ import { DeviceAuthModule } from '../device-auth/device-auth.module';
       { name: 'alertNotifications', schema: AlertNotificationsSchema },
     ]),
     MqttModule,
-    DeviceAuthModule
+    DeviceAuthModule,
+    TimeseriesModule,
+    MessageBuffersModule,
+    AnomalyDetectionModule,
+    CalibrationModule,
+    IotRateLimiterModule,
+    IotErrorHandlerModule,
   ],
   providers: [IotPipelineService],
   exports: [IotPipelineService],
