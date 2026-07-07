@@ -26,6 +26,7 @@ import { HeartBeatModule } from './heart-beat/heart-beat.module';
 import { CommandModule } from './iot/command/command.module';
 import { ProfIotModule } from './prof-iot/prof-iot.module';
 import { MidIotModule } from './mid-iot/mid-iot.module';
+import { IrrigationModule } from './irrigation/irrigation.module';
 
 @Module({
   imports: [
@@ -35,6 +36,9 @@ import { MidIotModule } from './mid-iot/mid-iot.module';
       playground: true,
       uploads: false,
       autoSchemaFile: true,
+      subscriptions: {
+        'graphql-ws': true,
+      },
       formatError: (error: T) => {
         console.log('error', error);
         const graphQLFormattedError = {
@@ -89,6 +93,7 @@ import { MidIotModule } from './mid-iot/mid-iot.module';
     CommandModule,
     ProfIotModule,
     MidIotModule,
+    IrrigationModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],
