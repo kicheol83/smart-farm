@@ -17,6 +17,7 @@ export enum SensorsType {
   LIGHT = 'LIGHT',
   CO2 = 'CO2',
   SOIL_MOISTURE = 'SOIL_MOISTURE',
+  WATER_LEVEL = 'WATER_LEVEL',
 }
 
 registerEnumType(SensorsType, {
@@ -29,5 +30,6 @@ registerEnumType(SensorsType, {
     LIGHT: { description: "Yorug'lik (lux)" },
     CO2: { description: 'CO2 (ppm)' },
     SOIL_MOISTURE: { description: 'Tuproq namligi (%)' },
+    WATER_LEVEL: { description: 'Suv tanki darajasi (%)' },
   },
 });
