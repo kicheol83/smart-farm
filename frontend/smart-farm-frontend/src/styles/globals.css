@@ -1,0 +1,47 @@
+/* Satoshi font — /public/fonts ga font fayllarini qo'ying (ixtiyoriy) */
+@font-face {
+  font-family: "Satoshi";
+  src: url("/fonts/Satoshi-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Satoshi";
+  src: url("/fonts/Satoshi-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Satoshi";
+  src: url("/fonts/Satoshi-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+
+/* ── Layout balandligi — html/body/#root to'liq ekran bo'lishi shart ────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* ── Chrome/Safari autofill — ko'k/sariq fonni MUI stiliga moslash ──────── */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  transition: background-color 9999s ease-in-out 0s;
+  -webkit-text-fill-color: inherit !important;
+  caret-color: currentColor;
+}

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Farm</title>
+    <script>
+      // React yuklanishidan OLDIN ishlaydi — dark/light "flash" bo'lmasligi uchun
+      (function () {
+        try {
+          var stored = localStorage.getItem("smart-farm-theme-mode");
+          var mode =
+            stored ||
+            (window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light");
+          if (mode === "dark") {
+            document.documentElement.style.backgroundColor = "#121212";
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
