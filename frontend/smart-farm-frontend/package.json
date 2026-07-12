@@ -1,0 +1,44 @@
+{
+  "name": "smart-farm-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@apollo/client": "3.11.8",
+    "@emotion/react": "11.13.3",
+    "@emotion/styled": "11.13.0",
+    "@hookform/resolvers": "3.9.0",
+    "@mui/icons-material": "6.1.5",
+    "@mui/material": "6.1.5",
+    "@mui/x-charts": "7.20.0",
+    "@mui/x-data-grid": "7.20.0",
+    "date-fns": "3.6.0",
+    "graphql": "16.9.0",
+    "graphql-ws": "5.16.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-hook-form": "7.53.0",
+    "react-router-dom": "6.26.2",
+    "socket.io-client": "4.7.5",
+    "zod": "3.23.8",
+    "zustand": "4.5.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.12.0",
+    "@types/react-dom": "^19.2.3",
+    "@typescript-eslint/eslint-plugin": "^8.63.0",
+    "@typescript-eslint/parser": "^8.63.0",
+    "@vitejs/plugin-react": "4.3.2",
+    "eslint": "^9.12.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.3",
+    "typescript": "5.6.3",
+    "vite": "5.4.8"
+  }
+}
