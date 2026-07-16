@@ -7,12 +7,6 @@ interface AuthTextFieldProps extends InputBaseProps {
   errorText?: string;
 }
 
-/**
- * Figma "Input Field" komponenti (node 2678:26853 / 26574 / error variant):
- *   Label (Satoshi Medium 14px) ustida, pastida Input box
- *   Normal:  bg base/neutral-100 (#f4f4f4), border base/neutral-200 (#eaeaea)
- *   Error:   border qizil, pastida qizil ogohlantirish matni + icon
- */
 export function AuthTextField({
   label,
   endAdornment,
@@ -22,7 +16,9 @@ export function AuthTextField({
   const hasError = Boolean(errorText);
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5, width: "100%" }}>
+    <Box
+      sx={{ display: "flex", flexDirection: "column", gap: 0.5, width: "100%" }}
+    >
       <Typography
         sx={{
           fontFamily: "Satoshi, sans-serif",
