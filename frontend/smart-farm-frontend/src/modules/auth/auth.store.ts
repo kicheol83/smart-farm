@@ -37,7 +37,11 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: "smart-farm-auth",
-      partialize: (state) => ({ user: state.user }),
+      partialize: (state) => ({
+        user: state.user,
+        accessToken: state.accessToken,
+        isAuthenticated: state.isAuthenticated,
+      }),
     },
   ),
 );

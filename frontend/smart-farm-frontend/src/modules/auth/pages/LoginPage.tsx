@@ -15,28 +15,29 @@ import VisibilityOffRoundedIcon from "@mui/icons-material/VisibilityOffRounded";
 import { useAuthStore } from "../auth.store";
 import { AuthTextField } from "../components/AuthTextField";
 import { GradientCheckbox } from "../components/GradientCheckbox";
+import { AuthOnboardingPanel } from "../components/AuthOnboardingPanel";
 import { Logo } from "@/components/icons/Logo";
 import { GoogleIcon, AppleIcon } from "@/components/icons/BrandIcons";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import {
   GRADIENT_LOGIN_BUTTON,
   GRADIENT_LOGIN_BUTTON_DARK,
-  GRADIENT_ONBOARDING_OVERLAY,
   LOGIN_BG_LIGHT,
   LOGIN_BG_DARK,
 } from "@/theme/theme";
 
 const LOGIN_MUTATION = gql`
-  mutation Login($input: LoginInput!) {
+  mutation Login($input: LoginMemberInput!) {
     login(input: $input) {
+      _id
+      memberFullName
+      memberEmail
+      memberRole
+      memberAvatar
+      memberStatus
+      createdAt
+      updatedAt
       accessToken
-      member {
-        _id
-        memberFullName
-        memberEmail
-        memberRole
-        memberAvatar
-      }
     }
   }
 `;
@@ -46,7 +47,8 @@ const APPLE_AUTH_URL = `${import.meta.env.VITE_API_BASE_URL ?? "http://localhost
 
 // Placeholder onboarding rasm — o'zingizning fermer fotosiga almashtiring:
 // public/onboarding.jpg ga qo'ying va pastdagi ONBOARDING_IMAGE ni "/onboarding.jpg" qiling
-const ONBOARDING_IMAGE = "https://picsum.photos/seed/smartfarm-greenhouse/800/1200";
+const ONBOARDING_IMAGE =
+  "https://picsum.photos/seed/smartfarm-greenhouse/800/1200";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -80,7 +82,6 @@ export function LoginPage() {
     setPasswordError(null);
     setServerError(null);
 
-    // Client-side validatsiya — Figma "Login / Error" holatiga mos matnlar
     let hasError = false;
     if (!EMAIL_REGEX.test(email)) {
       setEmailError("Wrong email address. Please check again.");
@@ -100,7 +101,6 @@ export function LoginPage() {
       setAuth(data.login.member, data.login.accessToken);
       navigate("/dashboard");
     } catch (err: any) {
-      // Backend xatosi — odatda parol yoki email noto'g'ri
       setPasswordError("Incorrect password. Please try again.");
       setServerError(err.message ?? null);
     }
@@ -115,12 +115,10 @@ export function LoginPage() {
         bgcolor: isDark ? LOGIN_BG_DARK : LOGIN_BG_LIGHT,
       }}
     >
-      {/* Dark/Light rejim almashtirish — Login sahifasida ham kerak */}
       <Box sx={{ position: "absolute", top: 16, right: 16, zIndex: 10 }}>
         <ThemeToggle />
       </Box>
 
-      {/* ── Chap: Login form ──────────────────────────────────────────────── */}
       <Box
         sx={{
           display: "flex",
@@ -148,7 +146,14 @@ export function LoginPage() {
           </Typography>
         </Box>
 
-        <Box sx={{ display: "flex", flexDirection: "column", gap: "40px", width: "100%" }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "40px",
+            width: "100%",
+          }}
+        >
           {/* Form Input card */}
           <Box
             sx={{
@@ -190,9 +195,21 @@ export function LoginPage() {
             <Box
               component="form"
               onSubmit={handleSubmit}
-              sx={{ display: "flex", flexDirection: "column", gap: "24px", width: "100%" }}
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "24px",
+                width: "100%",
+              }}
             >
-              <Box sx={{ display: "flex", flexDirection: "column", gap: "12px", width: "100%" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "12px",
+                  width: "100%",
+                }}
+              >
                 <AuthTextField
                   label="Email"
                   type="email"
@@ -227,17 +244,35 @@ export function LoginPage() {
                       tabIndex={-1}
                     >
                       {showPassword ? (
-                        <VisibilityOffRoundedIcon sx={{ fontSize: 20, color: "text.secondary" }} />
+                        <VisibilityOffRoundedIcon
+                          sx={{ fontSize: 20, color: "text.secondary" }}
+                        />
                       ) : (
-                        <VisibilityRoundedIcon sx={{ fontSize: 20, color: "text.secondary" }} />
+                        <VisibilityRoundedIcon
+                          sx={{ fontSize: 20, color: "text.secondary" }}
+                        />
                       )}
                     </IconButton>
                   }
                 />
 
                 {/* Remember Me row */}
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1, width: "100%" }}>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, flex: 1 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    width: "100%",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 0.5,
+                      flex: 1,
+                    }}
+                  >
                     <GradientCheckbox
                       checked={rememberMe}
                       onChange={(e) => setRememberMe(e.target.checked)}
@@ -273,7 +308,6 @@ export function LoginPage() {
                 </Box>
               </Box>
 
-              {/* Log in tugma — bo'sh bo'lsa disabled kulrang, to'ldirilsa gradient */}
               <Button
                 type="submit"
                 disabled={loading || !isFilled}
@@ -325,7 +359,14 @@ export function LoginPage() {
             </Typography>
           </Divider>
 
-          <Box sx={{ display: "flex", flexDirection: "column", gap: "12px", width: "100%" }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "12px",
+              width: "100%",
+            }}
+          >
             <Button
               fullWidth
               component="a"
@@ -372,7 +413,15 @@ export function LoginPage() {
               Log in with Apple
             </Button>
 
-            <Box sx={{ display: "flex", gap: 0.5, alignItems: "center", justifyContent: "center", width: "100%" }}>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 0.5,
+                alignItems: "center",
+                justifyContent: "center",
+                width: "100%",
+              }}
+            >
               <Typography
                 sx={{
                   fontFamily: "Inter, sans-serif",
@@ -404,82 +453,12 @@ export function LoginPage() {
         </Box>
       </Box>
 
-      {/* ── O'ng: Onboarding rasm — faqat desktop ───────────────────────────── */}
-      <Box
-        sx={{
-          display: { xs: "none", lg: "flex" },
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-          p: "24px",
-        }}
-      >
-        <Box
-          sx={{
-            position: "relative",
-            width: "100%",
-            height: "100%",
-            borderRadius: "12px",
-            overflow: "hidden",
-            backgroundImage: `url(${ONBOARDING_IMAGE})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            bgcolor: "action.selected",
-          }}
-        >
-          <Box sx={{ position: "absolute", inset: 0, backgroundImage: GRADIENT_ONBOARDING_OVERLAY }} />
-
-          <Box
-            sx={{
-              position: "absolute",
-              bottom: 64,
-              left: "50%",
-              transform: "translateX(-50%)",
-              width: "80%",
-              maxWidth: 475,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 2,
-            }}
-          >
-            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0.5 }}>
-              <Typography
-                sx={{
-                  fontFamily: "Satoshi, sans-serif",
-                  fontWeight: 700,
-                  fontSize: 36,
-                  letterSpacing: "-0.72px",
-                  lineHeight: 1.4,
-                  color: "#fff",
-                  textAlign: "center",
-                }}
-              >
-                Grow Smarter, Farm Better
-              </Typography>
-              <Typography
-                sx={{
-                  fontFamily: "Satoshi, sans-serif",
-                  fontWeight: 500,
-                  fontSize: 16,
-                  letterSpacing: "-0.32px",
-                  lineHeight: 1.6,
-                  color: "#ececec",
-                  textAlign: "center",
-                }}
-              >
-                Track soil health, moisture, and vegetation to make data-driven decisions.
-              </Typography>
-            </Box>
-
-            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-              <Box sx={{ width: 40, height: 6, borderRadius: "99999px", bgcolor: "#fff" }} />
-              <Box sx={{ width: 6, height: 6, borderRadius: "99999px", bgcolor: "#ececec" }} />
-              <Box sx={{ width: 6, height: 6, borderRadius: "99999px", bgcolor: "#ececec" }} />
-            </Box>
-          </Box>
-        </Box>
-      </Box>
+      <AuthOnboardingPanel
+        image={ONBOARDING_IMAGE}
+        heading="Grow Smarter, Farm Better"
+        subtitle="Track soil health, moisture, and vegetation to make data-driven decisions."
+        activeStep={0}
+      />
     </Box>
   );
 }

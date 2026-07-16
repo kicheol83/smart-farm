@@ -3,11 +3,6 @@ import { Box } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import { GRADIENT_GREEN } from "@/theme/theme";
 
-/**
- * Figma "Checkbox" komponenti (node 2453:3385):
- *   checked → 8px check belgisi, yashil gradient doira fon, backdrop-blur
- *   unchecked → oddiy bo'sh doira, border bilan
- */
 export function GradientCheckbox(props: CheckboxProps) {
   return (
     <Checkbox

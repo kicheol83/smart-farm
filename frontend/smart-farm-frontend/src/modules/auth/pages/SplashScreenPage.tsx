@@ -6,14 +6,6 @@ import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { useAuthStore } from "../auth.store";
 import { LOGIN_BG_LIGHT, LOGIN_BG_DARK } from "@/theme/theme";
 
-/**
- * Figma "Splash Screen" (node 2678:26548) — ilova ochilishidagi birinchi ekran.
- * Logo (88px) + "Smart Farm" (48px) markazda.
- *
- * 1.2 soniyadan keyin avtomatik:
- *   - Login qilingan bo'lsa → /dashboard
- *   - Aks holda → /login
- */
 export function SplashScreenPage() {
   const navigate = useNavigate();
   const theme = useTheme();
@@ -38,7 +30,6 @@ export function SplashScreenPage() {
         bgcolor: isDark ? LOGIN_BG_DARK : LOGIN_BG_LIGHT,
       }}
     >
-      {/* Dark/Light rejim almashtirish — ilova ochilishidayoq mavjud */}
       <Box sx={{ position: "absolute", top: 16, right: 16, zIndex: 10 }}>
         <ThemeToggle />
       </Box>

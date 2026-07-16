@@ -19,19 +19,18 @@ import { TaskListPage } from "@/modules/task/pages/TaskListPage";
 import { PlantHealthPage } from "@/modules/plant-health/pages/PlantHealthPage";
 import { IrrigationPage } from "@/modules/irrigation/pages/IrrigationPage";
 import { AdminDashboardPage } from "@/modules/admin/pages/AdminDashboardPage";
+import { EmailVerificationPage } from "@/modules/auth/pages/EmailVerificationPage";
 
 export default function App() {
   return (
     <Routes>
-      {/* ── Splash Screen — ilova ochilganda birinchi ko'rinadi ────────────── */}
       <Route path="/" element={<SplashScreenPage />} />
 
-      {/* ── Auth sahifalari — layoutsiz ─────────────────────────────────── */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
+      <Route path="/signup/verify" element={<EmailVerificationPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
-      {/* ── Himoyalangan sahifalar — Sidebar + Header bilan ─────────────── */}
       <Route
         element={
           <ProtectedRoute>
@@ -49,7 +48,6 @@ export default function App() {
         <Route path="/plant-health" element={<PlantHealthPage />} />
         <Route path="/irrigation" element={<IrrigationPage />} />
 
-        {/* Faqat ADMIN role uchun */}
         <Route
           path="/admin"
           element={
