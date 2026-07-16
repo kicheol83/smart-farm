@@ -2,13 +2,15 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "@/components/layout/ProtectedRoute";
 import { AppLayout } from "@/components/layout/AppLayout";
 
-// Auth (layout siz)
 import { LoginPage } from "@/modules/auth/pages/LoginPage";
 import { SplashScreenPage } from "@/modules/auth/pages/SplashScreenPage";
 import { SignupPage } from "@/modules/auth/pages/SignupPage";
+import { EmailVerificationPage } from "@/modules/auth/pages/EmailVerificationPage";
 import { ForgotPasswordPage } from "@/modules/auth/pages/ForgotPasswordPage";
+import { ForgotPasswordVerifyPage } from "@/modules/auth/pages/ForgotPasswordVerifyPage";
+import { CreateNewPasswordPage } from "@/modules/auth/pages/CreateNewPasswordPage";
+import { PasswordChangeSuccessPage } from "@/modules/auth/pages/PasswordChangeSuccessPage";
 
-// Asosiy sahifalar (AppLayout ichida — Sidebar + Header bilan)
 import { DashboardPage } from "@/modules/dashboard/pages/DashboardPage";
 import { DeviceListPage } from "@/modules/device/pages/DeviceListPage";
 import { ReportPage } from "@/modules/report/pages/ReportPage";
@@ -19,7 +21,6 @@ import { TaskListPage } from "@/modules/task/pages/TaskListPage";
 import { PlantHealthPage } from "@/modules/plant-health/pages/PlantHealthPage";
 import { IrrigationPage } from "@/modules/irrigation/pages/IrrigationPage";
 import { AdminDashboardPage } from "@/modules/admin/pages/AdminDashboardPage";
-import { EmailVerificationPage } from "@/modules/auth/pages/EmailVerificationPage";
 
 export default function App() {
   return (
@@ -30,6 +31,18 @@ export default function App() {
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/signup/verify" element={<EmailVerificationPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route
+        path="/forgot-password/verify"
+        element={<ForgotPasswordVerifyPage />}
+      />
+      <Route
+        path="/forgot-password/reset"
+        element={<CreateNewPasswordPage />}
+      />
+      <Route
+        path="/forgot-password/success"
+        element={<PasswordChangeSuccessPage />}
+      />
 
       <Route
         element={

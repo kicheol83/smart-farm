@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useMutation, gql } from "@apollo/client";
-import { Box, Typography, Button, useTheme } from "@mui/material";
-import { AuthTextField } from "../components/AuthTextField";
+import { Box, Typography, Button, Link, useTheme } from "@mui/material";
+import { OtpInput } from "../components/OtpInput";
+import { BackButton } from "../components/BackButton";
 import { AuthOnboardingPanel } from "../components/AuthOnboardingPanel";
 import { Logo } from "@/components/icons/Logo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
@@ -21,36 +22,39 @@ const FORGOT_PASSWORD_MUTATION = gql`
   }
 `;
 
-const ONBOARDING_IMAGE = "https://picsum.photos/seed/smartfarm-forgot/800/1200";
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const OTP_LENGTH = 6;
 
-export function ForgotPasswordPage() {
+export function ForgotPasswordVerifyPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
 
-  const [email, setEmail] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const email: string = (location.state as { email?: string })?.email ?? "";
 
-  const [forgotPassword, { loading }] = useMutation(FORGOT_PASSWORD_MUTATION);
+  const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""));
 
-  const isFilled = email.length > 0;
+  const [resendOtp, { loading: resending }] = useMutation(
+    FORGOT_PASSWORD_MUTATION,
+  );
 
-  async function handleSubmit(e: React.FormEvent) {
+  const isFilled = otp.every((d) => d !== "");
+
+  useEffect(() => {
+    if (!email) navigate("/forgot-password", { replace: true });
+  }, [email, navigate]);
+
+  function handleVerify(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
 
-    if (!EMAIL_REGEX.test(email)) {
-      setError("Wrong email address. Please check again.");
-      return;
-    }
+    navigate("/forgot-password/reset", { state: { email, otp: otp.join("") } });
+  }
 
+  async function handleResend() {
     try {
-      await forgotPassword({ variables: { input: { memberEmail: email } } });
-      navigate("/forgot-password/verify", { state: { email } });
-    } catch (err: any) {
-      setError(err.message ?? "Xatolik yuz berdi.");
-    }
+      await resendOtp({ variables: { input: { memberEmail: email } } });
+      setOtp(Array(OTP_LENGTH).fill(""));
+    } catch {}
   }
 
   return (
@@ -94,7 +98,7 @@ export function ForgotPasswordPage() {
 
         <Box
           component="form"
-          onSubmit={handleSubmit}
+          onSubmit={handleVerify}
           sx={{
             display: "flex",
             flexDirection: "column",
@@ -105,6 +109,8 @@ export function ForgotPasswordPage() {
             p: "24px",
           }}
         >
+          <BackButton onClick={() => navigate("/forgot-password")} />
+
           <Box
             sx={{
               display: "flex",
@@ -139,24 +145,44 @@ export function ForgotPasswordPage() {
             </Typography>
           </Box>
 
-          <AuthTextField
-            label="Email"
-            type="email"
-            required
-            autoComplete="email"
-            placeholder="e.g. name@example.com"
-            value={email}
-            errorText={error ?? undefined}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              if (error) setError(null);
-            }}
-          />
+          <Box sx={{ display: "flex", justifyContent: "center" }}>
+            <OtpInput value={otp} onChange={setOtp} />
+          </Box>
+
+          <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
+            <Typography
+              sx={{
+                fontFamily: "Inter, sans-serif",
+                fontSize: 14,
+                letterSpacing: "-0.28px",
+                color: "text.secondary",
+              }}
+            >
+              Didn't receive code?
+            </Typography>
+            <Link
+              component="button"
+              type="button"
+              onClick={handleResend}
+              disabled={resending}
+              sx={{
+                fontFamily: "Inter, sans-serif",
+                fontWeight: 500,
+                fontSize: 14,
+                letterSpacing: "-0.28px",
+                color: "#17b26a",
+                textDecoration: "none",
+                "&:hover": { textDecoration: "underline" },
+              }}
+            >
+              Resend
+            </Link>
+          </Box>
 
           <Button
             type="submit"
             fullWidth
-            disabled={loading || !isFilled}
+            disabled={!isFilled}
             sx={{
               py: "9px",
               borderRadius: "8px",
@@ -175,13 +201,13 @@ export function ForgotPasswordPage() {
               "&.Mui-disabled": { bgcolor: "#cecece", color: "#a4a4a4" },
             }}
           >
-            {loading ? "Yuborilmoqda..." : "Send"}
+            Verify
           </Button>
         </Box>
       </Box>
 
       <AuthOnboardingPanel
-        image={ONBOARDING_IMAGE}
+        image="https://picsum.photos/seed/smartfarm-forgot/800/1200"
         heading="Real-Time Insights Access"
         subtitle="Analyze field metrics quickly with intuitive charts and visual reports."
         activeStep={2}

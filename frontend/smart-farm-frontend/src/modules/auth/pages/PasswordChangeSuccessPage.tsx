@@ -1,57 +1,21 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useMutation, gql } from "@apollo/client";
 import { Box, Typography, Button, useTheme } from "@mui/material";
-import { AuthTextField } from "../components/AuthTextField";
+import LockRoundedIcon from "@mui/icons-material/LockRounded";
 import { AuthOnboardingPanel } from "../components/AuthOnboardingPanel";
 import { Logo } from "@/components/icons/Logo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import {
   GRADIENT_LOGIN_BUTTON,
   GRADIENT_LOGIN_BUTTON_DARK,
+  GRADIENT_GREEN,
   LOGIN_BG_LIGHT,
   LOGIN_BG_DARK,
 } from "@/theme/theme";
 
-const FORGOT_PASSWORD_MUTATION = gql`
-  mutation ForgotPassword($input: ForgotPasswordInput!) {
-    forgotPassword(input: $input) {
-      message
-    }
-  }
-`;
-
-const ONBOARDING_IMAGE = "https://picsum.photos/seed/smartfarm-forgot/800/1200";
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-export function ForgotPasswordPage() {
+export function PasswordChangeSuccessPage() {
   const navigate = useNavigate();
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
-
-  const [email, setEmail] = useState("");
-  const [error, setError] = useState<string | null>(null);
-
-  const [forgotPassword, { loading }] = useMutation(FORGOT_PASSWORD_MUTATION);
-
-  const isFilled = email.length > 0;
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-
-    if (!EMAIL_REGEX.test(email)) {
-      setError("Wrong email address. Please check again.");
-      return;
-    }
-
-    try {
-      await forgotPassword({ variables: { input: { memberEmail: email } } });
-      navigate("/forgot-password/verify", { state: { email } });
-    } catch (err: any) {
-      setError(err.message ?? "Xatolik yuz berdi.");
-    }
-  }
 
   return (
     <Box
@@ -93,11 +57,10 @@ export function ForgotPasswordPage() {
         </Box>
 
         <Box
-          component="form"
-          onSubmit={handleSubmit}
           sx={{
             display: "flex",
             flexDirection: "column",
+            alignItems: "center",
             gap: "24px",
             width: "100%",
             bgcolor: "background.paper",
@@ -105,6 +68,20 @@ export function ForgotPasswordPage() {
             p: "24px",
           }}
         >
+          <Box
+            sx={{
+              width: 72,
+              height: 72,
+              borderRadius: "50%",
+              backgroundImage: GRADIENT_GREEN,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <LockRoundedIcon sx={{ fontSize: 32, color: "#fff" }} />
+          </Box>
+
           <Box
             sx={{
               display: "flex",
@@ -122,7 +99,7 @@ export function ForgotPasswordPage() {
                 color: "text.primary",
               }}
             >
-              Forgot Your Password?
+              Password Change
             </Typography>
             <Typography
               sx={{
@@ -134,54 +111,40 @@ export function ForgotPasswordPage() {
                 color: "text.secondary",
               }}
             >
-              If you've forgotten your password, please enter your email to
-              reset it.
+              You have successfully changed your password
             </Typography>
           </Box>
 
-          <AuthTextField
-            label="Email"
-            type="email"
-            required
-            autoComplete="email"
-            placeholder="e.g. name@example.com"
-            value={email}
-            errorText={error ?? undefined}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              if (error) setError(null);
-            }}
-          />
-
           <Button
-            type="submit"
             fullWidth
-            disabled={loading || !isFilled}
+            onClick={() => navigate("/login")}
             sx={{
               py: "9px",
               borderRadius: "8px",
-              backgroundImage: isFilled
-                ? isDark
-                  ? GRADIENT_LOGIN_BUTTON_DARK
-                  : GRADIENT_LOGIN_BUTTON
-                : "none",
-              bgcolor: isFilled ? "transparent" : "#cecece",
-              color: isFilled ? "#fff" : "#a4a4a4",
+              backgroundImage: isDark
+                ? GRADIENT_LOGIN_BUTTON_DARK
+                : GRADIENT_LOGIN_BUTTON,
+              color: "#fff",
               fontFamily: "Satoshi, sans-serif",
               fontWeight: 500,
               fontSize: 14,
               letterSpacing: "-0.28px",
               textTransform: "none",
-              "&.Mui-disabled": { bgcolor: "#cecece", color: "#a4a4a4" },
+              "&:hover": {
+                backgroundImage: isDark
+                  ? GRADIENT_LOGIN_BUTTON_DARK
+                  : GRADIENT_LOGIN_BUTTON,
+                opacity: 0.9,
+              },
             }}
           >
-            {loading ? "Yuborilmoqda..." : "Send"}
+            Login
           </Button>
         </Box>
       </Box>
 
       <AuthOnboardingPanel
-        image={ONBOARDING_IMAGE}
+        image="https://picsum.photos/seed/smartfarm-forgot/800/1200"
         heading="Real-Time Insights Access"
         subtitle="Analyze field metrics quickly with intuitive charts and visual reports."
         activeStep={2}
