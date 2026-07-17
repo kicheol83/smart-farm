@@ -21,6 +21,7 @@ import { TaskListPage } from "@/modules/task/pages/TaskListPage";
 import { PlantHealthPage } from "@/modules/plant-health/pages/PlantHealthPage";
 import { IrrigationPage } from "@/modules/irrigation/pages/IrrigationPage";
 import { AdminDashboardPage } from "@/modules/admin/pages/AdminDashboardPage";
+import { LiveViewPage } from "./modules/camera/pages/LiveViewPage";
 
 export default function App() {
   return (
@@ -58,6 +59,7 @@ export default function App() {
         <Route path="/settings/*" element={<SettingsPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/tasks" element={<TaskListPage />} />
+        <Route path="/live-view" element={<LiveViewPage />} />
         <Route path="/plant-health" element={<PlantHealthPage />} />
         <Route path="/irrigation" element={<IrrigationPage />} />
 
