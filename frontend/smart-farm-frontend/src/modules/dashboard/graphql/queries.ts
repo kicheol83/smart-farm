@@ -110,3 +110,37 @@ export const SUBSCRIBE_SENSOR_ALERT = gql`
     }
   }
 `;
+
+export const GET_CAMERAS_BY_GREENHOUSE = gql`
+  query CamerasByGreenhouse($greenHouseId: ID!) {
+    camerasByGreenhouse(greenHouseId: $greenHouseId) {
+      _id
+      cameraStreamUrl
+      cameraStatus
+    }
+  }
+`;
+
+export const GET_TASK_BOARD_OVERVIEW = gql`
+  query TaskBoardOverview($greenHousesId: ID!) {
+    taskBoardOverview(greenHousesId: $greenHousesId) {
+      greenHouseId
+      totalTasks
+      completedTasks
+      inProgressTasks
+      overdueTasks
+      columns {
+        status
+        count
+        tasks {
+          _id
+          taskTitle
+          taskDescription
+          taskStatus
+          taskPriority
+          dueDate
+        }
+      }
+    }
+  }
+`;
