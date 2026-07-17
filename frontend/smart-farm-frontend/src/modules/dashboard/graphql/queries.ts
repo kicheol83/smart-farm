@@ -37,6 +37,32 @@ export const GET_GREENHOUSE_SUMMARY = gql`
   }
 `;
 
+export const GET_GREENHOUSE_DEVICE_OVERVIEW = gql`
+  query GreenhouseDeviceOverview($greenHouseId: ID!) {
+    greenhouseDeviceOverview(greenHouseId: $greenHouseId) {
+      greenHouseId
+      greenHouseName
+      statusCounts {
+        total
+        online
+        offline
+        maintenance
+        error
+      }
+      typeCounts {
+        deviceType
+        count
+      }
+      devices {
+        _id
+        deviceName
+        deviceType
+        deviceStatus
+      }
+    }
+  }
+`;
+
 export const GET_GREENHOUSE_DETAIL = gql`
   query GetGreenhouseDetail($id: ID!) {
     greenhouse(id: $id) {

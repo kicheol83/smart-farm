@@ -9,9 +9,11 @@ import GrassOutlinedIcon from "@mui/icons-material/GrassOutlined";
 import { Header } from "@/components/layout/Header";
 import { WeatherMapCard } from "../components/WeatherMapCard";
 import { PlantReportCard } from "../components/PlantReportCard";
+import { DashboardDevicePanel } from "../components/DashboardDevicePanel";
 import {
   GET_GREENHOUSE_SUMMARY,
   GET_GREENHOUSE_DETAIL,
+  GET_GREENHOUSE_DEVICE_OVERVIEW,
 } from "../graphql/queries";
 
 export function DashboardPage() {
@@ -29,8 +31,14 @@ export function DashboardPage() {
     skip: !hasGreenhouse,
   });
 
+  const { data: deviceData } = useQuery(GET_GREENHOUSE_DEVICE_OVERVIEW, {
+    variables: { greenHouseId },
+    skip: !hasGreenhouse,
+  });
+
   const summary = summaryData?.greenhouseSensorSummary;
   const detail = detailData?.greenhouse;
+  const deviceOverview = deviceData?.greenhouseDeviceOverview;
 
   if (!hasGreenhouse) {
     return (
@@ -134,21 +142,11 @@ export function DashboardPage() {
           </Box>
         </Box>
 
-        <Box
-          sx={{
-            borderRadius: 2,
-            bgcolor: "background.paper",
-            minHeight: 300,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            p: 2,
-          }}
-        >
-          <Typography variant="body2" color="text.secondary" textAlign="center">
-            Device panel — 2-bosqichda quriladi
-          </Typography>
-        </Box>
+        <DashboardDevicePanel
+          greenHouseName={deviceOverview?.greenHouseName}
+          typeCounts={deviceOverview?.typeCounts}
+          devices={deviceOverview?.devices}
+        />
 
         <Box
           sx={{
