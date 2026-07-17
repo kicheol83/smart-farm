@@ -1,15 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { Box, useMediaQuery, useTheme } from "@mui/material";
 import { Sidebar } from "./Sidebar";
-import { Header } from "./Header";
 
-/**
- * Figma "Body" strukturasi: Sidebar (103px) + [Header (76px) + Main Content]
- *
- * Responsive:
- *   Mobil (< md):  Sidebar pastki BottomNavigation bo'lib chiqadi
- *   Desktop (md+): Sidebar chapda, flex-row
- */
 export function AppLayout() {
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
@@ -23,8 +15,14 @@ export function AppLayout() {
       }}
     >
       <Sidebar />
-      <Box sx={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        <Header />
+      <Box
+        sx={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+        }}
+      >
         <Box
           component="main"
           sx={{
@@ -32,7 +30,7 @@ export function AppLayout() {
             overflowY: "auto",
             bgcolor: "background.default",
             p: { xs: 2, sm: 3 },
-            pb: isDesktop ? 3 : 10, // BottomNavigation bosib qolmasligi uchun
+            pb: isDesktop ? 3 : 10,
           }}
         >
           <Outlet />

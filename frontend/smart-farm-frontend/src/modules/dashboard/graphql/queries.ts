@@ -1,33 +1,49 @@
 import { gql } from "@apollo/client";
 
-/**
- * Backend: module9/admin.resolver.ts dagi kabi emas,
- * bu yerda module1/greenhouse.resolver.ts dagi getGreenhouseSummary
- * va module7/alert.resolver.ts dagi activeAlertsSummary ishlatiladi.
- */
-
 export const GET_ACTIVE_ALERTS_COUNT = gql`
-  query GetActiveAlertsCount {
-    activeAlertsSummary {
-      count
+  query ActiveAlertsSummary($greenHouseId: ID!) {
+    activeAlertsSummary(greenHouseId: $greenHouseId) {
+      total
+      critical
+      warning
+      info
+      recentAlerts {
+        _id
+        alertsType
+        alertsThreshold
+        alertsActualValues
+        alertsSeverity
+        sensorsId
+        createdAt
+        updatedAt
+      }
     }
   }
 `;
 
 export const GET_GREENHOUSE_SUMMARY = gql`
-  query GetGreenhouseSummary($greenHouseId: ID!) {
-    getGreenhouseSummary(greenHouseId: $greenHouseId) {
-      location
+  query GreenhouseSensorSummary($greenHouseId: ID!) {
+    greenhouseSensorSummary(greenHouseId: $greenHouseId) {
+      greenHouseId
+      greenHouseName
       temperature
-      weatherCondition
-      highTemp
-      lowTemp
-      plantHealthScore
-      plantHealthStatus
-      windSpeed
-      soilPh
       humidity
+      ph
+      light
+      co2
       soilMoisture
+      lastUpdated
+    }
+  }
+`;
+
+export const GET_GREENHOUSE_DETAIL = gql`
+  query GetGreenhouseDetail($id: ID!) {
+    greenhouse(id: $id) {
+      _id
+      greenHouseName
+      greenHouseType
+      greenHouseSize
     }
   }
 `;

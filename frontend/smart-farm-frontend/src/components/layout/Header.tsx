@@ -1,4 +1,11 @@
-import { Box, Typography, Button, Chip, useMediaQuery, useTheme } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Button,
+  Chip,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
 import NotificationsRoundedIcon from "@mui/icons-material/NotificationsRounded";
 import ArrowOutwardRoundedIcon from "@mui/icons-material/ArrowOutwardRounded";
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
@@ -7,10 +14,6 @@ import { GET_ACTIVE_ALERTS_COUNT } from "@/modules/dashboard/graphql/queries";
 import { ThemeToggle } from "./ThemeToggle";
 import { GRADIENT_DARK, GRADIENT_DARK_MODE } from "@/theme/theme";
 
-/**
- * Figma "Header" komponenti — sarlavha + Alert tugmasi + Sector selector.
- * Node: I2678:24961;2654:12167 va atrofi
- */
 interface HeaderProps {
   title?: string;
 }
@@ -18,13 +21,18 @@ interface HeaderProps {
 export function Header({ title = "Greenhouse Monitoring" }: HeaderProps) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const gradient = theme.palette.mode === "dark" ? GRADIENT_DARK_MODE : GRADIENT_DARK;
-
+  const gradient =
+    theme.palette.mode === "dark" ? GRADIENT_DARK_MODE : GRADIENT_DARK;
+  const greenHouseId = localStorage.getItem("greenHouseId") || "";
   const { data } = useQuery(GET_ACTIVE_ALERTS_COUNT, {
-    pollInterval: 30_000,
+    variables: {
+      greenHouseId,
+    },
+    skip: !greenHouseId,
+    pollInterval: 30000,
   });
 
-  const alertCount = data?.activeAlertsSummary?.count ?? 0;
+  const alertCount = data?.activeAlertsSummary?.total ?? 0;
 
   return (
     <Box
@@ -48,7 +56,6 @@ export function Header({ title = "Greenhouse Monitoring" }: HeaderProps) {
 
       <ThemeToggle />
 
-      {/* Alert Button */}
       <Button
         sx={{
           backgroundImage: gradient,
@@ -83,7 +90,6 @@ export function Header({ title = "Greenhouse Monitoring" }: HeaderProps) {
         />
       </Button>
 
-      {/* Sector Selector */}
       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
         <Typography
           variant="body2"
