@@ -10,10 +10,14 @@ import { Header } from "@/components/layout/Header";
 import { WeatherMapCard } from "../components/WeatherMapCard";
 import { PlantReportCard } from "../components/PlantReportCard";
 import { DashboardDevicePanel } from "../components/DashboardDevicePanel";
+import { DashboardCameraPanel } from "../components/DashboardCameraPanel";
+import { DashboardTaskPanel } from "../components/DashboardTaskPanel";
 import {
   GET_GREENHOUSE_SUMMARY,
   GET_GREENHOUSE_DETAIL,
   GET_GREENHOUSE_DEVICE_OVERVIEW,
+  GET_CAMERAS_BY_GREENHOUSE,
+  GET_TASK_BOARD_OVERVIEW,
 } from "../graphql/queries";
 
 export function DashboardPage() {
@@ -36,9 +40,23 @@ export function DashboardPage() {
     skip: !hasGreenhouse,
   });
 
+  const { data: cameraData } = useQuery(GET_CAMERAS_BY_GREENHOUSE, {
+    variables: { greenHouseId },
+    skip: !hasGreenhouse,
+  });
+
+  const { data: taskData } = useQuery(GET_TASK_BOARD_OVERVIEW, {
+    variables: { greenHousesId: greenHouseId },
+    skip: !hasGreenhouse,
+  });
+
   const summary = summaryData?.greenhouseSensorSummary;
   const detail = detailData?.greenhouse;
   const deviceOverview = deviceData?.greenhouseDeviceOverview;
+  const cameras = cameraData?.camerasByGreenhouse ?? [];
+  const taskOverview = taskData?.taskBoardOverview;
+
+  const allTasks = taskOverview?.columns?.flatMap((c: any) => c.tasks) ?? [];
 
   if (!hasGreenhouse) {
     return (
@@ -148,20 +166,13 @@ export function DashboardPage() {
           devices={deviceOverview?.devices}
         />
 
-        <Box
-          sx={{
-            borderRadius: 2,
-            bgcolor: "background.paper",
-            minHeight: 300,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            p: 2,
-          }}
-        >
-          <Typography variant="body2" color="text.secondary" textAlign="center">
-            Camera + Task panel — 3-bosqichda quriladi
-          </Typography>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          <DashboardCameraPanel cameras={cameras} />
+          <DashboardTaskPanel
+            totalTasks={taskOverview?.totalTasks}
+            completedTasks={taskOverview?.completedTasks}
+            tasks={allTasks}
+          />
         </Box>
       </Box>
     </>
