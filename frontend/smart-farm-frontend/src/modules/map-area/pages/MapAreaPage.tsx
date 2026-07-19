@@ -130,7 +130,6 @@ export function MapAreaPage() {
     <>
       <Header title="Map" />
 
-      {/* Import + Add Map Area */}
       <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1, mb: 2 }}>
         <Button
           variant="outlined"
@@ -158,7 +157,6 @@ export function MapAreaPage() {
           height: { lg: "calc(100vh - 200px)" },
         }}
       >
-        {/* Chap panel */}
         <Box
           sx={{
             display: "flex",

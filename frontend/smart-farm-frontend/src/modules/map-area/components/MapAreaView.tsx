@@ -89,7 +89,6 @@ export function MapAreaView({
         </IconButton>
       </Box>
 
-      {/* Tanlangan sector — markazda label */}
       {selectedSector && (
         <Box
           onClick={() => onSelectSector(selectedSector._id)}
@@ -153,7 +152,6 @@ export function MapAreaView({
         </Box>
       ))}
 
-      {/* Yuqori o'ng info karta */}
       {selectedSector && (
         <Card
           elevation={3}
@@ -242,7 +240,6 @@ export function MapAreaView({
         </Card>
       )}
 
-      {/* Pastki chap: Clouds + fullscreen */}
       <Box
         sx={{
           position: "absolute",
