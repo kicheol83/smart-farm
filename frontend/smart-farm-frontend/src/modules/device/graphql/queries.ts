@@ -22,6 +22,7 @@ export const GET_GREENHOUSE_DEVICE_OVERVIEW = gql`
         deviceType
         deviceStatus
         installedAt
+        updatedAt
       }
     }
   }

@@ -4,7 +4,7 @@ import { Box, Typography, Tabs, Tab } from "@mui/material";
 import { Header } from "@/components/layout/Header";
 import { SectionListItem } from "../components/SectionListItem";
 import { PlantSectionListItem } from "../components/PlantSectionListItem";
-import { DeviceTabListItem } from "../components/DeviceTabListItem";
+import { TaskTabListItem } from "../components/TaskTabListItem";
 import { ActivityTabListItem } from "../components/ActivityTabListItem";
 import { GreenhouseMapView } from "../components/GreenhouseMapView";
 import { SectionDetailPopup } from "../components/SectionDetailPopup";
@@ -18,7 +18,7 @@ import {
 import { GET_TASK_LIST } from "@/modules/task/graphql/queries";
 import { GET_GREENHOUSE_DEVICE_OVERVIEW } from "@/modules/device/graphql/queries";
 import { PlantHealthOverviewCard } from "../components/lantHealthOverviewCard";
-import { TaskTabListItem } from "../components/TaskTabListItem";
+import { DeviceTabListItem } from "../components/DeviceTabListItem";
 
 const TABS = [
   { key: "details", label: "Details" },
