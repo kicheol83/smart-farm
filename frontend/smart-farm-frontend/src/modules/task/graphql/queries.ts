@@ -34,6 +34,7 @@ export const GET_TASK_LIST = gql`
         taskStatus
         taskPriority
         dueDate
+        updatedAt
       }
       total
       page
