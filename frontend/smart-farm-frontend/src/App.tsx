@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "@/components/layout/ProtectedRoute";
 import { AppLayout } from "@/components/layout/AppLayout";
 
+// Auth (layout siz)
 import { LoginPage } from "@/modules/auth/pages/LoginPage";
 import { SplashScreenPage } from "@/modules/auth/pages/SplashScreenPage";
 import { SignupPage } from "@/modules/auth/pages/SignupPage";
@@ -11,23 +12,24 @@ import { ForgotPasswordVerifyPage } from "@/modules/auth/pages/ForgotPasswordVer
 import { CreateNewPasswordPage } from "@/modules/auth/pages/CreateNewPasswordPage";
 import { PasswordChangeSuccessPage } from "@/modules/auth/pages/PasswordChangeSuccessPage";
 
+// Asosiy sahifalar (AppLayout ichida — Sidebar + Header bilan)
 import { DashboardPage } from "@/modules/dashboard/pages/DashboardPage";
 import { DeviceListPage } from "@/modules/device/pages/DeviceListPage";
 import { ReportPage } from "@/modules/report/pages/ReportPage";
+import { ReportDetailsPage } from "@/modules/report/pages/ReportDetailsPage";
 import { MapAreaPage } from "@/modules/map-area/pages/MapAreaPage";
 import { SettingsPage } from "@/modules/settings/pages/SettingsPage";
 import { ProfilePage } from "@/modules/profile/pages/ProfilePage";
 import { TaskListPage } from "@/modules/task/pages/TaskListPage";
+import { LiveViewPage } from "@/modules/camera/pages/LiveViewPage";
 import { PlantHealthPage } from "@/modules/plant-health/pages/PlantHealthPage";
 import { IrrigationPage } from "@/modules/irrigation/pages/IrrigationPage";
 import { AdminDashboardPage } from "@/modules/admin/pages/AdminDashboardPage";
-import { LiveViewPage } from "./modules/camera/pages/LiveViewPage";
 
 export default function App() {
   return (
     <Routes>
       <Route path="/" element={<SplashScreenPage />} />
-
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/signup/verify" element={<EmailVerificationPage />} />
@@ -44,7 +46,6 @@ export default function App() {
         path="/forgot-password/success"
         element={<PasswordChangeSuccessPage />}
       />
-
       <Route
         element={
           <ProtectedRoute>
@@ -55,6 +56,20 @@ export default function App() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/devices" element={<DeviceListPage />} />
         <Route path="/report" element={<ReportPage />} />
+        <Route path="/report/details" element={<ReportDetailsPage />} />
+        {/* <Route path="/report/alerts" element={<AlertsSummaryPage />} /> */}
+        {/* <Route
+          path="/report/water-usage"
+          element={<WaterUsageAnalyticsPage />}
+        />
+        {/* <Route
+          path="/report/soil-moisture"
+          element={<SoilMoistureTrendPage />}
+        />
+        <Route
+          path="/report/plant-health"
+          element={<OverallPlantHealthPage />}
+        /> */}
         <Route path="/map-area" element={<MapAreaPage />} />
         <Route path="/settings/*" element={<SettingsPage />} />
         <Route path="/profile" element={<ProfilePage />} />
@@ -72,7 +87,6 @@ export default function App() {
           }
         />
       </Route>
-
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
   );
