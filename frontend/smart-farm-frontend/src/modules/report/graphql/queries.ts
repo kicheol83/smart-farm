@@ -108,7 +108,11 @@ export const GET_ACTIVE_ALERTS_SUMMARY = gql`
         _id
         alertsType
         alertsThreshold
+        alertsActualValues
         alertsSeverity
+        sensorsId
+        createdAt
+        updatedAt
       }
     }
   }

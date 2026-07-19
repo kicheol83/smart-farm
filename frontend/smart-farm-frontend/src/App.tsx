@@ -25,6 +25,7 @@ import { LiveViewPage } from "@/modules/camera/pages/LiveViewPage";
 import { PlantHealthPage } from "@/modules/plant-health/pages/PlantHealthPage";
 import { IrrigationPage } from "@/modules/irrigation/pages/IrrigationPage";
 import { AdminDashboardPage } from "@/modules/admin/pages/AdminDashboardPage";
+import { AlertsSummaryPage } from "./modules/report/pages/AlertsSummaryPage";
 
 export default function App() {
   return (
@@ -57,7 +58,7 @@ export default function App() {
         <Route path="/devices" element={<DeviceListPage />} />
         <Route path="/report" element={<ReportPage />} />
         <Route path="/report/details" element={<ReportDetailsPage />} />
-        {/* <Route path="/report/alerts" element={<AlertsSummaryPage />} /> */}
+        <Route path="/report/alerts" element={<AlertsSummaryPage />} />
         {/* <Route
           path="/report/water-usage"
           element={<WaterUsageAnalyticsPage />}
