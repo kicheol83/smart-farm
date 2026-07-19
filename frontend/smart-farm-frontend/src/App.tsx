@@ -26,6 +26,7 @@ import { PlantHealthPage } from "@/modules/plant-health/pages/PlantHealthPage";
 import { IrrigationPage } from "@/modules/irrigation/pages/IrrigationPage";
 import { AdminDashboardPage } from "@/modules/admin/pages/AdminDashboardPage";
 import { AlertsSummaryPage } from "./modules/report/pages/AlertsSummaryPage";
+import { WaterUsageAnalyticsPage } from "./modules/report/pages/WaterUsageAnalyticsPage";
 
 export default function App() {
   return (
@@ -59,15 +60,15 @@ export default function App() {
         <Route path="/report" element={<ReportPage />} />
         <Route path="/report/details" element={<ReportDetailsPage />} />
         <Route path="/report/alerts" element={<AlertsSummaryPage />} />
-        {/* <Route
+        <Route
           path="/report/water-usage"
           element={<WaterUsageAnalyticsPage />}
         />
         {/* <Route
           path="/report/soil-moisture"
           element={<SoilMoistureTrendPage />}
-        />
-        <Route
+        /> */}
+        {/* <Route
           path="/report/plant-health"
           element={<OverallPlantHealthPage />}
         /> */}
