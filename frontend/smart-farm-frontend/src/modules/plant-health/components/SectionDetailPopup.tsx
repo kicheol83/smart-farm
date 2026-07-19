@@ -160,9 +160,6 @@ export function SectionDetailPopup({
           />
         </>
       ) : variant === "task" ? (
-        // "task" variant — DIQQAT: bu Task modeliga umuman bog'liq emas
-        // (Figma'da bu popup pest-scan natijasi ko'rinishida, backend'da
-        // bunday pest-scan moduli mavjud emas). Faqat "Plant" haqiqiy.
         <>
           <Field label="Scan Timestamp" value="—" />
           <Field label="Pest Scan" value="—" />
@@ -181,10 +178,6 @@ export function SectionDetailPopup({
           </Box>
         </>
       ) : variant === "device" ? (
-        // "device" variant — MUHIM: backend Device modelida sectionId
-        // yo'q, shuning uchun "aynan shu section'ga tegishli qurilmalar"
-        // degan bog'lanishni HAQIQATDA ko'rsata olmaymiz. Soxta moslashtirish
-        // qilish o'rniga buni ochiq aytamiz.
         <Box sx={{ py: 2 }}>
           <Typography
             sx={{
@@ -204,7 +197,6 @@ export function SectionDetailPopup({
           </Typography>
         </Box>
       ) : (
-        // "activity" variant — ActionLog ham section bilan bog'lanmagan
         <Box sx={{ py: 2 }}>
           <Typography
             sx={{

@@ -3,8 +3,6 @@ import { useQuery } from "@apollo/client";
 import { Box, Typography, Tabs, Tab } from "@mui/material";
 import { Header } from "@/components/layout/Header";
 import { SectionListItem } from "../components/SectionListItem";
-import { PlantHealthOverviewCard } from "../components/PlantHealthOverviewCard";
-import { PlantSectionListItem } from "../components/PlantSectionListItem";
 import { TaskTabListItem } from "../components/TaskTabListItem";
 import { DeviceTabListItem } from "../components/DeviceTabListItem";
 import { ActivityTabListItem } from "../components/ActivityTabListItem";
@@ -19,6 +17,8 @@ import {
 } from "../graphql/queries";
 import { GET_TASK_LIST } from "@/modules/task/graphql/queries";
 import { GET_GREENHOUSE_DEVICE_OVERVIEW } from "@/modules/device/graphql/queries";
+import { PlantSectionListItem } from "../components/PlantSectionListItem";
+import { PlantHealthOverviewCard } from "../components/lantHealthOverviewCard";
 
 const TABS = [
   { key: "details", label: "Details" },
@@ -344,7 +344,6 @@ export function PlantHealthPage() {
           )}
         </Box>
 
-        {/* O'ng panel — xarita + popup */}
         <Box sx={{ position: "relative", minHeight: 400 }}>
           <GreenhouseMapView
             sections={mapSections}
