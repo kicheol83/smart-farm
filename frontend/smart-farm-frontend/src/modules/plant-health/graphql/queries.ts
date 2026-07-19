@@ -1,26 +1,29 @@
 import { gql } from "@apollo/client";
 
-
 export const GET_GREENHOUSE_SECTION_OVERVIEW = gql`
-  query GreenhouseSectionOverview($greenHouseId: ID!) {
-    greenhouseSectionOverview(greenHouseId: $greenHouseId) {
+  query GreenhouseDeviceOverview($greenHouseId: ID!) {
+    greenhouseDeviceOverview(greenHouseId: $greenHouseId) {
       greenHouseId
       greenHouseName
-      totalSections
-      healthySections
-      warningSections
-      criticalSections
-      overallHealthIndex
-      sections {
-        sectionId
-        sectionName
-        sectionStatus
-        healthIndex
-        temperature
-        humidity
-        soilMoisture
-        ph
-        lastUpdated
+      statusCounts {
+        total
+        online
+        offline
+        maintenance
+        error
+      }
+      typeCounts {
+        deviceType
+        count
+      }
+      devices {
+        _id
+        deviceName
+        deviceType
+        deviceStatus
+        installedAt
+        greenHouseId
+        updatedAt
       }
     }
   }
@@ -61,7 +64,9 @@ export const GET_SECTIONS_BY_GREENHOUSE = gql`
       sectionArea
       plantCount
       currentHealthIndex
-      cropsId
+      greenHouseId
+      createdAt
+      updatedAt
     }
   }
 `;
