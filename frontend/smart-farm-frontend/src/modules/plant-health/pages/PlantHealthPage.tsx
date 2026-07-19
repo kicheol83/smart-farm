@@ -5,7 +5,7 @@ import { Header } from "@/components/layout/Header";
 import { SectionListItem } from "../components/SectionListItem";
 import { PlantSectionListItem } from "../components/PlantSectionListItem";
 import { TaskTabListItem } from "../components/TaskTabListItem";
-import { ActivityTabListItem } from "../components/ActivityTabListItem";
+import { DeviceTabListItem } from "../components/DeviceTabListItem";
 import { GreenhouseMapView } from "../components/GreenhouseMapView";
 import { SectionDetailPopup } from "../components/SectionDetailPopup";
 import {
@@ -18,7 +18,7 @@ import {
 import { GET_TASK_LIST } from "@/modules/task/graphql/queries";
 import { GET_GREENHOUSE_DEVICE_OVERVIEW } from "@/modules/device/graphql/queries";
 import { PlantHealthOverviewCard } from "../components/lantHealthOverviewCard";
-import { DeviceTabListItem } from "../components/DeviceTabListItem";
+import { ActivityTabListItem } from "../components/ActivityTabListItem";
 
 const TABS = [
   { key: "details", label: "Details" },
