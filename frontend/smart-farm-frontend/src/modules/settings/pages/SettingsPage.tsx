@@ -16,10 +16,6 @@ import {
 } from "../graphql/queries";
 import { NotificationsSettingsTab } from "../components/NotificationsSettingsTab";
 
-/**
- * Figma "Settings" — TO'LIQ (4/4 tab): General, Unit customization,
- * User actions log, Notifications and sounds.
- */
 export function SettingsPage() {
   const [tab, setTab] = useState("general");
   const [activityPage, setActivityPage] = useState(1);
