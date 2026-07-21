@@ -40,7 +40,8 @@ export class MemberResolver {
   @Mutation(() => Member)
   public async login(@Args('input') input: LoginMemberInput): Promise<Member> {
     console.log('Mutation: login');
-    return await this.memberService.login(input);
+    const result = await this.memberService.login(input);
+    return result;
   }
 
   /** Autentacited */
@@ -109,11 +110,13 @@ export class MemberResolver {
   }
 
   // Authorization: ADMIN
-	@Roles(MemberRole.ADMIN)
-	@UseGuards(RolesGuard)
-	@Mutation(() => Member)
-	public async updateMemberByAdmin(@Args('input') input: MemberUpdateInput): Promise<Member> {
-		console.log('Mutation: updateMemberByAdmin');
-		return await this.memberService.updateMemberByAdmin(input);
-	}
+  @Roles(MemberRole.ADMIN)
+  @UseGuards(RolesGuard)
+  @Mutation(() => Member)
+  public async updateMemberByAdmin(
+    @Args('input') input: MemberUpdateInput,
+  ): Promise<Member> {
+    console.log('Mutation: updateMemberByAdmin');
+    return await this.memberService.updateMemberByAdmin(input);
+  }
 }
