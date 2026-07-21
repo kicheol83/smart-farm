@@ -15,8 +15,6 @@ import { Header } from "@/components/layout/Header";
 import { SectorAreaListItem } from "../components/SectorAreaListItem";
 import { MapAreaView } from "../components/MapAreaView";
 import { AddMapAreaDialog } from "../components/AddMapAreaDialog";
-import { DateSelectorRow } from "../components/DateSelectorRow";
-import { MapAreaTrendChart } from "../components/MapAreaTrendChart";
 import {
   GET_GREENHOUSE_FARM_ID,
   GET_FIELD_MAPS_BY_FARM,
@@ -26,9 +24,12 @@ import {
   CREATE_SECTOR_MUTATION,
   DELETE_SECTOR_MUTATION,
 } from "../graphql/queries";
+import { DateSelectorRow } from "../components/DateSelectorRow";
+import { MapAreaTrendChart } from "../components/MapAreaTrendChart";
 
 export function MapAreaPage() {
-  const greenHouseId = localStorage.getItem("currentGreenhouseId") || "";
+  localStorage.setItem("greenHouseId", "6a2daf715e4567e07ca5d328");
+  const greenHouseId = localStorage.getItem("greenHouseId") || "";
   const hasGreenhouse = greenHouseId.length > 0;
 
   const [selectedSectorId, setSelectedSectorId] = useState<string | null>(null);
@@ -212,7 +213,6 @@ export function MapAreaPage() {
           )}
         </Box>
 
-        {/* Xarita */}
         <MapAreaView
           sectors={sectors}
           selectedSector={selectedSector}

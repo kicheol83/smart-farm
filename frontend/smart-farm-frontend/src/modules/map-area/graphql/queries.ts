@@ -29,6 +29,13 @@ export const GET_FIELD_MAP_WITH_SECTORS = gql`
       _id
       fieldName
       totalArea
+      farmId
+      createdAt
+      updatedAt
+      boundaryCoordinates {
+        lat
+        lng
+      }
       centerPoint {
         lat
         lng
@@ -38,14 +45,21 @@ export const GET_FIELD_MAP_WITH_SECTORS = gql`
         sectorName
         sectorStatus
         sectorArea
-        centerPoint {
-          lat
-          lng
-        }
         ndviValue
         ndviLevel
         healthIndex
         fieldId
+        cropsId
+        createdAt
+        updatedAt
+        coordinates {
+          lat
+          lng
+        }
+        centerPoint {
+          lat
+          lng
+        }
       }
     }
   }
