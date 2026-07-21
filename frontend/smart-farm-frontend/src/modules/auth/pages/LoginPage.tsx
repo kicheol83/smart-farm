@@ -98,7 +98,17 @@ export function LoginPage() {
         variables: { input: { memberEmail: email, memberPassword: password } },
       });
 
-      setAuth(data.login.member, data.login.accessToken);
+      setAuth(
+        {
+          _id: data.login._id,
+          memberFullName: data.login.memberFullName,
+          memberEmail: data.login.memberEmail,
+          memberRole: data.login.memberRole,
+          memberAvatar: data.login.memberAvatar,
+        },
+        data.login.accessToken,
+      );
+
       navigate("/dashboard");
     } catch (err: any) {
       setPasswordError("Incorrect password. Please try again.");
