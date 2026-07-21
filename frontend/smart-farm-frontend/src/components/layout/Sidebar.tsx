@@ -14,17 +14,10 @@ import PieChartRoundedIcon from "@mui/icons-material/PieChartRounded";
 import MapRoundedIcon from "@mui/icons-material/MapRounded";
 import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
 import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
+import AdminPanelSettingsRoundedIcon from "@mui/icons-material/AdminPanelSettingsRounded";
 import { GRADIENT_DARK, GRADIENT_DARK_MODE } from "@/theme/theme";
 import { Logo } from "@/components/icons/Logo";
-
-/**
- * Figma "Sidebar" komponenti — 103px kenglik, dark gradient active state.
- * Node: 2478:5848
- *
- * Responsive:
- *   < md (900px): pastki BottomNavigation
- *   >= md:         chap tomonda vertikal panel
- */
+import { useAuthStore } from "@/modules/auth/auth.store";
 
 const NAV_ITEMS = [
   { to: "/dashboard", icon: HomeRoundedIcon, label: "Home" },
@@ -43,12 +36,21 @@ export function Sidebar() {
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const location = useLocation();
   const navigate = useNavigate();
-  const gradient = theme.palette.mode === "dark" ? GRADIENT_DARK_MODE : GRADIENT_DARK;
+  const gradient =
+    theme.palette.mode === "dark" ? GRADIENT_DARK_MODE : GRADIENT_DARK;
+  const isAdmin = useAuthStore((s) => s.user?.memberRole === "ADMIN");
+
+  const bottomItems = isAdmin
+    ? [
+        ...BOTTOM_ITEMS,
+        { to: "/admin", icon: AdminPanelSettingsRoundedIcon, label: "Admin" },
+      ]
+    : BOTTOM_ITEMS;
 
   const isActive = (to: string) => location.pathname.startsWith(to);
 
   if (!isDesktop) {
-    const allItems = [...NAV_ITEMS, ...BOTTOM_ITEMS];
+    const allItems = [...NAV_ITEMS, ...bottomItems];
     const activeIndex = allItems.findIndex((item) => isActive(item.to));
 
     return (
@@ -67,7 +69,11 @@ export function Sidebar() {
         }}
       >
         {allItems.map(({ to, icon: Icon, label }) => (
-          <BottomNavigationAction key={to} label={label} icon={<Icon fontSize="small" />} />
+          <BottomNavigationAction
+            key={to}
+            label={label}
+            icon={<Icon fontSize="small" />}
+          />
         ))}
       </BottomNavigation>
     );
@@ -86,12 +92,10 @@ export function Sidebar() {
         bgcolor: "background.default",
       }}
     >
-      {/* Brand */}
       <Box sx={{ py: 4, display: "flex", justifyContent: "center" }}>
         <Logo size={46} />
       </Box>
 
-      {/* Asosiy nav */}
       <Stack spacing={1} sx={{ flex: 1, justifyContent: "center" }}>
         {NAV_ITEMS.map(({ to, icon: Icon }) => {
           const active = isActive(to);
@@ -116,9 +120,8 @@ export function Sidebar() {
         })}
       </Stack>
 
-      {/* Pastki nav */}
       <Stack spacing={1} sx={{ py: 4 }}>
-        {BOTTOM_ITEMS.map(({ to, icon: Icon }) => {
+        {bottomItems.map(({ to, icon: Icon }) => {
           const active = isActive(to);
           return (
             <IconButton
