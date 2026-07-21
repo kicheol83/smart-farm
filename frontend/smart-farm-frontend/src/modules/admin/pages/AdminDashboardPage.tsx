@@ -33,13 +33,13 @@ const TABS = [
   { key: "alerts", label: "System Alerts" },
 ];
 
-
 export function AdminDashboardPage() {
   const [tab, setTab] = useState("overview");
 
   const { data: statsData } = useQuery(GET_ADMIN_GLOBAL_STATS, {
     skip: tab !== "overview",
   });
+
   const { data: growthData } = useQuery(GET_ADMIN_MEMBER_GROWTH_TREND, {
     variables: { input: {} },
     skip: tab !== "overview",
@@ -108,6 +108,8 @@ export function AdminDashboardPage() {
     await deleteMember({ variables: { memberId } });
     refetchMembers();
   }
+
+  
 
   return (
     <>
