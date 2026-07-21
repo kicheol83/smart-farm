@@ -5,7 +5,6 @@ import { Header } from "@/components/layout/Header";
 import { SettingsTabs } from "../components/SettingsTabs";
 import { GeneralSettingsTab } from "../components/GeneralSettingsTab";
 import { UnitSettingsTab } from "../components/UnitSettingsTab";
-import { UserActionLogTab } from "../components/UserActionLogTab";
 import { NotificationsSettingsTab } from "../components/NotificationsSettingsTab";
 import {
   GET_MY_SETTINGS,
@@ -15,6 +14,7 @@ import {
   GET_MY_NOTIFICATION_SETTINGS,
   UPDATE_NOTIFICATION_SETTINGS,
 } from "../graphql/queries";
+import { UserActionLogTab } from "../components/UserActionLogTab";
 
 export function SettingsPage() {
   const [tab, setTab] = useState("general");
