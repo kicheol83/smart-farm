@@ -5,7 +5,7 @@ import { Header } from "@/components/layout/Header";
 import { SettingsTabs } from "../components/SettingsTabs";
 import { GeneralSettingsTab } from "../components/GeneralSettingsTab";
 import { UnitSettingsTab } from "../components/UnitSettingsTab";
-import { NotificationsSettingsTab } from "../components/NotificationsSettingsTab";
+import { UserActionLogTab } from "../components/UserActionLogTab";
 import {
   GET_MY_SETTINGS,
   UPDATE_GENERAL_SETTINGS,
@@ -14,8 +14,12 @@ import {
   GET_MY_NOTIFICATION_SETTINGS,
   UPDATE_NOTIFICATION_SETTINGS,
 } from "../graphql/queries";
-import { UserActionLogTab } from "../components/UserActionLogTab";
+import { NotificationsSettingsTab } from "../components/NotificationsSettingsTab";
 
+/**
+ * Figma "Settings" — TO'LIQ (4/4 tab): General, Unit customization,
+ * User actions log, Notifications and sounds.
+ */
 export function SettingsPage() {
   const [tab, setTab] = useState("general");
   const [activityPage, setActivityPage] = useState(1);
