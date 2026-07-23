@@ -20,6 +20,8 @@ interface TaskBoardCardProps {
   description: string;
   status: TaskStatus;
   dueDate: string;
+  startTime?: string;
+  endTime?: string;
   onMove: (taskId: string, newStatus: TaskStatus) => void;
   onDelete: (taskId: string) => void;
 }
@@ -36,12 +38,21 @@ const STATUS_LABEL: Record<TaskStatus, string> = {
   DONE: "Done",
 };
 
+function formatTime(hhmm: string): string {
+  const [h, m] = hhmm.split(":").map(Number);
+  const period = h >= 12 ? "PM" : "AM";
+  const hour12 = h % 12 === 0 ? 12 : h % 12;
+  return `${String(hour12).padStart(2, "0")}:${String(m).padStart(2, "0")} ${period}`;
+}
+
 export function TaskBoardCard({
   taskId,
   title,
   description,
   status,
   dueDate,
+  startTime,
+  endTime,
   onMove,
   onDelete,
 }: TaskBoardCardProps) {
@@ -133,7 +144,9 @@ export function TaskBoardCard({
             color: "text.secondary",
           }}
         >
-          Due: {format(new Date(dueDate), "MMM dd, yyyy")}
+          {startTime && endTime
+            ? `${formatTime(startTime)} - ${formatTime(endTime)}`
+            : `Due: ${format(new Date(dueDate), "MMM dd, yyyy")}`}
         </Typography>
       </Box>
 

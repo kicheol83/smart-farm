@@ -22,7 +22,7 @@ import {
 type TaskStatus = "TODO" | "IN_PROGRESS" | "DONE";
 
 export function TaskListPage() {
-  const greenHouseId = localStorage.getItem("greenHouseId") || "";
+  const greenHouseId = localStorage.getItem("currentGreenhouseId") || "";
   const hasGreenhouse = greenHouseId.length > 0;
 
   const [tab, setTab] = useState<"board" | "list">("board");
@@ -80,6 +80,8 @@ export function TaskListPage() {
     taskDescription: string;
     taskPriority: string;
     dueDate: string;
+    startTime?: string;
+    endTime?: string;
   }) {
     await createTask({
       variables: {
@@ -113,7 +115,6 @@ export function TaskListPage() {
   return (
     <>
       <Header title="Task Overview" />
-
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, mb: 3 }}>
         <TaskSummaryCard
           icon={FormatListBulletedRoundedIcon}

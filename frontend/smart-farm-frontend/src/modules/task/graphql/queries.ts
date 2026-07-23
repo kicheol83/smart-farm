@@ -18,6 +18,9 @@ export const GET_TASK_BOARD_OVERVIEW = gql`
           taskStatus
           taskPriority
           dueDate
+          sectionId
+          startTime
+          endTime
         }
       }
     }
@@ -34,6 +37,9 @@ export const GET_TASK_LIST = gql`
         taskStatus
         taskPriority
         dueDate
+        sectionId
+        startTime
+        endTime
         updatedAt
       }
       total

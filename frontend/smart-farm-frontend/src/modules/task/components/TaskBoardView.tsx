@@ -11,6 +11,8 @@ interface Task {
   taskDescription: string;
   taskStatus: TaskStatus;
   dueDate: string;
+  startTime?: string;
+  endTime?: string;
 }
 
 interface Column {
@@ -32,7 +34,6 @@ const COLUMN_META: Record<TaskStatus, { label: string; dotColor: string }> = {
   DONE: { label: "Done", dotColor: "#35C56E" },
 };
 
-// Figma dagi ustun tartibi
 const COLUMN_ORDER: TaskStatus[] = ["TODO", "IN_PROGRESS", "DONE"];
 
 export function TaskBoardView({
@@ -59,7 +60,6 @@ export function TaskBoardView({
             key={status}
             sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}
           >
-            {/* Ustun sarlavhasi */}
             <Box
               sx={{
                 display: "flex",
@@ -126,6 +126,8 @@ export function TaskBoardView({
                   description={t.taskDescription}
                   status={t.taskStatus}
                   dueDate={t.dueDate}
+                  startTime={t.startTime}
+                  endTime={t.endTime}
                   onMove={onMove}
                   onDelete={onDelete}
                 />
