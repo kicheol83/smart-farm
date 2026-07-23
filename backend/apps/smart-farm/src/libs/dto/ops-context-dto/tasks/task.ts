@@ -75,11 +75,26 @@ export class Task {
   @Field(() => TaskPiority)
   taskPriority: TaskPiority;
 
-  @Field({ description: 'Bajarilish muddati' })
+  @Field()
   dueDate: Date;
 
   @Field(() => ID)
   greenHousesId: string;
+
+  @Field(() => ID, {
+    nullable: true,
+  })
+  sectionId?: string;
+
+  @Field({
+    nullable: true,
+  })
+  startTime?: string;
+
+  @Field({
+    nullable: true,
+  })
+  endTime?: string;
 
   @Field(() => [TaskAssignee])
   assignees: TaskAssignee[];
@@ -166,6 +181,21 @@ export class CreateTaskInput {
   @IsMongoId()
   greenHousesId: string;
 
+  @Field(() => ID, { nullable: true })
+  @IsOptional()
+  @IsMongoId()
+  sectionId?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  startTime?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  endTime?: string;
+
   @Field(() => [ID], { nullable: true })
   @IsOptional()
   @IsArray()
@@ -199,6 +229,21 @@ export class UpdateTaskInput {
   @IsOptional()
   @IsDateString()
   dueDate?: string;
+
+  @Field(() => ID, { nullable: true })
+  @IsOptional()
+  @IsMongoId()
+  sectionId?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  startTime?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  endTime?: string;
 }
 
 @InputType()
@@ -228,6 +273,13 @@ export class GetTasksInput {
   @Field(() => ID)
   @IsMongoId()
   greenHousesId: string;
+
+  @Field(() => ID, {
+    nullable: true,
+  })
+  @IsOptional()
+  @IsMongoId()
+  sectionId?: string;
 
   @Field(() => Int, { defaultValue: 1 })
   page: number;
