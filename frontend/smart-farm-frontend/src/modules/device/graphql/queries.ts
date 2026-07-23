@@ -36,6 +36,13 @@ export const GET_DEVICE_WITH_SENSORS = gql`
       deviceType
       deviceStatus
       installedAt
+      networkType
+      powerSource
+      rssi
+      snr
+      lastDataReceived
+      latitude
+      longitude
       sensors {
         _id
         sensorType

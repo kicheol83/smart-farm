@@ -28,13 +28,28 @@ interface DeviceDetail {
   deviceStatus: DeviceStatus;
   installedAt: string;
   sensors: Sensor[];
-  // ── Backend hali qaytarmaydi — kelajakda shu maydonlar to'ldiriladi ──
-  networkConnectivity?: string;
+  networkType?: string;
   powerSource?: string;
-  radioQuality?: string;
+  rssi?: number;
+  snr?: number;
   lastDataReceived?: string;
   latitude?: number;
   longitude?: number;
+}
+
+function formatRadioQuality(rssi?: number, snr?: number): string {
+  if (rssi === undefined && snr === undefined) return "—";
+  let grade = "Fair";
+  if (rssi !== undefined) {
+    if (rssi >= -70) grade = "Excellent";
+    else if (rssi >= -85) grade = "Good";
+    else if (rssi >= -100) grade = "Fair";
+    else grade = "Poor";
+  }
+  const parts = [];
+  if (rssi !== undefined) parts.push(`RSSI ${rssi} dBm`);
+  if (snr !== undefined) parts.push(`SNR ${snr} dB`);
+  return `${grade} (${parts.join(" / ")})`;
 }
 
 interface RecentActivityItem {
@@ -45,9 +60,7 @@ interface RecentActivityItem {
 interface DeviceDetailPanelProps {
   device?: DeviceDetail;
   loading?: boolean;
-  /** Agar bu qurilma soil-moisture sensori bo'lsa va sensor data mavjud bo'lsa */
   soilMoistureValue?: number;
-  /** Backend hali activity-log bermaydi — bo'sh massiv default */
   recentActivity?: RecentActivityItem[];
   onStatusChange: (status: DeviceStatus) => void;
   onDelete: () => void;
@@ -193,7 +206,7 @@ export function DeviceDetailPanel({
         />
         <InfoField
           label="Network Connectivity"
-          value={device.networkConnectivity ?? "—"}
+          value={device.networkType ?? "—"}
         />
         <InfoField label="Device Type" value={device.deviceType} />
         <InfoField
@@ -205,10 +218,12 @@ export function DeviceDetailPanel({
           }
         />
         <InfoField label="Power Source" value={device.powerSource ?? "—"} />
-        <InfoField label="Radio Quality" value={device.radioQuality ?? "—"} />
+        <InfoField
+          label="Radio Quality"
+          value={formatRadioQuality(device.rssi, device.snr)}
+        />
       </Box>
 
-      {/* Yashil Soil Moisture karta — faqat tegishli sensor bo'lsa va data mavjud bo'lsa */}
       {isSoilSensor && (
         <Box
           sx={{

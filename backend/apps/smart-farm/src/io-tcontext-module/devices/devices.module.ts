@@ -7,6 +7,7 @@ import { GreenHouseSchema } from '../../schemas/farm/GreenHouse.model';
 import DevicesSchema from '../../schemas/iot/Devices.model';
 import { AuthModule } from '../../account-context-module/auth/auth.module';
 import { ActionLogModule } from '../action-log/action-log.module';
+import { AlertsModule } from '../../ops-context-module/alerts/alerts.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ActionLogModule } from '../action-log/action-log.module';
     ]),
     AuthModule,
     ActionLogModule,
+    AlertsModule,
   ],
   providers: [DevicesService, DevicesResolver],
   exports: [DevicesService],

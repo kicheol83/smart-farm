@@ -1,45 +1,86 @@
-import { Schema } from 'mongoose';
-import { DeviceStatus, DeviceType } from '../../libs/enums/devices.enum';
+import * as mongoose from 'mongoose';
 
-export const DevicesSchema = new Schema(
+const DevicesSchema = new mongoose.Schema(
   {
     deviceName: {
       type: String,
       required: true,
+      trim: true,
     },
     deviceType: {
       type: String,
-      enum: Object.values(DeviceType),
-      default: DeviceType.SENSOR_HUB,
       required: true,
+      enum: [
+        'SENSOR_HUB',
+        'CONTROLLER',
+        'CAMERA',
+        'GATEWAY',
+        'WEATHER_STATION',
+      ],
     },
     deviceStatus: {
       type: String,
-      enum: Object.values(DeviceStatus),
-      default: DeviceStatus.OFFLINE,
       required: true,
+      enum: ['ONLINE', 'OFFLINE', 'MAINTENANCE', 'ERROR'],
+      default: 'OFFLINE',
     },
     installedAt: {
       type: Date,
       required: true,
     },
-    updatedAt: {
-      type: Date,
-      default: Date.now,
-    },
     greenHouseId: {
-      type: Schema.Types.ObjectId,
-      ref: 'GreenHouse',
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'greenHouses',
       required: true,
+      index: true,
+    },
+
+    sectionId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'sections',
+      required: false,
+      index: true,
+    },
+    networkType: {
+      type: String,
+      required: false,
+      trim: true,
+    },
+    powerSource: {
+      type: String,
+      required: false,
+      trim: true,
+    },
+    rssi: {
+      type: Number,
+      required: false,
+      description: 'Signal quvvati (dBm), masalan -85',
+    },
+    snr: {
+      type: Number,
+      required: false,
+      description: 'Signal-shovqin nisbati (dB), masalan 6.5',
+    },
+    lastDataReceived: {
+      type: Date,
+      required: false,
+    },
+    latitude: {
+      type: Number,
+      required: false,
+    },
+    longitude: {
+      type: Number,
+      required: false,
     },
   },
-  { timestamps: true, collection: 'devices' },
+  {
+    timestamps: true,
+    collection: 'devices',
+  },
 );
 
-DevicesSchema.index({ greenHouseId: 1 });
-DevicesSchema.index({ deviceType: 1 });
-DevicesSchema.index({ deviceStatus: 1 });
-DevicesSchema.index({ deviceName: 1 }, { unique: true });
-DevicesSchema.index({ installedAt: -1 });
+DevicesSchema.index({ greenHouseId: 1, deviceStatus: 1 });
+DevicesSchema.index({ sectionId: 1 });
 
 export default DevicesSchema;

@@ -130,4 +130,7 @@ export interface CreateActionLogData {
   resourceId?: string;
   memberId: string;
   memberFullName: string;
+  device: string;
+  ipAddress: string;
+  actionCode?: string;
 }
