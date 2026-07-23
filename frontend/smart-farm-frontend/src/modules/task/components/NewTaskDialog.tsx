@@ -7,6 +7,7 @@ import {
   Button,
   TextField,
   MenuItem,
+  Box,
 } from "@mui/material";
 
 interface NewTaskDialogProps {
@@ -17,6 +18,8 @@ interface NewTaskDialogProps {
     taskDescription: string;
     taskPriority: string;
     dueDate: string;
+    startTime?: string;
+    endTime?: string;
   }) => void;
 }
 
@@ -25,14 +28,25 @@ export function NewTaskDialog({ open, onClose, onSubmit }: NewTaskDialogProps) {
   const [taskDescription, setTaskDescription] = useState("");
   const [taskPriority, setTaskPriority] = useState("MEDIUM");
   const [dueDate, setDueDate] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
 
   function handleSubmit() {
     if (!taskTitle || !dueDate) return;
-    onSubmit({ taskTitle, taskDescription, taskPriority, dueDate });
+    onSubmit({
+      taskTitle,
+      taskDescription,
+      taskPriority,
+      dueDate,
+      startTime: startTime || undefined,
+      endTime: endTime || undefined,
+    });
     setTaskTitle("");
     setTaskDescription("");
     setTaskPriority("MEDIUM");
     setDueDate("");
+    setStartTime("");
+    setEndTime("");
   }
 
   return (
@@ -73,13 +87,33 @@ export function NewTaskDialog({ open, onClose, onSubmit }: NewTaskDialogProps) {
         </TextField>
         <TextField
           label="Due Date"
-          type="datetime-local"
+          type="date"
           fullWidth
           size="small"
           InputLabelProps={{ shrink: true }}
           value={dueDate}
           onChange={(e) => setDueDate(e.target.value)}
         />
+        <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
+          <TextField
+            label="Start Time"
+            type="time"
+            fullWidth
+            size="small"
+            InputLabelProps={{ shrink: true }}
+            value={startTime}
+            onChange={(e) => setStartTime(e.target.value)}
+          />
+          <TextField
+            label="End Time"
+            type="time"
+            fullWidth
+            size="small"
+            InputLabelProps={{ shrink: true }}
+            value={endTime}
+            onChange={(e) => setEndTime(e.target.value)}
+          />
+        </Box>
       </DialogContent>
       <DialogActions sx={{ p: 2 }}>
         <Button onClick={onClose} sx={{ textTransform: "none" }}>
