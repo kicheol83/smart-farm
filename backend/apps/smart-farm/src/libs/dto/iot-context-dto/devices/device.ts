@@ -4,6 +4,7 @@ import {
   Field,
   ID,
   Int,
+  Float,
   registerEnumType,
 } from '@nestjs/graphql';
 import {
@@ -70,6 +71,40 @@ export class Device {
 
   @Field(() => ID)
   greenHouseId: string;
+
+  @Field(() => ID, {
+    nullable: true,
+  })
+  sectionId?: string;
+
+  @Field({
+    nullable: true,
+  })
+  networkType?: string;
+
+  @Field({
+    nullable: true,
+  })
+  powerSource?: string;
+
+  @Field(() => Float, {
+    nullable: true,
+  })
+  rssi?: number;
+
+  @Field(() => Float, {
+    nullable: true,
+  })
+  snr?: number;
+
+  @Field({ nullable: true })
+  lastDataReceived?: Date;
+
+  @Field(() => Float, { nullable: true })
+  latitude?: number;
+
+  @Field(() => Float, { nullable: true })
+  longitude?: number;
 
   @Field()
   updatedAt: Date;
@@ -152,6 +187,30 @@ export class DeviceWithSensors {
   @Field(() => ID)
   greenHouseId: string;
 
+  @Field(() => ID, { nullable: true })
+  sectionId?: string;
+
+  @Field({ nullable: true })
+  networkType?: string;
+
+  @Field({ nullable: true })
+  powerSource?: string;
+
+  @Field(() => Float, { nullable: true })
+  rssi?: number;
+
+  @Field(() => Float, { nullable: true })
+  snr?: number;
+
+  @Field({ nullable: true })
+  lastDataReceived?: Date;
+
+  @Field(() => Float, { nullable: true })
+  latitude?: number;
+
+  @Field(() => Float, { nullable: true })
+  longitude?: number;
+
   @Field(() => [SensorInfo])
   sensors: SensorInfo[];
 
@@ -177,6 +236,29 @@ export class CreateDeviceInput {
   @Field(() => ID)
   @IsMongoId()
   greenHouseId: string;
+
+  @Field(() => ID, { nullable: true })
+  @IsOptional()
+  @IsMongoId()
+  sectionId?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  networkType?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  powerSource?: string;
+
+  @Field(() => Float, { nullable: true })
+  @IsOptional()
+  latitude?: number;
+
+  @Field(() => Float, { nullable: true })
+  @IsOptional()
+  longitude?: number;
 }
 
 @InputType()
@@ -195,6 +277,44 @@ export class UpdateDeviceInput {
   @IsOptional()
   @IsEnum(DeviceStatus)
   deviceStatus?: DeviceStatus;
+
+  @Field(() => ID, { nullable: true })
+  @IsOptional()
+  @IsMongoId()
+  sectionId?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  networkType?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  powerSource?: string;
+
+  @Field(() => Float, { nullable: true })
+  @IsOptional()
+  latitude?: number;
+
+  @Field(() => Float, { nullable: true })
+  @IsOptional()
+  longitude?: number;
+}
+
+@InputType()
+export class UpdateDeviceTelemetryInput {
+  @Field(() => ID)
+  @IsMongoId()
+  deviceId: string;
+
+  @Field(() => Float, { nullable: true })
+  @IsOptional()
+  rssi?: number;
+
+  @Field(() => Float, { nullable: true })
+  @IsOptional()
+  snr?: number;
 }
 
 @InputType()

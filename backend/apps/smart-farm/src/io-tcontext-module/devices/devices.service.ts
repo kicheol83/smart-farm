@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  Logger,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types, Document } from 'mongoose';
 import {
@@ -16,11 +11,6 @@ import {
   DeviceWithSensors,
 } from '../../libs/dto/iot-context-dto/devices/device';
 import { Member } from '../../libs/dto/account-context-dto/member/member';
-import { ActionLogService, IActionLog } from '../action-log/action-log.service';
-import {
-  ActionResource,
-  ActionType,
-} from '../../libs/dto/iot-context-dto/action-log/action-log';
 
 export interface IDevice extends Document {
   _id: Types.ObjectId;
@@ -29,6 +19,14 @@ export interface IDevice extends Document {
   deviceStatus: string;
   installedAt: Date;
   greenHouseId: Types.ObjectId;
+  sectionId?: Types.ObjectId;
+  networkType?: string;
+  powerSource?: string;
+  rssi?: number;
+  snr?: number;
+  lastDataReceived?: Date;
+  latitude?: number;
+  longitude?: number;
   updatedAt: Date;
 }
 
@@ -56,43 +54,21 @@ export class DevicesService {
 
     @InjectModel('sensors')
     private readonly sensorModel: Model<ISensor>,
-
-    private readonly actionLogService: ActionLogService,
   ) {}
 
-  public async create(
-    input: CreateDeviceInput,
-    member: Member,
-  ): Promise<IDevice> {
-    if (!Types.ObjectId.isValid(input.greenHouseId)) {
-      throw new BadRequestException('Invalid greenHouseId');
-    }
-
-    const greenhouse = await this.greenhouseModel.findById(input.greenHouseId);
-    if (!greenhouse) {
-      throw new NotFoundException('Greenhouse not found');
-    }
-
+  public async create(input: CreateDeviceInput): Promise<IDevice> {
     const device = await this.deviceModel.create({
       ...input,
       installedAt: new Date(input.installedAt),
       deviceStatus: DeviceStatus.OFFLINE,
       greenHouseId: new Types.ObjectId(input.greenHouseId),
+      sectionId: input.sectionId
+        ? new Types.ObjectId(input.sectionId)
+        : undefined,
     });
-
     this.logger.log(
       `Device created | ${device.deviceName} | type=${device.deviceType}`,
     );
-
-    await this.actionLogService.log({
-      actionType: ActionType.CREATE,
-      actionResource: ActionResource.DEVICE,
-      description: `Device "${device.deviceName}" created.`,
-      resourceId: device._id.toString(),
-      memberId: member._id.toString(),
-      memberFullName: member.memberFullName,
-    });
-
     return device;
   }
 
@@ -129,6 +105,27 @@ export class DevicesService {
     return device;
   }
 
+  public async updateTelemetry(
+    deviceId: string,
+    rssi?: number,
+    snr?: number,
+  ): Promise<IDevice> {
+    const device = await this.deviceModel
+      .findByIdAndUpdate(
+        deviceId,
+        {
+          ...(rssi !== undefined ? { rssi } : {}),
+          ...(snr !== undefined ? { snr } : {}),
+          lastDataReceived: new Date(),
+          deviceStatus: DeviceStatus.ONLINE,
+        },
+        { new: true },
+      )
+      .exec();
+    if (!device) throw new NotFoundException('Device not found.');
+    return device;
+  }
+
   public async filter(input: FilterDevicesInput): Promise<IDevice[]> {
     const query: any = {
       greenHouseId: new Types.ObjectId(input.greenHouseId),
@@ -147,13 +144,21 @@ export class DevicesService {
       .find({ deviceId: device._id })
       .exec();
 
-    return {
+    const result = {
       _id: String(device._id),
       deviceName: device.deviceName,
       deviceType: device.deviceType as DeviceType,
       deviceStatus: device.deviceStatus as DeviceStatus,
       installedAt: device.installedAt,
       greenHouseId: String(device.greenHouseId),
+      sectionId: device.sectionId ? String(device.sectionId) : undefined,
+      networkType: device.networkType,
+      powerSource: device.powerSource,
+      rssi: device.rssi,
+      snr: device.snr,
+      lastDataReceived: device.lastDataReceived,
+      latitude: device.latitude,
+      longitude: device.longitude,
       updatedAt: device.updatedAt,
       sensors: sensors.map((s) => ({
         _id: String(s._id),
@@ -161,6 +166,7 @@ export class DevicesService {
         sensorsUnit: s.sensorsUnit,
       })),
     };
+    return result;
   }
 
   public async getGreenhouseOverview(

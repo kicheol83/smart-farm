@@ -1,40 +1,66 @@
 import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from '../../account-context-module/auth/guards/auth.guard';
-import {
-  FilterDevicesInput,
-  Device,
-  DeviceWithSensors,
-  GreenhouseDeviceOverview,
-  CreateDeviceInput,
-  UpdateDeviceInput,
-  DeviceStatus,
-} from '../../libs/dto/iot-context-dto/devices/device';
 import { DevicesService } from './devices.service';
+import { ActionLogService } from '../action-log/action-log.service';
+import { AlertsService } from '../../ops-context-module/alerts/alerts.service';
+import {
+  CreateDeviceInput,
+  Device,
+  DeviceStatus,
+  DeviceWithSensors,
+  FilterDevicesInput,
+  GreenhouseDeviceOverview,
+  UpdateDeviceInput,
+  UpdateDeviceTelemetryInput,
+} from '../../libs/dto/iot-context-dto/devices/device';
+import { AuthGuard } from '../../account-context-module/auth/guards/auth.guard';
 import { AuthMember } from '../../account-context-module/auth/decorators/authMember.decorator';
 import { Member } from '../../libs/dto/account-context-dto/member/member';
+import { RequestMeta } from '../../account-context-module/auth/decorators/requesr.meta.decorator';
+import {
+  ActionResource,
+  ActionType,
+} from '../../libs/dto/iot-context-dto/action-log/action-log';
+import { AlertSeverity } from '../../libs/enums/alerts.enum';
 
 @Resolver(() => Device)
 export class DevicesResolver {
-  constructor(private readonly deviceService: DevicesService) {}
+  constructor(
+    private readonly deviceService: DevicesService,
+    private readonly actionLogService: ActionLogService,
+    private readonly alertService: AlertsService,
+  ) {}
 
-  @Mutation(() => Device, { description: 'Figma: Add New Device modal' })
+  @Mutation(() => Device)
   @UseGuards(AuthGuard)
   public async createDevice(
     @Args('input') input: CreateDeviceInput,
-    @AuthMember() member: Member,
+    @AuthMember() user: Member,
+    @RequestMeta() meta: RequestMeta,
   ): Promise<Device> {
-    const result = await this.deviceService.create(input, member);
-    return result as any;
+    const device = await this.deviceService.create(input);
+
+    await this.actionLogService.log({
+      actionType: ActionType.CREATE,
+      actionResource: ActionResource.DEVICE,
+      description: `Device ${device.deviceName} created`,
+      resourceId: String(device._id),
+      memberId: user._id.toString(),
+      memberFullName: user.memberFullName,
+      device: meta.device,
+      ipAddress: meta.ipAddress,
+      actionCode: 'DEV-01',
+    });
+
+    return device as any;
   }
 
-  @Query(() => DeviceWithSensors, { description: 'Device + uning sensorlari' })
+  @Query(() => DeviceWithSensors)
   @UseGuards(AuthGuard)
   public async deviceWithSensors(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<DeviceWithSensors> {
-    const result = await this.deviceService.findWithSensors(id);
-    return result;
+    return this.deviceService.findWithSensors(id);
   }
 
   @Query(() => GreenhouseDeviceOverview)
@@ -42,8 +68,7 @@ export class DevicesResolver {
   public async greenhouseDeviceOverview(
     @Args('greenHouseId', { type: () => ID }) greenHouseId: string,
   ): Promise<GreenhouseDeviceOverview> {
-    const result = await this.deviceService.getGreenhouseOverview(greenHouseId);
-    return result;
+    return this.deviceService.getGreenhouseOverview(greenHouseId);
   }
 
   @Query(() => [Device])
@@ -59,9 +84,24 @@ export class DevicesResolver {
   public async updateDevice(
     @Args('id', { type: () => ID }) id: string,
     @Args('input') input: UpdateDeviceInput,
+    @AuthMember() user: Member,
+    @RequestMeta() meta: RequestMeta,
   ): Promise<Device> {
-    const result = await this.deviceService.update(id, input);
-    return result as any;
+    const device = await this.deviceService.update(id, input);
+
+    await this.actionLogService.log({
+      actionType: ActionType.UPDATE,
+      actionResource: ActionResource.DEVICE,
+      description: `Device ${device.deviceName} updated`,
+      resourceId: id,
+      memberId: user._id.toString(),
+      memberFullName: user.memberFullName,
+      device: meta.device,
+      ipAddress: meta.ipAddress,
+      actionCode: 'DEV-02',
+    });
+
+    return device as any;
   }
 
   @Mutation(() => Device)
@@ -69,17 +109,73 @@ export class DevicesResolver {
   public async updateDeviceStatus(
     @Args('id', { type: () => ID }) id: string,
     @Args('status', { type: () => DeviceStatus }) status: DeviceStatus,
+    @AuthMember() user: Member,
+    @RequestMeta() meta: RequestMeta,
   ): Promise<Device> {
-    const result = await this.deviceService.updateStatus(id, status);
-    return result as any;
+    const device = await this.deviceService.updateStatus(id, status);
+
+    await this.actionLogService.log({
+      actionType: ActionType.UPDATE,
+      actionResource: ActionResource.DEVICE,
+      description: `Device ${device.deviceName} status changed to ${status}`,
+      resourceId: id,
+      memberId: user._id.toString(),
+      memberFullName: user.memberFullName,
+      device: meta.device,
+      ipAddress: meta.ipAddress,
+      actionCode: 'DEV-04',
+    });
+
+    if (status === DeviceStatus.ERROR) {
+      await this.alertService.createSystemAlert(
+        id,
+        AlertSeverity.CRITICAL,
+        `${device.deviceName} reported an error`,
+      );
+    } else if (status === DeviceStatus.OFFLINE) {
+      await this.alertService.createSystemAlert(
+        id,
+        AlertSeverity.WARNING,
+        `${device.deviceName} went offline`,
+      );
+    }
+
+    return device as any;
+  }
+
+  @Mutation(() => Device)
+  @UseGuards(AuthGuard)
+  public async updateDeviceTelemetry(
+    @Args('input') input: UpdateDeviceTelemetryInput,
+  ): Promise<Device> {
+    return this.deviceService.updateTelemetry(
+      input.deviceId,
+      input.rssi,
+      input.snr,
+    ) as any;
   }
 
   @Mutation(() => Boolean)
   @UseGuards(AuthGuard)
   public async deleteDevice(
     @Args('id', { type: () => ID }) id: string,
+    @AuthMember() user: Member,
+    @RequestMeta() meta: RequestMeta,
   ): Promise<boolean> {
     const result = await this.deviceService.remove(id);
+
+    await this.actionLogService.log({
+      actionType: ActionType.DELETE,
+      actionResource: ActionResource.DEVICE,
+      description: `Device deleted`,
+      resourceId: id,
+      memberId: user._id.toString(),
+      memberFullName: user.memberFullName,
+      device: meta.device,
+      ipAddress: meta.ipAddress,
+      actionCode: 'DEV-03',
+    });
+
     return result;
   }
 }
