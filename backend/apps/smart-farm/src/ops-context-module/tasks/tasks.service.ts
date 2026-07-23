@@ -22,6 +22,9 @@ export interface ITask extends Document {
   taskPriority: string;
   dueDate: Date;
   greenHousesId: Types.ObjectId;
+  sectionId?: Types.ObjectId;
+  startTime?: string;
+  endTime?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -62,6 +65,11 @@ export class TasksService {
       taskPriority: input.taskPriority,
       dueDate: new Date(input.dueDate),
       greenHousesId: new Types.ObjectId(input.greenHousesId),
+      sectionId: input.sectionId
+        ? new Types.ObjectId(input.sectionId)
+        : undefined,
+      startTime: input.startTime,
+      endTime: input.endTime,
     });
 
     if (input.assigneeIds?.length) {
@@ -187,6 +195,7 @@ export class TasksService {
       greenHousesId: new Types.ObjectId(input.greenHousesId),
     };
 
+    if (input.sectionId) query.sectionId = new Types.ObjectId(input.sectionId);
     if (input.taskStatus) query.taskStatus = input.taskStatus;
     if (input.taskPriority) query.taskPriority = input.taskPriority;
     if (input.search) {
@@ -238,6 +247,9 @@ export class TasksService {
       taskPriority: task.taskPriority as any,
       dueDate: task.dueDate,
       greenHousesId: String(task.greenHousesId),
+      sectionId: task.sectionId ? String(task.sectionId) : undefined,
+      startTime: task.startTime,
+      endTime: task.endTime,
       assignees,
       createdAt: task.createdAt,
       updatedAt: task.updatedAt,

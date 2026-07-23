@@ -1,11 +1,11 @@
-import { Schema } from 'mongoose';
-import { TaskPiority, TaskStatus } from '../../libs/enums/tasks.enums';
+import * as mongoose from 'mongoose';
 
-export const TasksSchema = new Schema(
+const TasksSchema = new mongoose.Schema(
   {
     taskTitle: {
       type: String,
       required: true,
+      trim: true,
     },
     taskDescription: {
       type: String,
@@ -13,39 +13,49 @@ export const TasksSchema = new Schema(
     },
     taskStatus: {
       type: String,
-      enum: Object.values(TaskStatus),
-      default: TaskStatus.TODO,
+      required: true,
+      enum: ['TODO', 'IN_PROGRESS', 'DONE'],
+      default: 'TODO',
     },
     taskPriority: {
       type: String,
-      enum: Object.values(TaskPiority),
-      default: TaskPiority.MEDIUM,
+      required: true,
+      enum: ['LOW', 'MEDIUM', 'HIGH'],
+      default: 'MEDIUM',
     },
     dueDate: {
       type: Date,
       required: true,
     },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
-    updatedAt: {
-      type: Date,
-      default: Date.now,
-    },
     greenHousesId: {
-      type: Schema.Types.ObjectId,
-      ref: 'GreenHouse',
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'greenHouses',
       required: true,
+      index: true,
+    },
+
+    sectionId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'sections',
+      required: false,
+      index: true,
+    },
+    startTime: {
+      type: String,
+      required: false,
+    },
+    endTime: {
+      type: String,
+      required: false,
     },
   },
-  { timestamps: true, collection: 'tasks' },
+  {
+    timestamps: true,
+    collection: 'tasks',
+  },
 );
 
-TasksSchema.index({ greenHousesId: 1 });
-TasksSchema.index({ taskStatus: 1 });
-TasksSchema.index({ taskPriority: 1 });
-TasksSchema.index({ dueData: 1 });
-TasksSchema.index({ createdAt: -1 });
+TasksSchema.index({ greenHousesId: 1, taskStatus: 1 });
+TasksSchema.index({ sectionId: 1 });
 
 export default TasksSchema;
