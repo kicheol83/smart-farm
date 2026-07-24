@@ -30,6 +30,19 @@ export const ActionLogSchema = new Schema(
       type: String,
       required: true,
     },
+
+    device: {
+      type: String,
+      required: false,
+    },
+    ipAddress: {
+      type: String,
+      required: false,
+    },
+    actionCode: {
+      type: String,
+      required: false,
+    },
   },
   { timestamps: true, collection: 'actionLogs' },
 );
