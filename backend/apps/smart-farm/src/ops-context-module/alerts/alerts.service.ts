@@ -16,6 +16,7 @@ import {
   ActiveAlertsSummary,
 } from '../../libs/dto/ops-context-dto/alerts/alert';
 import { Greenhouse } from '../../libs/dto/farm-context-dto/greenhouse/greenhouse';
+import { ISection } from '../../farm-context-module/sections/sections.service';
 
 export interface IAlert extends Document {
   _id: Types.ObjectId;
@@ -23,7 +24,9 @@ export interface IAlert extends Document {
   alertsThreshold: number;
   alertsActualValues: string;
   alertsSeverity: string;
-  sensorsId: Types.ObjectId;
+  sensorsId?: Types.ObjectId;
+  sectionId?: Types.ObjectId;
+  deviceId?: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -82,6 +85,9 @@ export class AlertsService {
 
     @InjectModel('farms')
     private readonly farmModel: Model<IFarm>,
+
+    @InjectModel('sections')
+    private readonly sectionModel: Model<ISection>,
   ) {}
 
   public async create(input: CreateAlertInput): Promise<IAlert> {
@@ -93,6 +99,7 @@ export class AlertsService {
     if (!sensor) {
       throw new NotFoundException('Sensor not found');
     }
+
     const alert = await this.alertModel.create({
       ...input,
       sensorsId: new Types.ObjectId(input.sensorsId),
@@ -101,6 +108,44 @@ export class AlertsService {
       `Alert created | type=${alert.alertsType} | severity=${alert.alertsSeverity}`,
     );
     return alert;
+  }
+
+  async createPlantHealthAlert(
+    sectionId: string,
+    severity: AlertSeverity,
+    description: string,
+    healthIndex: number,
+  ): Promise<IAlert> {
+    return this.create({
+      alertsType: 'PLANT_HEALTH',
+      alertsThreshold: 50,
+      alertsActualValues:
+        healthIndex < 50 ? AlertsActualValues.LOW : AlertsActualValues.NORMAL,
+      alertsSeverity: severity,
+      sectionId,
+    } as any).then((alert) => {
+      this.logger.log(
+        `Plant health alert | section=${sectionId} | ${description}`,
+      );
+      return alert;
+    });
+  }
+
+  async createSystemAlert(
+    deviceId: string,
+    severity: AlertSeverity,
+    description: string,
+  ): Promise<IAlert> {
+    return this.create({
+      alertsType: 'SYSTEM_SENSOR',
+      alertsThreshold: 0,
+      alertsActualValues: AlertsActualValues.HIGH,
+      alertsSeverity: severity,
+      deviceId,
+    } as any).then((alert) => {
+      this.logger.log(`System alert | device=${deviceId} | ${description}`);
+      return alert;
+    });
   }
 
   public async findBySensor(sensorsId: string): Promise<IAlert[]> {
@@ -161,26 +206,18 @@ export class AlertsService {
     alert: IAlert,
     actualValue: number,
   ): Promise<void> {
-    const sensor: ISensor = await this.sensorModel
-      .findById(alert.sensorsId)
-      .exec();
-    console.log('Sensor:', sensor);
+    const sensor = await this.sensorModel.findById(alert.sensorsId).exec();
     if (!sensor) return;
 
-    const device: IDevice = await this.deviceModel
-      .findById(sensor.deviceId)
-      .exec();
-    console.log('Device:', device);
+    const device = await this.deviceModel.findById(sensor.deviceId).exec();
     if (!device) return;
 
-    const greenhouse: IGreenhouse = await this.greenhouseModel
+    const greenhouse: any = await this.greenhouseModel
       .findById(device.greenHouseId)
       .exec();
     if (!greenhouse) return;
 
-    const farm: IFarm = await this.farmModel
-      .findById(greenhouse.farmsId)
-      .exec();
+    const farm = await this.farmModel.findById(greenhouse.farmsId).exec();
     if (!farm) return;
 
     const message = this.buildAlertMessage(
@@ -189,7 +226,7 @@ export class AlertsService {
       actualValue,
     );
 
-    const notification = await this.notificationModel.create({
+    await this.notificationModel.create({
       message,
       isRead: false,
       memberId: farm.memberId,
@@ -256,11 +293,13 @@ export class AlertsService {
     return result.modifiedCount;
   }
 
-  public async getActiveAlertsSummary(
+  async getActiveAlertsSummary(
     greenHouseId: string,
   ): Promise<ActiveAlertsSummary> {
+    const ghObjectId = new Types.ObjectId(greenHouseId);
+
     const devices = await this.deviceModel
-      .find({ greenHouseId: new Types.ObjectId(greenHouseId) })
+      .find({ greenHouseId: ghObjectId })
       .select('_id')
       .exec();
     const deviceIds = devices.map((d) => d._id);
@@ -271,8 +310,20 @@ export class AlertsService {
       .exec();
     const sensorIds = sensors.map((s) => s._id);
 
+    const sections = await this.sectionModel
+      .find({ greenHouseId: ghObjectId })
+      .select('_id')
+      .exec();
+    const sectionIds = sections.map((s) => s._id);
+
     const alerts = await this.alertModel
-      .find({ sensorsId: { $in: sensorIds } })
+      .find({
+        $or: [
+          { sensorsId: { $in: sensorIds } },
+          { sectionId: { $in: sectionIds } },
+          { deviceId: { $in: deviceIds } },
+        ],
+      })
       .sort({ createdAt: -1 })
       .exec();
 

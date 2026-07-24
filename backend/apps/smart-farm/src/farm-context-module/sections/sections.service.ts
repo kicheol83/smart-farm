@@ -84,6 +84,7 @@ export class SectionsService {
 
     @InjectModel('devices')
     private readonly deviceModel: Model<IDevice>,
+
     @InjectModel('crops')
     private cropModel: Model<Crops>,
 
