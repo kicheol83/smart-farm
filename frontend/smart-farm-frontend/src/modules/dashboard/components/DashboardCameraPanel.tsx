@@ -15,6 +15,7 @@ interface CameraItem {
   _id: string;
   cameraStreamUrl: string;
   cameraStatus: CameraStatus;
+  cameraName?: string;
 }
 
 interface DashboardCameraPanelProps {
@@ -69,7 +70,8 @@ export function DashboardCameraPanel({
               color: "#fff",
             }}
           >
-            {total > 0 ? `Camera ${index + 1}` : "Camera"}
+            {cameras[index]?.cameraName ??
+              (total > 0 ? `Camera ${index + 1}` : "Camera")}
           </Typography>
         </Box>
 
@@ -82,7 +84,6 @@ export function DashboardCameraPanel({
         </IconButton>
       </Box>
 
-      {/* O'rta: video placeholder (RTSP player keyinroq ulanadi) */}
       <Box
         sx={{
           display: "flex",
@@ -105,7 +106,6 @@ export function DashboardCameraPanel({
         </Typography>
       </Box>
 
-      {/* Pastki: 1/5 + navigatsiya + tugmalar */}
       <Box
         sx={{
           display: "flex",

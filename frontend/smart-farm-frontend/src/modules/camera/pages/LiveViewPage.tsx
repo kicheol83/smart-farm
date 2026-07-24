@@ -13,8 +13,7 @@ import {
 } from "../graphql/queries";
 
 export function LiveViewPage() {
-  localStorage.setItem("greenHouseId", "6a2daf715e4567e07ca5d328");
-  const greenHouseId = localStorage.getItem("greenHouseId") || "";
+  const greenHouseId = localStorage.getItem("currentGreenhouseId") || "";
   const hasGreenhouse = greenHouseId.length > 0;
 
   const [search, setSearch] = useState("");
@@ -34,7 +33,8 @@ export function LiveViewPage() {
   const selectedIndex = cameras.findIndex((c: any) => c._id === selectedId);
   const selectedCamera = cameras[selectedIndex];
   const cameraLabel =
-    selectedIndex >= 0 ? `Camera ${selectedIndex + 1}` : "Camera";
+    selectedCamera?.cameraName ??
+    (selectedIndex >= 0 ? `Camera ${selectedIndex + 1}` : "Camera");
 
   const { data: snapshotsData } = useQuery(GET_CAMERA_SNAPSHOTS, {
     variables: { cameraId: selectedId, limit: 20 },
@@ -101,7 +101,14 @@ export function LiveViewPage() {
                   void saveSnapshot;
                 }}
               />
-              <CameraInfoPanel cameraLabel={cameraLabel} />
+              <CameraInfoPanel
+                cameraLabel={cameraLabel}
+                cameraName={selectedCamera.cameraName}
+                model={selectedCamera.model}
+                networkStatus={selectedCamera.networkStatus}
+                resolution={selectedCamera.resolution}
+                encoding={selectedCamera.encoding}
+              />
             </>
           ) : (
             <Box

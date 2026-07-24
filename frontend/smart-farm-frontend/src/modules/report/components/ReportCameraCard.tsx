@@ -10,6 +10,7 @@ import VideocamOffRoundedIcon from "@mui/icons-material/VideocamOffRounded";
 interface CameraItem {
   _id: string;
   cameraStatus: string;
+  cameraName?: string;
 }
 
 interface ReportCameraCardProps {
@@ -51,7 +52,8 @@ export function ReportCameraCard({ cameras }: ReportCameraCardProps) {
             color: "#fff",
           }}
         >
-          {total > 0 ? `Camera ${index + 1}` : "Camera"}
+          {cameras[index]?.cameraName ??
+            (total > 0 ? `Camera ${index + 1}` : "Camera")}
         </Typography>
       </Box>
 

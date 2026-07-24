@@ -14,6 +14,7 @@ type CameraStatus = "ONLINE" | "OFFLINE" | "RECORDING";
 interface CameraItem {
   _id: string;
   cameraStatus: CameraStatus;
+  cameraName?: string;
 }
 
 interface CameraLocationSidebarProps {
@@ -139,7 +140,7 @@ export function CameraLocationSidebar({
                 flex: 1,
               }}
             >
-              Camera {i + 1}
+              {c.cameraName ?? `Camera ${i + 1}`}
             </Typography>
             <Box
               sx={{

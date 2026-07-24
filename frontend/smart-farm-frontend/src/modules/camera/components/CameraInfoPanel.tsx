@@ -2,6 +2,7 @@ import { Box, Card, Typography } from "@mui/material";
 
 interface CameraInfoPanelProps {
   cameraLabel: string;
+  cameraName?: string;
   model?: string;
   networkStatus?: string;
   resolution?: string;
@@ -10,13 +11,14 @@ interface CameraInfoPanelProps {
 
 export function CameraInfoPanel({
   cameraLabel,
+  cameraName,
   model,
   networkStatus,
   resolution,
   encoding,
 }: CameraInfoPanelProps) {
   const rows: [string, string][] = [
-    ["Name", cameraLabel],
+    ["Name", cameraName ?? cameraLabel],
     ["Model", model ?? "—"],
     ["Network Status", networkStatus ?? "—"],
     ["Resolution", resolution ?? "—"],
