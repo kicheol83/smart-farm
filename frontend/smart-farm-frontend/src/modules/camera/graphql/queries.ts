@@ -6,6 +6,11 @@ export const GET_CAMERAS_BY_GREENHOUSE = gql`
       _id
       cameraStreamUrl
       cameraStatus
+      cameraName
+      model
+      networkStatus
+      resolution
+      encoding
     }
   }
 `;

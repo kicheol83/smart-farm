@@ -37,6 +37,17 @@ export const GET_GREENHOUSE_SUMMARY = gql`
   }
 `;
 
+export const GET_GREENHOUSE_DETAIL = gql`
+  query GetGreenhouseDetail($id: ID!) {
+    greenhouse(id: $id) {
+      _id
+      greenHouseName
+      greenHouseType
+      greenHouseSize
+    }
+  }
+`;
+
 export const GET_GREENHOUSE_DEVICE_OVERVIEW = gql`
   query GreenhouseDeviceOverview($greenHouseId: ID!) {
     greenhouseDeviceOverview(greenHouseId: $greenHouseId) {
@@ -59,28 +70,6 @@ export const GET_GREENHOUSE_DEVICE_OVERVIEW = gql`
         deviceType
         deviceStatus
       }
-    }
-  }
-`;
-
-export const GET_GREENHOUSE_DETAIL = gql`
-  query GetGreenhouseDetail($id: ID!) {
-    greenhouse(id: $id) {
-      _id
-      greenHouseName
-      greenHouseType
-      greenHouseSize
-    }
-  }
-`;
-
-export const GET_DEVICE_LIST = gql`
-  query GetDeviceList($greenHouseId: ID!) {
-    devices(greenHouseId: $greenHouseId) {
-      _id
-      deviceName
-      deviceStatus
-      deviceType
     }
   }
 `;
@@ -117,6 +106,7 @@ export const GET_CAMERAS_BY_GREENHOUSE = gql`
       _id
       cameraStreamUrl
       cameraStatus
+      cameraName
     }
   }
 `;
