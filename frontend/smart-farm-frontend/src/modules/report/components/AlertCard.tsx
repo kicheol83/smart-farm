@@ -5,6 +5,8 @@ import ScienceRoundedIcon from "@mui/icons-material/ScienceRounded";
 import AirRoundedIcon from "@mui/icons-material/AirRounded";
 import WbSunnyRoundedIcon from "@mui/icons-material/WbSunnyRounded";
 import GrassRoundedIcon from "@mui/icons-material/GrassRounded";
+import SpaRoundedIcon from "@mui/icons-material/SpaRounded";
+import MemoryRoundedIcon from "@mui/icons-material/MemoryRounded";
 import type { SvgIconComponent } from "@mui/icons-material";
 import { format } from "date-fns";
 
@@ -28,7 +30,6 @@ const VALUE_STYLE: Record<
   HIGH: { label: "High", color: "#c62828", bg: "rgba(229,57,53,0.14)" },
 };
 
-/** Har bir alertsType uchun umumiy (generic) tavsiya matni — backend bermaydi, deterministik mapping */
 const ACTION_HINT: Record<string, string> = {
   TEMPERATURE: "Check ventilation and cooling system",
   HUMIDITY: "Check humidity control system",
@@ -36,6 +37,8 @@ const ACTION_HINT: Record<string, string> = {
   CO2: "Check ventilation system",
   SOIL_MOISTURE: "Check irrigation schedule",
   LIGHT: "Check lighting system",
+  PLANT_HEALTH: "Inspect section and check for pest/disease signs",
+  SYSTEM_SENSOR: "Check device power and connectivity",
 };
 
 const TYPE_ICON: Record<string, SvgIconComponent> = {
@@ -45,6 +48,8 @@ const TYPE_ICON: Record<string, SvgIconComponent> = {
   CO2: AirRoundedIcon,
   SOIL_MOISTURE: GrassRoundedIcon,
   LIGHT: WbSunnyRoundedIcon,
+  PLANT_HEALTH: SpaRoundedIcon,
+  SYSTEM_SENSOR: MemoryRoundedIcon,
 };
 
 function typeLabel(type: string): string {
@@ -59,15 +64,7 @@ export function AlertCard({
 }: AlertCardProps) {
   const valueStyle = VALUE_STYLE[alertsActualValues];
   const TypeIcon = TYPE_ICON[alertsType];
-  console.log({
-    alertsType,
-    valueStyle,
-  });
-  console.log({
-    alertsType,
-    alertsActualValues,
-    valueStyle,
-  });
+
   return (
     <Box
       sx={{
