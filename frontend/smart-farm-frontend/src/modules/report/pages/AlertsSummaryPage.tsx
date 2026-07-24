@@ -20,6 +20,8 @@ interface Alert {
 
 const ENVIRONMENTAL_TYPES = ["TEMPERATURE", "HUMIDITY", "CO2", "LIGHT"];
 const SOIL_TYPES = ["PH", "SOIL_MOISTURE"];
+const PLANT_HEALTH_TYPES = ["PLANT_HEALTH"];
+const SYSTEM_SENSOR_TYPES = ["SYSTEM_SENSOR"];
 
 const COLUMN_MAP: { key: Severity; label: string; dotColor: string }[] = [
   { key: "INFO", label: "Optimal", dotColor: "#35C56E" },
@@ -44,6 +46,12 @@ export function AlertsSummaryPage() {
     ENVIRONMENTAL_TYPES.includes(a.alertsType),
   );
   const soilAlerts = alerts.filter((a) => SOIL_TYPES.includes(a.alertsType));
+  const plantHealthAlerts = alerts.filter((a) =>
+    PLANT_HEALTH_TYPES.includes(a.alertsType),
+  );
+  const systemAlerts = alerts.filter((a) =>
+    SYSTEM_SENSOR_TYPES.includes(a.alertsType),
+  );
 
   if (!hasGreenhouse) {
     return (
@@ -69,13 +77,12 @@ export function AlertsSummaryPage() {
     <>
       <Header title="Alerts Summary" />
 
-      {/* 4 kategoriya karta */}
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, mb: 3 }}>
         <AlertCategoryCard
           dotColor="#f9ad19"
           label="Plant Health Alerts"
-          value="—"
-          description="Backend'da plant-health turidagi alertlar hali mavjud emas."
+          value={`${plantHealthAlerts.length} Alert${plantHealthAlerts.length !== 1 ? "s" : ""}`}
+          description="Section sog'lik indeksi kritik darajaga tushganda avtomatik yaratiladi."
         />
         <AlertCategoryCard
           dotColor="#f9ad19"
@@ -92,12 +99,11 @@ export function AlertsSummaryPage() {
         <AlertCategoryCard
           dotColor="#e53935"
           label="System & Sensor Alerts"
-          value="—"
-          description="Backend'da sensor-fault turidagi alertlar hali mavjud emas."
+          value={`${systemAlerts.length} Alert${systemAlerts.length !== 1 ? "s" : ""}`}
+          description="Qurilma offline yoki xato holatiga o'tganda avtomatik yaratiladi."
         />
       </Box>
 
-      {/* Tab + amallar */}
       <Box
         sx={{
           display: "flex",
@@ -133,7 +139,6 @@ export function AlertsSummaryPage() {
         </Box>
       </Box>
 
-      {/* 3-ustunli kanban */}
       <Box
         sx={{
           display: "grid",
