@@ -104,18 +104,7 @@ export class CameraService {
     return result;
   }
 
-  public async saveSnapshot(
-    input: CreateSnapshotInput,
-  ): Promise<ICameraSnapshot> {
-    if (!Types.ObjectId.isValid(input.cameraId)) {
-      throw new BadRequestException('Invalid cameraId');
-    }
-
-    const camera = await this.cameraModel.findById(input.cameraId);
-    if (!camera) {
-      throw new NotFoundException('Camera not found');
-    }
-
+  async saveSnapshot(input: CreateSnapshotInput): Promise<ICameraSnapshot> {
     const snapshot = await this.snapshotModel.create({
       snapshotUrl: input.snapshotUrl,
       captureAt: new Date(input.captureAt),

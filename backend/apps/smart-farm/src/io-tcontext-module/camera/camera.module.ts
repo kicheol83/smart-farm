@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { CameraResolver } from './camera.resolver';
 import { CameraService } from './camera.service';
 import { CameraSnapshootsSchema } from '../../schemas/iot/CameraSnapshots';
-import { CameraSchema } from '../../schemas/iot/Camera.model';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GreenHouseSchema } from '../../schemas/farm/GreenHouse.model';
 import { AuthModule } from '../../account-context-module/auth/auth.module';
+import CameraSchema from '../../schemas/iot/Camera.model';
 
 @Module({
   imports: [

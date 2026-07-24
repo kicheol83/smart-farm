@@ -11,7 +11,6 @@ import {
   IsNotEmpty,
   IsString,
   IsOptional,
-  IsUrl,
 } from 'class-validator';
 
 export enum CameraStatus {
@@ -43,6 +42,29 @@ export class Camera {
   @Field(() => ID)
   greenHouseId: string;
 
+  @Field({
+    nullable: true,
+  })
+  cameraName?: string;
+
+  @Field({
+    nullable: true,
+  })
+  model?: string;
+
+  @Field({
+    nullable: true,
+  })
+  networkStatus?: string;
+
+  @Field({
+    nullable: true,
+  })
+  resolution?: string;
+
+  @Field()
+  encoding?: string;
+
   @Field()
   createdAt: Date;
 
@@ -55,7 +77,7 @@ export class CameraSnapshot {
   @Field(() => ID)
   _id: string;
 
-  @Field()
+  @Field({ description: 'S3 snapshot URL' })
   snapshotUrl: string;
 
   @Field()
@@ -75,6 +97,31 @@ export class CreateCameraInput {
   @Field(() => ID)
   @IsMongoId()
   greenHouseId: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  cameraName?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  model?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  networkStatus?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  resolution?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  encoding?: string;
 }
 
 @InputType()
@@ -88,6 +135,31 @@ export class UpdateCameraInput {
   @IsOptional()
   @IsEnum(CameraStatus)
   cameraStatus?: CameraStatus;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  cameraName?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  model?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  networkStatus?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  resolution?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  encoding?: string;
 }
 
 @InputType()
