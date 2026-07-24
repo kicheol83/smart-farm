@@ -13,6 +13,8 @@ interface MapSection {
   sectionId: string;
   sectionName: string;
   sectionStatus: SectionStatus;
+  mapPositionX?: number;
+  mapPositionY?: number;
 }
 
 interface GreenhouseMapViewProps {
@@ -24,19 +26,23 @@ interface GreenhouseMapViewProps {
 const GREENHOUSE_IMAGE =
   "https://picsum.photos/seed/smartfarm-greenhouse-map/1400/900";
 
+const FALLBACK_POSITIONS = [
+  { top: 44, left: 58 },
+  { top: 47, left: 70 },
+  { top: 62, left: 45 },
+];
+
 export function GreenhouseMapView({
   sections,
   selectedId,
   onSelectSection,
 }: GreenhouseMapViewProps) {
-  const visiblePins = sections.slice(0, 4);
-  const sidebarChips = sections.slice(4);
-
-  const PIN_POSITIONS = [
-    { top: "44%", left: "58%" },
-    { top: "47%", left: "70%" },
-    { top: "62%", left: "45%" },
-  ];
+  const positioned = sections.filter(
+    (s) => s.mapPositionX !== undefined && s.mapPositionY !== undefined,
+  );
+  const unpositioned = sections.filter(
+    (s) => s.mapPositionX === undefined || s.mapPositionY === undefined,
+  );
 
   return (
     <Box
@@ -51,13 +57,57 @@ export function GreenhouseMapView({
         backgroundPosition: "center",
       }}
     >
-      {visiblePins.map((s, i) => (
+      {positioned.map((s, i) => {
+        const pos = { top: s.mapPositionY!, left: s.mapPositionX! };
+        return (
+          <Box
+            key={s.sectionId}
+            onClick={() => onSelectSection(s.sectionId)}
+            sx={{
+              position: "absolute",
+              top: `${pos.top}%`,
+              left: `${pos.left}%`,
+              transform: "translate(-50%, -50%)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 0.5,
+              cursor: "pointer",
+            }}
+          >
+            <Box
+              sx={{
+                bgcolor: "rgba(0,0,0,0.65)",
+                color: "#fff",
+                borderRadius: 1.5,
+                px: 1,
+                py: 0.25,
+                fontSize: 11,
+                fontFamily: "Inter, sans-serif",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {s.sectionName}
+            </Box>
+            <RadioButtonCheckedRoundedIcon
+              sx={{
+                fontSize: 16,
+                color: s.sectionId === selectedId ? "#35C56E" : "#fff",
+                filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.5))",
+              }}
+            />
+          </Box>
+        );
+      })}
+
+      {unpositioned.slice(0, 3).map((s, i) => (
         <Box
           key={s.sectionId}
           onClick={() => onSelectSection(s.sectionId)}
           sx={{
             position: "absolute",
-            ...PIN_POSITIONS[i % PIN_POSITIONS.length],
+            top: `${FALLBACK_POSITIONS[i % FALLBACK_POSITIONS.length].top}%`,
+            left: `${FALLBACK_POSITIONS[i % FALLBACK_POSITIONS.length].left}%`,
             transform: "translate(-50%, -50%)",
             display: "flex",
             flexDirection: "column",
@@ -101,7 +151,7 @@ export function GreenhouseMapView({
           alignItems: "flex-end",
         }}
       >
-        {sidebarChips.map((s) => (
+        {unpositioned.slice(3).map((s) => (
           <Box
             key={s.sectionId}
             onClick={() => onSelectSection(s.sectionId)}
@@ -127,7 +177,6 @@ export function GreenhouseMapView({
         ))}
       </Box>
 
-      {/* Chap pastki: fullscreen/layers */}
       <Box
         sx={{
           position: "absolute",
