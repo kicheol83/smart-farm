@@ -1,7 +1,6 @@
-import { Schema } from 'mongoose';
-import { CameraStatus } from '../../libs/enums/sensors.enum';
+import * as mongoose from 'mongoose';
 
-export const CameraSchema = new Schema(
+const CameraSchema = new mongoose.Schema(
   {
     cameraStreamUrl: {
       type: String,
@@ -9,30 +8,49 @@ export const CameraSchema = new Schema(
     },
     cameraStatus: {
       type: String,
-      enum: Object.values(CameraStatus),
-      default: CameraStatus.OFFLINE,
+      required: true,
+      enum: ['ONLINE', 'OFFLINE', 'RECORDING'],
+      default: 'OFFLINE',
     },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
-    updatedAt: {
-      type: Date,
-      default: Date.now,
+    greenHouseId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'greenHouses',
+      required: true,
+      index: true,
     },
 
-    greenHouseId: {
-      type: Schema.Types.ObjectId,
-      ref: 'GreenHouse',
-      required: true,
+    cameraName: {
+      type: String,
+      required: false,
+      trim: true,
+    },
+    model: {
+      type: String,
+      required: false,
+      trim: true,
+    },
+    networkStatus: {
+      type: String,
+      required: false,
+      trim: true,
+    },
+    resolution: {
+      type: String,
+      required: false,
+      trim: true,
+    },
+    encoding: {
+      type: String,
+      required: false,
+      trim: true,
     },
   },
-  { timestamps: true, collection: 'cameras' },
+  {
+    timestamps: true,
+    collection: 'cameras',
+  },
 );
 
-CameraSchema.index({ greenHouseId: 1 });
 CameraSchema.index({ greenHouseId: 1, cameraStatus: 1 });
-CameraSchema.index({ cameraStreamUrl: 1 }, { unique: true });
-CameraSchema.index({ createdAt: -1 });
 
 export default CameraSchema;
