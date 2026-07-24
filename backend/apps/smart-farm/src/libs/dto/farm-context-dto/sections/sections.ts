@@ -18,8 +18,6 @@ import {
   Min,
   Max,
 } from 'class-validator';
-import { Crops } from '../crops/crops';
-
 
 export enum SectionStatus {
   HEALTHY = 'HEALTHY',
@@ -55,15 +53,6 @@ registerEnumType(SectionType, {
   },
 });
 
-@InputType()
-export class SectionGeometryInput {
-  @Field()
-  type: string;
-
-  @Field(() => [[[Float]]])
-  coordinates: number[][][];
-}
-
 @ObjectType()
 export class Section {
   @Field(() => ID)
@@ -78,10 +67,10 @@ export class Section {
   @Field(() => SectionStatus)
   sectionStatus: SectionStatus;
 
-  @Field(() => Float, { description: 'Maydon m²' })
+  @Field(() => Float)
   sectionArea: number;
 
-  @Field(() => Int, { description: "O'simlik soni" })
+  @Field(() => Int)
   plantCount: number;
 
   @Field(() => Float, {
@@ -94,6 +83,16 @@ export class Section {
 
   @Field(() => ID, { nullable: true })
   cropsId?: string;
+
+  @Field(() => Float, {
+    nullable: true,
+  })
+  mapPositionX?: number;
+
+  @Field(() => Float, {
+    nullable: true,
+  })
+  mapPositionY?: number;
 
   @Field()
   createdAt: Date;
@@ -113,20 +112,30 @@ export class SectionHealthSummary {
   @Field(() => SectionStatus)
   sectionStatus: SectionStatus;
 
-  @Field(() => Float)
+  @Field(() => Float, { description: "Sog'lik indeksi 0-100" })
   healthIndex: number;
 
-  @Field(() => Float)
+  @Field(() => Float, { nullable: true, description: 'Harorat °C' })
   temperature?: number;
 
-  @Field(() => Float)
+  @Field(() => Float, { nullable: true, description: 'Namlik %' })
   humidity?: number;
 
-  @Field(() => Float)
+  @Field(() => Float, { nullable: true, description: 'Tuproq namligi %' })
   soilMoisture?: number;
 
-  @Field(() => Float)
+  @Field(() => Float, { nullable: true, description: 'pH' })
   ph?: number;
+
+  @Field(() => Float, {
+    nullable: true,
+  })
+  mapPositionX?: number;
+
+  @Field(() => Float, {
+    nullable: true,
+  })
+  mapPositionY?: number;
 
   @Field()
   lastUpdated: Date;
@@ -155,7 +164,7 @@ export class GreenhouseSectionOverview {
   @Field(() => Float)
   overallHealthIndex: number;
 
-  @Field(() => [SectionHealthSummary])
+  @Field(() => [SectionHealthSummary], {})
   sections: SectionHealthSummary[];
 }
 
@@ -180,9 +189,6 @@ export class CreateSectionInput {
   @IsPositive()
   plantCount: number;
 
-  @Field(() => SectionGeometryInput)
-  sectionGeometry: SectionGeometryInput;
-
   @Field(() => ID)
   @IsMongoId()
   greenHouseId: string;
@@ -191,6 +197,24 @@ export class CreateSectionInput {
   @IsOptional()
   @IsMongoId()
   cropsId?: string;
+
+  @Field(() => Float, {
+    nullable: true,
+  })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Max(100)
+  mapPositionX?: number;
+
+  @Field(() => Float, {
+    nullable: true,
+  })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Max(100)
+  mapPositionY?: number;
 }
 
 @InputType()
@@ -226,6 +250,24 @@ export class UpdateSectionInput {
   @IsOptional()
   @IsMongoId()
   cropsId?: string;
+
+  @Field(() => Float, {
+    nullable: true,
+  })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Max(100)
+  mapPositionX?: number;
+
+  @Field(() => Float, {
+    nullable: true,
+  })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Max(100)
+  mapPositionY?: number;
 }
 
 @InputType()

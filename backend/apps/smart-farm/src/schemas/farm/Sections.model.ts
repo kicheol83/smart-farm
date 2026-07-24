@@ -1,96 +1,67 @@
-import { Schema, Types } from 'mongoose';
-import {
-  SectionStatus,
-  SectionType,
-} from '../../libs/dto/farm-context-dto/sections/sections';
+import { Schema } from 'mongoose';
+import { SectionStatus, SectionType } from '../../libs/dto/farm-context-dto/sections/sections';
 
 export const SectionsSchema = new Schema(
   {
     sectionName: {
       type: String,
       required: true,
-      trim: true,
     },
-
     sectionType: {
       type: String,
       enum: Object.values(SectionType),
+      default: SectionType.HYDROPONIC,
       required: true,
     },
-
     sectionStatus: {
       type: String,
       enum: Object.values(SectionStatus),
       default: SectionStatus.HEALTHY,
+      required: true,
     },
-
     sectionArea: {
       type: Number,
       required: true,
-      min: 0,
     },
-
     plantCount: {
       type: Number,
       required: true,
-      min: 0,
     },
-
     currentHealthIndex: {
       type: Number,
-      default: 100,
+      default: null,
+    },
+    greenHouseId: {
+      type: Schema.Types.ObjectId,
+      ref: 'greenHouses',
+      required: true,
+    },
+    cropsId: {
+      type: Schema.Types.ObjectId,
+      ref: 'crops',
+      required: false,
+      default: null,
+    },
+
+    mapPositionX: {
+      type: Number,
+      required: false,
       min: 0,
       max: 100,
     },
-
-    sectionGeometry: {
-      type: {
-        type: String,
-        enum: ['Polygon'],
-        required: true,
-        default: 'Polygon',
-      },
-
-      coordinates: {
-        type: [[[Number]]],
-        required: true,
-      },
-    },
-
-    greenHouseId: {
-      type: Types.ObjectId,
-      ref: 'greenHouses',
-      required: true,
-      index: true,
-    },
-
-    cropsId: {
-      type: Types.ObjectId,
-      ref: 'crops',
-      default: null,
-      index: true,
+    mapPositionY: {
+      type: Number,
+      required: false,
+      min: 0,
+      max: 100,
     },
   },
-  {
-    timestamps: true,
-    collection: 'sections',
-  },
+  { timestamps: true, collection: 'sections' },
 );
 
-SectionsSchema.index({
-  sectionGeometry: '2dsphere',
-});
-
-SectionsSchema.index({
-  greenHouseId: 1,
-});
-
-SectionsSchema.index({
-  cropsId: 1,
-});
-
-SectionsSchema.index({
-  sectionStatus: 1,
-});
+SectionsSchema.index({ greenHouseId: 1 });
+SectionsSchema.index({ sectionStatus: 1 });
+SectionsSchema.index({ greenHouseId: 1, sectionStatus: 1 });
+SectionsSchema.index({ cropsId: 1 });
 
 export default SectionsSchema;

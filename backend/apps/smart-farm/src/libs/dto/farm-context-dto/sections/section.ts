@@ -19,6 +19,8 @@ import {
   Max,
 } from 'class-validator';
 
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
 export enum SectionStatus {
   HEALTHY = 'HEALTHY',
   WARNING = 'WARNING',
@@ -84,6 +86,16 @@ export class Section {
   @Field(() => ID, { nullable: true })
   cropsId?: string;
 
+  @Field(() => Float, {
+    nullable: true,
+  })
+  mapPositionX?: number;
+
+  @Field(() => Float, {
+    nullable: true,
+  })
+  mapPositionY?: number;
+
   @Field()
   createdAt: Date;
 
@@ -105,19 +117,29 @@ export class SectionHealthSummary {
   @Field(() => Float)
   healthIndex: number;
 
-  @Field(() => Float, { nullable: true })
+  @Field(() => Float)
   temperature?: number;
 
-  @Field(() => Float, { nullable: true })
+  @Field(() => Float)
   humidity?: number;
 
-  @Field(() => Float, { nullable: true })
+  @Field(() => Float)
   soilMoisture?: number;
 
-  @Field(() => Float, { nullable: true })
+  @Field(() => Float)
   ph?: number;
 
-  @Field({ description: 'Oxirgi yangilanish' })
+  @Field(() => Float, {
+    nullable: true,
+  })
+  mapPositionX?: number;
+
+  @Field(() => Float, {
+    nullable: true,
+  })
+  mapPositionY?: number;
+
+  @Field()
   lastUpdated: Date;
 }
 
@@ -144,7 +166,7 @@ export class GreenhouseSectionOverview {
   @Field(() => Float)
   overallHealthIndex: number;
 
-  @Field(() => [SectionHealthSummary], {})
+  @Field(() => [SectionHealthSummary])
   sections: SectionHealthSummary[];
 }
 
@@ -177,6 +199,24 @@ export class CreateSectionInput {
   @IsOptional()
   @IsMongoId()
   cropsId?: string;
+
+  @Field(() => Float, {
+    nullable: true,
+  })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Max(100)
+  mapPositionX?: number;
+
+  @Field(() => Float, {
+    nullable: true,
+  })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Max(100)
+  mapPositionY?: number;
 }
 
 @InputType()
@@ -212,6 +252,24 @@ export class UpdateSectionInput {
   @IsOptional()
   @IsMongoId()
   cropsId?: string;
+
+  @Field(() => Float, {
+    nullable: true,
+  })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Max(100)
+  mapPositionX?: number;
+
+  @Field(() => Float, {
+    nullable: true,
+  })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Max(100)
+  mapPositionY?: number;
 }
 
 @InputType()
