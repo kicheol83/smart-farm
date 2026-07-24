@@ -1,5 +1,27 @@
 import { gql } from "@apollo/client";
 
+export const GET_FARM = gql`
+  query GetFarm($farmId: ID!) {
+    farm(farmId: $farmId) {
+      _id
+      farmName
+      farmLocation
+      farmDescription
+    }
+  }
+`;
+
+export const UPDATE_FARM = gql`
+  mutation UpdateFarm($farmId: ID!, $input: UpdateFarmInput!) {
+    updateFarm(farmId: $farmId, input: $input) {
+      _id
+      farmName
+      farmLocation
+      farmDescription
+    }
+  }
+`;
+
 export const GET_MY_SETTINGS = gql`
   query MySettings {
     mySettings {
@@ -55,6 +77,11 @@ export const GET_MY_NOTIFICATION_SETTINGS = gql`
       infoAlerts
       deviceOfflineAlerts
       reportReadyAlerts
+      floatingNotifications
+      lockScreenNotifications
+      notificationsManagement
+      triggerEveryNMessages
+      sendOncePerDays
     }
   }
 `;
@@ -76,6 +103,11 @@ export const UPDATE_NOTIFICATION_SETTINGS = gql`
       infoAlerts
       deviceOfflineAlerts
       reportReadyAlerts
+      floatingNotifications
+      lockScreenNotifications
+      notificationsManagement
+      triggerEveryNMessages
+      sendOncePerDays
     }
   }
 `;
@@ -89,6 +121,9 @@ export const GET_MY_ACTION_LOGS_FOR_SETTINGS = gql`
         actionResource
         description
         memberFullName
+        device
+        ipAddress
+        actionCode
         createdAt
       }
       total

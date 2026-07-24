@@ -13,7 +13,8 @@ import {
 } from "../graphql/queries";
 
 export function LiveViewPage() {
-  const greenHouseId = localStorage.getItem("currentGreenhouseId") || "";
+  localStorage.setItem("greenHouseId", "6a2daf715e4567e07ca5d328");
+  const greenHouseId = localStorage.getItem("greenHouseId") || "";
   const hasGreenhouse = greenHouseId.length > 0;
 
   const [search, setSearch] = useState("");
