@@ -10,6 +10,7 @@ import SensorsSchema from '../../schemas/iot/Sensors.model';
 import DevicesSchema from '../../schemas/iot/Devices.model';
 import { AuthModule } from '../../account-context-module/auth/auth.module';
 import CropsSchema from '../../schemas/farm/Crops.model';
+import { AlertsModule } from '../../ops-context-module/alerts/alerts.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import CropsSchema from '../../schemas/farm/Crops.model';
       },
     ]),
     AuthModule,
+    AlertsModule
   ],
   providers: [SectionsResolver, SectionsService],
   exports: [SectionsService],

@@ -15,6 +15,8 @@ import {
   GreenhouseSectionOverview,
 } from '../../libs/dto/farm-context-dto/sections/sections';
 import { Crops } from '../../libs/dto/farm-context-dto/crops/crops';
+import { AlertSeverity } from '../../libs/enums/alerts.enum';
+import { AlertsService } from '../../ops-context-module/alerts/alerts.service';
 
 export interface ISection extends Document {
   _id: Types.ObjectId;
@@ -26,6 +28,8 @@ export interface ISection extends Document {
   currentHealthIndex?: number;
   greenHouseId: Types.ObjectId;
   cropsId?: Types.ObjectId;
+  mapPositionX?: number;
+  mapPositionY?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -82,6 +86,8 @@ export class SectionsService {
     private readonly deviceModel: Model<IDevice>,
     @InjectModel('crops')
     private cropModel: Model<Crops>,
+
+    private readonly alertService: AlertsService,
   ) {}
 
   public async create(input: CreateSectionInput): Promise<ISection> {
@@ -153,9 +159,7 @@ export class SectionsService {
     return true;
   }
 
-  public async updateHealth(
-    input: UpdateSectionHealthInput,
-  ): Promise<ISection> {
+  async updateHealth(input: UpdateSectionHealthInput): Promise<ISection> {
     const status = this.resolveStatus(input.healthIndex);
 
     const section = await this.sectionModel
@@ -173,10 +177,27 @@ export class SectionsService {
     this.logger.log(
       `Section health updated | ${section.sectionName} | index=${input.healthIndex} | status=${status}`,
     );
+
+    if (status === SectionStatus.CRITICAL) {
+      await this.alertService.createPlantHealthAlert(
+        String(section._id),
+        AlertSeverity.CRITICAL,
+        `${section.sectionName} health dropped to ${input.healthIndex}%`,
+        input.healthIndex,
+      );
+    } else if (status === SectionStatus.WARNING) {
+      await this.alertService.createPlantHealthAlert(
+        String(section._id),
+        AlertSeverity.WARNING,
+        `${section.sectionName} health at ${input.healthIndex}% — needs attention`,
+        input.healthIndex,
+      );
+    }
+
     return section;
   }
 
-  public async getGreenhouseOverview(
+  async getGreenhouseOverview(
     greenHouseId: string,
   ): Promise<GreenhouseSectionOverview> {
     const greenhouse = await this.greenhouseModel.findById(greenHouseId).exec();
@@ -231,8 +252,6 @@ export class SectionsService {
   ): Promise<SectionHealthSummary> {
     const sensorData = await this.getLatestSensorData(greenHouseId);
 
-    console.log('Sensor Data', sensorData);
-
     const healthIndex = section.currentHealthIndex ?? 0;
     const status = this.resolveStatus(healthIndex);
 
@@ -245,6 +264,8 @@ export class SectionsService {
       humidity: sensorData['HUMIDITY'],
       soilMoisture: sensorData['SOIL_MOISTURE'],
       ph: sensorData['PH'],
+      mapPositionX: section.mapPositionX,
+      mapPositionY: section.mapPositionY,
       lastUpdated: section.updatedAt,
     };
   }
