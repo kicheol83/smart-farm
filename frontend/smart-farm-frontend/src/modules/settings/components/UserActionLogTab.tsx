@@ -18,6 +18,9 @@ interface ActionLogItem {
   actionResource: string;
   description: string;
   memberFullName: string;
+  device?: string;
+  ipAddress?: string;
+  actionCode?: string;
   createdAt: string;
 }
 
@@ -101,7 +104,7 @@ export function UserActionLogTab({
                     borderColor: "divider",
                   }}
                 >
-                  —
+                  {a.device ?? "—"}
                 </TableCell>
                 <TableCell
                   sx={{
@@ -111,7 +114,7 @@ export function UserActionLogTab({
                     borderColor: "divider",
                   }}
                 >
-                  —
+                  {a.actionCode ?? "—"}
                 </TableCell>
                 <TableCell
                   sx={{
@@ -121,7 +124,7 @@ export function UserActionLogTab({
                     borderColor: "divider",
                   }}
                 >
-                  —
+                  {a.ipAddress ?? "—"}
                 </TableCell>
                 <TableCell
                   sx={{
