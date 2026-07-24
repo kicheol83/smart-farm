@@ -6,7 +6,7 @@ import {
   Int,
   registerEnumType,
 } from '@nestjs/graphql';
-import { IsEnum, IsMongoId, IsOptional, IsDateString } from 'class-validator';
+import { IsEnum, IsOptional, IsDateString } from 'class-validator';
 
 export enum ActionType {
   CREATE = 'CREATE',
@@ -46,7 +46,6 @@ registerEnumType(ActionType, {
 
 registerEnumType(ActionResource, {
   name: 'ActionResource',
-  description: 'Qaysi resurs ustida amal bajarildi',
 });
 
 @ObjectType()
@@ -71,6 +70,17 @@ export class ActionLog {
 
   @Field()
   memberFullName: string;
+
+  @Field({
+    nullable: true,
+  })
+  device?: string;
+
+  @Field({ nullable: true })
+  ipAddress?: string;
+
+  @Field({ nullable: true })
+  actionCode?: string;
 
   @Field()
   createdAt: Date;
@@ -112,12 +122,12 @@ export class GetActionLogsInput {
   @IsEnum(ActionResource)
   actionResource?: ActionResource;
 
-  @Field({ nullable: true })
+  @Field()
   @IsOptional()
   @IsDateString()
   from?: string;
 
-  @Field({ nullable: true })
+  @Field()
   @IsOptional()
   @IsDateString()
   to?: string;
@@ -130,7 +140,7 @@ export interface CreateActionLogData {
   resourceId?: string;
   memberId: string;
   memberFullName: string;
-  device: string;
-  ipAddress: string;
+  device?: string;
+  ipAddress?: string;
   actionCode?: string;
 }
