@@ -46,12 +46,23 @@ registerEnumType(AlertSeverity, {
   },
 });
 
+export const ALERT_TYPE = {
+  TEMPERATURE: 'TEMPERATURE',
+  HUMIDITY: 'HUMIDITY',
+  CO2: 'CO2',
+  LIGHT: 'LIGHT',
+  PH: 'PH',
+  SOIL_MOISTURE: 'SOIL_MOISTURE',
+  PLANT_HEALTH: 'PLANT_HEALTH',
+  SYSTEM_SENSOR: 'SYSTEM_SENSOR',
+} as const;
+
 @ObjectType()
 export class Alert {
   @Field(() => ID)
   _id: string;
 
-  @Field()
+  @Field({})
   alertsType: string;
 
   @Field(() => Float)
@@ -63,8 +74,20 @@ export class Alert {
   @Field(() => AlertSeverity)
   alertsSeverity: AlertSeverity;
 
-  @Field(() => ID)
-  sensorsId: string;
+  @Field(() => ID, {
+    nullable: true,
+  })
+  sensorsId?: string;
+
+  @Field(() => ID, {
+    nullable: true,
+  })
+  sectionId?: string;
+
+  @Field(() => ID, {
+    nullable: true,
+  })
+  deviceId?: string;
 
   @Field()
   createdAt: Date;
@@ -90,7 +113,9 @@ export class AlertNotification {
   @Field(() => ID)
   alertsId: string;
 
-  @Field(() => Alert, { nullable: true })
+  @Field(() => Alert, {
+    nullable: true,
+  })
   alert?: Alert;
 
   @Field()
@@ -141,7 +166,7 @@ export class ActiveAlertsSummary {
 
 @InputType()
 export class CreateAlertInput {
-  @Field()
+  @Field({})
   @IsString()
   @IsNotEmpty()
   alertsType: string;
@@ -158,9 +183,26 @@ export class CreateAlertInput {
   @IsEnum(AlertSeverity)
   alertsSeverity: AlertSeverity;
 
-  @Field(() => ID)
+  @Field(() => ID, {
+    nullable: true,
+  })
+  @IsOptional()
   @IsMongoId()
-  sensorsId: string;
+  sensorsId?: string;
+
+  @Field(() => ID, {
+    nullable: true,
+  })
+  @IsOptional()
+  @IsMongoId()
+  sectionId?: string;
+
+  @Field(() => ID, {
+    nullable: true,
+  })
+  @IsOptional()
+  @IsMongoId()
+  deviceId?: string;
 }
 
 @InputType()

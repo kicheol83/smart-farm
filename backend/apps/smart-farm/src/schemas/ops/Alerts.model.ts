@@ -1,14 +1,13 @@
-import { Schema } from 'mongoose';
-import {
-  AlertsActualValues,
-  AlertSeverity,
-} from '../../libs/enums/alerts.enum';
+import * as mongoose from 'mongoose';
 
-export const AlertsSchema = new Schema(
+const AlertsSchema = new mongoose.Schema(
   {
     alertsType: {
       type: String,
       required: true,
+      trim: true,
+      description:
+        'TEMPERATURE, HUMIDITY, PH, CO2, SOIL_MOISTURE, LIGHT, PLANT_HEALTH, SYSTEM_SENSOR',
     },
     alertsThreshold: {
       type: Number,
@@ -16,31 +15,41 @@ export const AlertsSchema = new Schema(
     },
     alertsActualValues: {
       type: String,
-      enum: Object.values(AlertsActualValues),
-      default: AlertsActualValues.LOW,
+      enum: ['LOW', 'NORMAL', 'HIGH'],
+      required: true,
     },
     alertsSeverity: {
       type: String,
-      enum: Object.values(AlertSeverity),
-      default: AlertSeverity.INFO,
-    },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
-    updatedAt: {
-      type: Date,
-      default: Date.now,
-    },
-    sensorsId: {
-      type: Schema.Types.ObjectId,
-      ref: 'Sensors',
+      enum: ['INFO', 'WARNING', 'CRITICAL'],
       required: true,
     },
+    sensorsId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'sensors',
+      required: false,
+    },
+
+    sectionId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'sections',
+      required: false,
+      index: true,
+    },
+    deviceId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'devices',
+      required: false,
+      index: true,
+    },
   },
-  { timestamps: true, collection: 'alerts' },
+  {
+    timestamps: true,
+    collection: 'alerts',
+  },
 );
 
 AlertsSchema.index({ sensorsId: 1 });
+AlertsSchema.index({ alertsType: 1 });
+AlertsSchema.index({ alertsSeverity: 1 });
 
 export default AlertsSchema;

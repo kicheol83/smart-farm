@@ -9,6 +9,7 @@ import GreenHouseSchema from '../../schemas/farm/GreenHouse.model';
 import FarmsSchema from '../../schemas/farm/Farms.model';
 import { AuthModule } from '../../account-context-module/auth/auth.module';
 import { AlertsService } from './alerts.service';
+import SectionsSchema from '../../schemas/farm/Sections.model';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { AlertsService } from './alerts.service';
       { name: 'devices', schema: DevicesSchema },
       { name: 'greenHouses', schema: GreenHouseSchema },
       { name: 'farms', schema: FarmsSchema },
+      { name: 'sections', schema: SectionsSchema },
     ]),
     AuthModule,
   ],
