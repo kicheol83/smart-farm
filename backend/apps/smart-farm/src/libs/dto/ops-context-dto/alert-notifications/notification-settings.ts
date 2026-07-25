@@ -69,6 +69,27 @@ export class NotificationSettings {
   @Field()
   reportReadyAlerts: boolean;
 
+  @Field({
+    nullable: true,
+  })
+  floatingNotifications?: boolean;
+
+  @Field({ nullable: true })
+  lockScreenNotifications?: boolean;
+
+  @Field({ nullable: true, })
+  notificationsManagement?: boolean;
+
+  @Field(() => Float, {
+    nullable: true,
+  })
+  triggerEveryNMessages?: number;
+
+  @Field(() => Float, {
+    nullable: true,
+  })
+  sendOncePerDays?: number;
+
   @Field()
   createdAt: Date;
 
@@ -181,4 +202,31 @@ export class UpdateNotificationSettingsInput {
   @IsOptional()
   @IsBoolean()
   reportReadyAlerts?: boolean;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  floatingNotifications?: boolean;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  lockScreenNotifications?: boolean;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  notificationsManagement?: boolean;
+
+  @Field(() => Float, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  triggerEveryNMessages?: number;
+
+  @Field(() => Float, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  sendOncePerDays?: number;
 }
