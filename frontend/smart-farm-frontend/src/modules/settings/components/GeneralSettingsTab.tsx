@@ -11,23 +11,40 @@ const TIMEZONES = [
 
 interface GeneralSettingsTabProps {
   timezone?: string;
-  onSave: (data: { timezone: string }) => void;
+  farmName?: string;
+  farmLocation?: string;
+  farmDescription?: string;
+  onSave: (data: {
+    timezone: string;
+    farmName: string;
+    farmLocation: string;
+    farmDescription: string;
+  }) => void;
   saving?: boolean;
 }
 
 export function GeneralSettingsTab({
   timezone,
+  farmName,
+  farmLocation,
+  farmDescription,
   onSave,
   saving,
 }: GeneralSettingsTabProps) {
-  const [farmProfile, setFarmProfile] = useState("My Smart Farm");
-  const [farmLocation, setFarmLocation] = useState("");
-  const [farmDescription, setFarmDescription] = useState("");
+  const [name, setName] = useState(farmName ?? "");
+  const [location, setLocation] = useState(farmLocation ?? "");
+  const [description, setDescription] = useState(farmDescription ?? "");
   const [tz, setTz] = useState(timezone ?? "Europe/Berlin");
 
   useEffect(() => {
     if (timezone) setTz(timezone);
   }, [timezone]);
+
+  useEffect(() => {
+    if (farmName !== undefined) setName(farmName);
+    if (farmLocation !== undefined) setLocation(farmLocation);
+    if (farmDescription !== undefined) setDescription(farmDescription);
+  }, [farmName, farmLocation, farmDescription]);
 
   return (
     <Box
@@ -47,9 +64,9 @@ export function GeneralSettingsTab({
         <TextField
           fullWidth
           size="small"
-          value={farmProfile}
-          onChange={(e) => setFarmProfile(e.target.value)}
-          helperText="Backend'da hali saqlanmaydi"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="My Smart Farm"
         />
       </Box>
 
@@ -74,10 +91,9 @@ export function GeneralSettingsTab({
           <TextField
             fullWidth
             size="small"
-            value={farmLocation}
-            onChange={(e) => setFarmLocation(e.target.value)}
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
             placeholder="Address"
-            helperText="Backend'da hali saqlanmaydi"
           />
         </Box>
         <Box>
@@ -123,9 +139,8 @@ export function GeneralSettingsTab({
           multiline
           rows={4}
           size="small"
-          value={farmDescription}
-          onChange={(e) => setFarmDescription(e.target.value)}
-          helperText="Backend'da hali saqlanmaydi"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
         />
       </Box>
 
@@ -139,7 +154,14 @@ export function GeneralSettingsTab({
         <Button
           variant="contained"
           disabled={saving}
-          onClick={() => onSave({ timezone: tz })}
+          onClick={() =>
+            onSave({
+              timezone: tz,
+              farmName: name,
+              farmLocation: location,
+              farmDescription: description,
+            })
+          }
           sx={{ textTransform: "none", borderRadius: 2 }}
         >
           Save

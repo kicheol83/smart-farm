@@ -22,7 +22,7 @@ const STATUS_STYLE: Record<
 
 export function ReportDetailsPreview() {
   const navigate = useNavigate();
-  const greenHouseId = localStorage.getItem("currentGreenhouseId") || "";
+  const greenHouseId = localStorage.getItem("greenHouseId") || "";
 
   const { data } = useQuery(GET_REPORT_ENTRIES, {
     variables: { input: { greenHouseId, page: 1, limit: 3 } },
