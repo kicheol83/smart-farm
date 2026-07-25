@@ -1,22 +1,53 @@
 import { useQuery } from "@apollo/client";
 import { Box, Typography, Card, IconButton } from "@mui/material";
 import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded";
+import { format } from "date-fns";
 import { Header } from "@/components/layout/Header";
 import { WaterUsageMetricCard } from "../components/WaterUsageMetricCard";
 import { WaterUsageDistributionChart } from "../components/WaterUsageDistributionChart";
-import { GET_FULL_GREENHOUSE_REPORT } from "../graphql/queries";
+import {
+  GET_FULL_GREENHOUSE_REPORT,
+  GET_WATER_EFFICIENCY_REPORT,
+  GET_WATER_ANOMALY_DETECTION,
+  GET_WATER_COST_ESTIMATION,
+  GET_WATER_ZONE_USAGE_REPORT,
+} from "../graphql/queries";
 
 export function WaterUsageAnalyticsPage() {
-  localStorage.setItem("greenHouseId", "6a2daf715e4567e07ca5d328");
-  const greenHouseId = localStorage.getItem("greenHouseId") || "";
+  const greenHouseId = localStorage.getItem("currentGreenhouseId") || "";
   const hasGreenhouse = greenHouseId.length > 0;
+  const analyticsInput = { greenHouseId };
 
   const { data } = useQuery(GET_FULL_GREENHOUSE_REPORT, {
     variables: { input: { greenHouseId, period: "LAST_7_DAYS" } },
     skip: !hasGreenhouse,
   });
 
+  const { data: efficiencyData } = useQuery(GET_WATER_EFFICIENCY_REPORT, {
+    variables: { input: analyticsInput },
+    skip: !hasGreenhouse,
+  });
+
+  const { data: anomalyData } = useQuery(GET_WATER_ANOMALY_DETECTION, {
+    variables: { input: analyticsInput },
+    skip: !hasGreenhouse,
+  });
+
+  const { data: costData } = useQuery(GET_WATER_COST_ESTIMATION, {
+    variables: { input: analyticsInput },
+    skip: !hasGreenhouse,
+  });
+
+  const { data: zoneData } = useQuery(GET_WATER_ZONE_USAGE_REPORT, {
+    variables: { input: analyticsInput },
+    skip: !hasGreenhouse,
+  });
+
   const waterUsage = data?.greenhouseFullReport?.waterUsage;
+  const efficiency = efficiencyData?.waterEfficiencyReport;
+  const anomaly = anomalyData?.waterAnomalyDetection;
+  const cost = costData?.waterCostEstimation;
+  const zones = zoneData?.waterZoneUsageReport?.zones ?? [];
   const lastUpdated = waterUsage ? "Today" : undefined;
 
   if (!hasGreenhouse) {
@@ -53,21 +84,28 @@ export function WaterUsageAnalyticsPage() {
         />
         <WaterUsageMetricCard
           label="Water Efficiency Score"
-          value="—"
+          value={efficiency ? String(efficiency.efficiencyScore) : "--"}
           unit="/100"
-          description="Backend'da samaradorlik hisob-kitobi hali mavjud emas."
+          description="Measures water usage efficiency based on liters delivered per minute of irrigation."
+          lastUpdated={lastUpdated}
         />
         <WaterUsageMetricCard
           label="Average Water per Plant"
-          value="—"
+          value={efficiency ? efficiency.averageWaterPerPlant.toFixed(2) : "--"}
           unit="L/day"
-          description="Backend'da o'simlik boshiga hisob-kitob hali mavjud emas."
+          description="Shows the average volume of water received by each plant daily."
+          lastUpdated={lastUpdated}
         />
         <WaterUsageMetricCard
           label="Irrigation Duration"
-          value="—"
+          value={
+            efficiency
+              ? String(Math.round(efficiency.irrigationDurationMinutes))
+              : "--"
+          }
           unit="min/day"
-          description="Backend'da irrigatsiya davomiyligi hali mavjud emas."
+          description="Displays total irrigation duration over the last 24 hours for improved monitoring."
+          lastUpdated={lastUpdated}
         />
       </Box>
 
@@ -103,17 +141,91 @@ export function WaterUsageAnalyticsPage() {
               >
                 Anomaly Detection
               </Typography>
-              <Typography
+              <Box
                 sx={{
-                  fontFamily: "Satoshi, sans-serif",
-                  fontWeight: 700,
-                  fontSize: 28,
-                  color: "text.secondary",
+                  display: "flex",
+                  alignItems: "baseline",
+                  gap: 0.5,
                   mb: 1.5,
                 }}
               >
-                —
-              </Typography>
+                <Typography
+                  sx={{
+                    fontFamily: "Satoshi, sans-serif",
+                    fontWeight: 700,
+                    fontSize: 28,
+                    color: "text.primary",
+                  }}
+                >
+                  {anomaly ? anomaly.anomalyCount : "--"}
+                </Typography>
+                <Typography
+                  sx={{
+                    fontFamily: "Satoshi, sans-serif",
+                    fontSize: 16,
+                    color: "text.secondary",
+                  }}
+                >
+                  anomaly
+                </Typography>
+              </Box>
+
+              {anomaly && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 0.5,
+                    mb: 1.5,
+                  }}
+                >
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <Typography
+                      sx={{
+                        fontFamily: "Inter, sans-serif",
+                        fontSize: 12,
+                        color: "text.secondary",
+                      }}
+                    >
+                      Alert Threshold
+                    </Typography>
+                    <Typography
+                      sx={{
+                        fontFamily: "Inter, sans-serif",
+                        fontSize: 12,
+                        color: "text.primary",
+                      }}
+                    >
+                      +{anomaly.alertThresholdPercent}% deviation
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <Typography
+                      sx={{
+                        fontFamily: "Inter, sans-serif",
+                        fontSize: 12,
+                        color: "text.secondary",
+                      }}
+                    >
+                      Last Scan
+                    </Typography>
+                    <Typography
+                      sx={{
+                        fontFamily: "Inter, sans-serif",
+                        fontSize: 12,
+                        color: "text.primary",
+                      }}
+                    >
+                      {format(new Date(anomaly.lastScan), "MMM dd, HH:mm")}
+                    </Typography>
+                  </Box>
+                </Box>
+              )}
+
               <Typography
                 sx={{
                   fontFamily: "Inter, sans-serif",
@@ -121,8 +233,8 @@ export function WaterUsageAnalyticsPage() {
                   color: "text.secondary",
                 }}
               >
-                Backend'da anomaliya aniqlash algoritmi hali mavjud emas — bu
-                funksiya kelajakda qo'shiladi.
+                Detects irregular water usage patterns such as sudden spikes and
+                potential leaks
               </Typography>
             </Card>
 
@@ -141,17 +253,92 @@ export function WaterUsageAnalyticsPage() {
               >
                 Cost Estimation
               </Typography>
-              <Typography
+              <Box
                 sx={{
-                  fontFamily: "Satoshi, sans-serif",
-                  fontWeight: 700,
-                  fontSize: 28,
-                  color: "text.secondary",
+                  display: "flex",
+                  alignItems: "baseline",
+                  gap: 0.5,
                   mb: 1.5,
                 }}
               >
-                —
-              </Typography>
+                <Typography
+                  sx={{
+                    fontFamily: "Satoshi, sans-serif",
+                    fontWeight: 700,
+                    fontSize: 28,
+                    color: "text.primary",
+                  }}
+                >
+                  {cost ? `$${cost.costPerDay.toFixed(2)}` : "--"}
+                </Typography>
+                <Typography
+                  sx={{
+                    fontFamily: "Satoshi, sans-serif",
+                    fontSize: 16,
+                    color: "text.secondary",
+                  }}
+                >
+                  /day
+                </Typography>
+              </Box>
+
+              {cost && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 0.5,
+                    mb: 1.5,
+                  }}
+                >
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <Typography
+                      sx={{
+                        fontFamily: "Inter, sans-serif",
+                        fontSize: 12,
+                        color: "text.secondary",
+                      }}
+                    >
+                      Trend
+                    </Typography>
+                    <Typography
+                      sx={{
+                        fontFamily: "Inter, sans-serif",
+                        fontSize: 12,
+                        color: "text.primary",
+                      }}
+                    >
+                      {cost.trendPercent > 0 ? "+" : ""}
+                      {cost.trendPercent}% vs last period
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <Typography
+                      sx={{
+                        fontFamily: "Inter, sans-serif",
+                        fontSize: 12,
+                        color: "text.secondary",
+                      }}
+                    >
+                      Status
+                    </Typography>
+                    <Typography
+                      sx={{
+                        fontFamily: "Inter, sans-serif",
+                        fontSize: 12,
+                        color: "text.primary",
+                      }}
+                    >
+                      {cost.status}
+                    </Typography>
+                  </Box>
+                </Box>
+              )}
+
               <Typography
                 sx={{
                   fontFamily: "Inter, sans-serif",
@@ -159,7 +346,8 @@ export function WaterUsageAnalyticsPage() {
                   color: "text.secondary",
                 }}
               >
-                Backend'da suv narxi/xarajat hisob-kitobi hali mavjud emas.
+                Helps track operational expenses accurately, providing insights
+                for budgeting and planning.
               </Typography>
             </Card>
           </Box>
@@ -192,18 +380,50 @@ export function WaterUsageAnalyticsPage() {
             </IconButton>
           </Box>
 
-          <Typography
-            sx={{
-              fontFamily: "Inter, sans-serif",
-              fontSize: 13,
-              color: "text.secondary",
-              textAlign: "center",
-              py: 4,
-            }}
-          >
-            Zona darajasidagi hisobot (Zone 01, Zone 02...) uchun backend
-            `WaterUsage` modeliga "zone" maydoni qo'shilishi kerak.
-          </Typography>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+            {zones.map((z: any) => (
+              <Box
+                key={z.sectionId}
+                sx={{ bgcolor: "background.default", borderRadius: 2, p: 1.5 }}
+              >
+                <Typography
+                  sx={{
+                    fontFamily: "Satoshi, sans-serif",
+                    fontWeight: 700,
+                    fontSize: 13,
+                    color: "text.primary",
+                  }}
+                >
+                  {z.sectionName} — {z.totalUsage} L
+                </Typography>
+                <Typography
+                  sx={{
+                    fontFamily: "Inter, sans-serif",
+                    fontSize: 12,
+                    color: "text.secondary",
+                    mt: 0.5,
+                  }}
+                >
+                  {z.note}
+                </Typography>
+              </Box>
+            ))}
+
+            {zones.length === 0 && (
+              <Typography
+                sx={{
+                  fontFamily: "Inter, sans-serif",
+                  fontSize: 13,
+                  color: "text.secondary",
+                  textAlign: "center",
+                  py: 3,
+                }}
+              >
+                Zona darajasidagi yozuv yo'q — WaterUsage yaratishda "sectionId"
+                ko'rsatilmagan.
+              </Typography>
+            )}
+          </Box>
         </Card>
       </Box>
     </>
