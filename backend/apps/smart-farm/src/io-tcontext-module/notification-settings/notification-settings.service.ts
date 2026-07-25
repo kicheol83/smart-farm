@@ -22,6 +22,11 @@ export interface INotificationSettings extends Document {
   infoAlerts: boolean;
   deviceOfflineAlerts: boolean;
   reportReadyAlerts: boolean;
+  floatingNotifications: boolean;
+  lockScreenNotifications: boolean;
+  notificationsManagement: boolean;
+  triggerEveryNMessages: number;
+  sendOncePerDays: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -43,6 +48,11 @@ const DEFAULT_NOTIFICATION_SETTINGS = {
   infoAlerts: false,
   deviceOfflineAlerts: true,
   reportReadyAlerts: true,
+  floatingNotifications: true,
+  lockScreenNotifications: true,
+  notificationsManagement: false,
+  triggerEveryNMessages: 1,
+  sendOncePerDays: 1,
 };
 
 @Injectable()
@@ -54,9 +64,7 @@ export class NotificationSettingsService {
     private readonly notifModel: Model<INotificationSettings>,
   ) {}
 
-  public async getOrCreate(
-    memberId: Types.ObjectId,
-  ): Promise<INotificationSettings> {
+  async getOrCreate(memberId: Types.ObjectId): Promise<INotificationSettings> {
     let settings = await this.notifModel.findOne({ memberId }).exec();
 
     if (!settings) {
@@ -72,7 +80,7 @@ export class NotificationSettingsService {
     return settings;
   }
 
-  public async update(
+  async update(
     memberId: Types.ObjectId,
     input: UpdateNotificationSettingsInput,
   ): Promise<INotificationSettings> {
@@ -91,6 +99,16 @@ export class NotificationSettingsService {
       updateData.deviceOfflineAlerts = input.deviceOfflineAlerts;
     if (input.reportReadyAlerts !== undefined)
       updateData.reportReadyAlerts = input.reportReadyAlerts;
+    if (input.floatingNotifications !== undefined)
+      updateData.floatingNotifications = input.floatingNotifications;
+    if (input.lockScreenNotifications !== undefined)
+      updateData.lockScreenNotifications = input.lockScreenNotifications;
+    if (input.notificationsManagement !== undefined)
+      updateData.notificationsManagement = input.notificationsManagement;
+    if (input.triggerEveryNMessages !== undefined)
+      updateData.triggerEveryNMessages = input.triggerEveryNMessages;
+    if (input.sendOncePerDays !== undefined)
+      updateData.sendOncePerDays = input.sendOncePerDays;
 
     if (input.channels) {
       updateData.channels = {

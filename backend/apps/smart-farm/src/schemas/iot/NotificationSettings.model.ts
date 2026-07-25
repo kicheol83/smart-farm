@@ -28,6 +28,20 @@ export const NotificationSettingsSchema = new Schema(
     infoAlerts: { type: Boolean, default: false },
     deviceOfflineAlerts: { type: Boolean, default: true },
     reportReadyAlerts: { type: Boolean, default: true },
+
+    floatingNotifications: { type: Boolean, default: true },
+    lockScreenNotifications: { type: Boolean, default: true },
+    notificationsManagement: { type: Boolean, default: false },
+    triggerEveryNMessages: {
+      type: Number,
+      default: 1,
+      description: '"Every X Message will trigger the event"',
+    },
+    sendOncePerDays: {
+      type: Number,
+      default: 1,
+      description: '"Event will be sent to user only once per Y" (kun)',
+    },
   },
   { timestamps: true, collection: 'notificationSettings' },
 );
