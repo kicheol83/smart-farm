@@ -16,36 +16,38 @@ interface NotificationSettingsData {
   infoAlerts: boolean;
   deviceOfflineAlerts: boolean;
   reportReadyAlerts: boolean;
+  floatingNotifications?: boolean;
+  lockScreenNotifications?: boolean;
+  notificationsManagement?: boolean;
+  triggerEveryNMessages?: number;
+  sendOncePerDays?: number;
 }
+
+type UpdatePatch = Partial<{
+  channels: Partial<NotificationChannels>;
+  criticalAlerts: boolean;
+  warningAlerts: boolean;
+  infoAlerts: boolean;
+  deviceOfflineAlerts: boolean;
+  reportReadyAlerts: boolean;
+  floatingNotifications: boolean;
+  lockScreenNotifications: boolean;
+  notificationsManagement: boolean;
+  triggerEveryNMessages: number;
+  sendOncePerDays: number;
+}>;
 
 interface NotificationsSettingsTabProps {
   data?: NotificationSettingsData;
-  onUpdate: (
-    patch: Partial<{
-      channels: Partial<NotificationChannels>;
-      criticalAlerts: boolean;
-      warningAlerts: boolean;
-      infoAlerts: boolean;
-      deviceOfflineAlerts: boolean;
-      reportReadyAlerts: boolean;
-    }>,
-  ) => void;
+  onUpdate: (patch: UpdatePatch) => void;
 }
 
-/**
- * Figma "Settings / Notifications and sounds" tab.
- *
- * DIQQAT: "Floating Notifications", "Lock Screen Notifications",
- * "Notifications Management", "Every X Message will trigger the event",
- * "sent once per Y" — bularning hech biri backendda yo'q, toggle'lari
- * disabled (bosilmaydi) holatda ko'rsatiladi.
- */
 export function NotificationsSettingsTab({
   data,
   onUpdate,
 }: NotificationsSettingsTabProps) {
-  const [everyN, setEveryN] = useState(1);
-  const [oncePer, setOncePer] = useState(1);
+  const [everyN, setEveryN] = useState(data?.triggerEveryNMessages ?? 1);
+  const [oncePer, setOncePer] = useState(data?.sendOncePerDays ?? 1);
 
   if (!data) {
     return (
@@ -83,14 +85,14 @@ export function NotificationsSettingsTab({
       <NotificationToggleRow
         label="Floating Notifications"
         description="Allow notifications to appear as floating pop-ups on top of other screens for faster visibility."
-        checked={false}
-        disabled
+        checked={data.floatingNotifications ?? true}
+        onChange={(v) => onUpdate({ floatingNotifications: v })}
       />
       <NotificationToggleRow
         label="Lock Screen Notifications"
         description="Allow notifications to appear on the lock screen for quick access and visibility."
-        checked={false}
-        disabled
+        checked={data.lockScreenNotifications ?? true}
+        onChange={(v) => onUpdate({ lockScreenNotifications: v })}
       />
 
       <Typography
@@ -115,8 +117,8 @@ export function NotificationsSettingsTab({
       <NotificationToggleRow
         label="Notifications Management"
         description="When turned ON, end-users will access advanced notification management for this event."
-        checked={false}
-        disabled
+        checked={data.notificationsManagement ?? false}
+        onChange={(v) => onUpdate({ notificationsManagement: v })}
       />
       <NotificationToggleRow
         label="Email Notifications"
@@ -125,7 +127,6 @@ export function NotificationsSettingsTab({
         onChange={(v) => onUpdate({ channels: { email: v } })}
       />
 
-      {/* Bonus — Figma'da yo'q, lekin backend'da HAQIQIY mavjud alertlar */}
       <Typography
         sx={{
           fontFamily: "Satoshi, sans-serif",
@@ -181,8 +182,12 @@ export function NotificationsSettingsTab({
           size="small"
           type="number"
           value={everyN}
-          onChange={(e) => setEveryN(Number(e.target.value))}
-          disabled
+          onChange={(e) => {
+            const v = Number(e.target.value);
+            setEveryN(v);
+            onUpdate({ triggerEveryNMessages: v });
+          }}
+          inputProps={{ min: 1 }}
           sx={{ width: 70 }}
         />
         <Typography
@@ -218,25 +223,18 @@ export function NotificationsSettingsTab({
           select
           size="small"
           value={oncePer}
-          onChange={(e) => setOncePer(Number(e.target.value))}
-          disabled
-          sx={{ width: 90 }}
+          onChange={(e) => {
+            const v = Number(e.target.value);
+            setOncePer(v);
+            onUpdate({ sendOncePerDays: v });
+          }}
+          sx={{ width: 110 }}
         >
-          <MenuItem value={1}>1</MenuItem>
-          <MenuItem value={2}>2</MenuItem>
+          <MenuItem value={1}>1 day</MenuItem>
+          <MenuItem value={2}>2 days</MenuItem>
+          <MenuItem value={7}>7 days</MenuItem>
         </TextField>
       </Box>
-
-      <Typography
-        sx={{
-          fontFamily: "Inter, sans-serif",
-          fontSize: 11,
-          color: "text.secondary",
-          mt: 1,
-        }}
-      >
-        Bu ikki maydon backend'da hali mavjud emas.
-      </Typography>
     </Box>
   );
 }
