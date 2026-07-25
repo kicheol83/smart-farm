@@ -1,4 +1,10 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import type { PaletteMode } from "@mui/material";
 import { buildTheme } from "./theme";
@@ -20,10 +26,6 @@ function getInitialMode(): PaletteMode {
     : "light";
 }
 
-/**
- * App ni shu Provider bilan o'rab qo'ying (main.tsx da).
- * Ichida MUI ThemeProvider + CssBaseline avtomatik ishlaydi.
- */
 export function ThemeModeProvider({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<PaletteMode>(getInitialMode);
 
@@ -47,10 +49,6 @@ export function ThemeModeProvider({ children }: { children: ReactNode }) {
   );
 }
 
-/**
- * Har qanday komponentda dark/light holatini o'qish/almashtirish uchun.
- * Masalan: const { mode, toggleMode } = useThemeMode();
- */
 export function useThemeMode() {
   const ctx = useContext(ThemeModeContext);
   if (!ctx) {

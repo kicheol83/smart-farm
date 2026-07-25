@@ -14,7 +14,7 @@ import {
 } from "../graphql/queries";
 
 export function WaterUsageAnalyticsPage() {
-  const greenHouseId = localStorage.getItem("currentGreenhouseId") || "";
+  const greenHouseId = localStorage.getItem("greenHouseId") || "";
   const hasGreenhouse = greenHouseId.length > 0;
   const analyticsInput = { greenHouseId };
 

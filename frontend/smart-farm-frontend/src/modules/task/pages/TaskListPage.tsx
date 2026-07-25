@@ -22,7 +22,7 @@ import {
 type TaskStatus = "TODO" | "IN_PROGRESS" | "DONE";
 
 export function TaskListPage() {
-  const greenHouseId = localStorage.getItem("currentGreenhouseId") || "";
+  const greenHouseId = localStorage.getItem("greenHouseId") || "";
   const hasGreenhouse = greenHouseId.length > 0;
 
   const [tab, setTab] = useState<"board" | "list">("board");
