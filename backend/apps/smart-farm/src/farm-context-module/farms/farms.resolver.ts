@@ -2,16 +2,13 @@ import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { Types } from 'mongoose';
 import { FarmsService } from './farms.service';
-import {
-  CreateFarmInput,
-  Farm,
-  UpdateFarmInput,
-} from '../../libs/dto/farm-context-dto/farms/farm';
+
 import { AuthGuard } from '../../account-context-module/auth/guards/auth.guard';
 import { CurrentUser } from '../../libs/types/decorators/current.user';
 import { JwtPayload } from '../../account-context-module/auth/decorators/currentUser.decorator';
 import { Member } from '../../libs/dto/account-context-dto/member/member';
 import { AuthMember } from '../../account-context-module/auth/decorators/authMember.decorator';
+import { CreateFarmInput, Farm, UpdateFarmInput } from '../../libs/dto/farm-context-dto/farms/farm';
 
 @Resolver(() => Farm)
 export class FarmsResolver {
