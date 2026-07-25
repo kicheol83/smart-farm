@@ -43,10 +43,10 @@ registerEnumType(ReportPeriod, {
 
 @ObjectType()
 export class ReportSensorAvg {
-  @Field(() => Float)
+  @Field(() => Float, { nullable: true })
   avgTemperature?: number;
 
-  @Field(() => Float)
+  @Field(() => Float, { nullable: true })
   avgHumidity?: number;
 
   @Field(() => Float)
@@ -274,6 +274,86 @@ export class Report {
   greenHousesId: string;
 }
 
+export enum ReportEntryStatus {
+  DONE = 'DONE',
+  OPTIMAL = 'OPTIMAL',
+  ATTENTION = 'ATTENTION',
+}
+
+registerEnumType(ReportEntryStatus, {
+  name: 'ReportEntryStatus',
+  valuesMap: {
+    DONE: { description: 'Yakunlangan tekshiruv' },
+    OPTIMAL: { description: 'Optimal holat' },
+    ATTENTION: { description: 'Diqqat talab qiladi' },
+  },
+});
+
+@ObjectType()
+export class ReportEntry {
+  @Field(() => ID)
+  _id: string;
+
+  @Field()
+  entryDate: Date;
+
+  @Field(() => ID)
+  greenHouseId: string;
+
+  @Field(() => ID)
+  sectionId: string;
+
+  @Field()
+  sectionName: string;
+
+  @Field({ nullable: true })
+  plantName?: string;
+
+  @Field(() => Float, { nullable: true })
+  areaM2?: number;
+
+  @Field(() => Float)
+  healthIndex: number;
+
+  @Field(() => ReportEntryStatus)
+  status: ReportEntryStatus;
+
+  @Field({
+    nullable: true,
+  })
+  harvestPrediction?: Date;
+
+  @Field(() => Float, { nullable: true })
+  soilMoisture?: number;
+
+  @Field(() => Float, { nullable: true })
+  humidity?: number;
+
+  @Field({ nullable: true, defaultValue: 'No pest' })
+  pestDisease?: string;
+
+  @Field({ nullable: true })
+  description?: string;
+
+  @Field()
+  createdAt: Date;
+}
+
+@ObjectType()
+export class PaginatedReportEntries {
+  @Field(() => [ReportEntry])
+  items: ReportEntry[];
+
+  @Field(() => Int)
+  total: number;
+
+  @Field(() => Int)
+  page: number;
+
+  @Field(() => Int)
+  totalPages: number;
+}
+
 @InputType()
 export class GetReportInput {
   @Field(() => ID)
@@ -308,4 +388,42 @@ export class SaveReportInput {
   @Field(() => ReportType)
   @IsEnum(ReportType)
   reportsType: ReportType;
+}
+
+@InputType()
+export class CreateReportEntryInput {
+  @Field(() => ID)
+  @IsMongoId()
+  sectionId: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsDateString()
+  harvestPrediction?: string;
+
+  @Field({ nullable: true, defaultValue: 'No pest' })
+  @IsOptional()
+  pestDisease?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  description?: string;
+}
+
+@InputType()
+export class GetReportEntriesInput {
+  @Field(() => ID)
+  @IsMongoId()
+  greenHouseId: string;
+
+  @Field(() => ID, { nullable: true })
+  @IsOptional()
+  @IsMongoId()
+  sectionId?: string;
+
+  @Field(() => Int, { defaultValue: 1 })
+  page: number;
+
+  @Field(() => Int, { defaultValue: 10 })
+  limit: number;
 }

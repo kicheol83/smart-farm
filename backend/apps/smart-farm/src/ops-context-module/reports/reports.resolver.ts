@@ -3,9 +3,13 @@ import { UseGuards } from '@nestjs/common';
 
 import { ReportsService } from './reports.service';
 import {
+  CreateReportEntryInput,
   FullGreenhouseReport,
+  GetReportEntriesInput,
   GetReportInput,
+  PaginatedReportEntries,
   Report,
+  ReportEntry,
   SaveReportInput,
 } from '../../libs/dto/ops-context-dto/reports/report';
 import { AuthGuard } from '../../account-context-module/auth/guards/auth.guard';
@@ -39,5 +43,21 @@ export class ReportsResolver {
   ): Promise<Report[]> {
     const result = (await this.reportService.findReports(greenHouseId)) as any;
     return result;
+  }
+
+  @Query(() => PaginatedReportEntries)
+  @UseGuards(AuthGuard)
+  async reportEntries(
+    @Args('input') input: GetReportEntriesInput,
+  ): Promise<PaginatedReportEntries> {
+    return this.reportService.findReportEntries(input);
+  }
+
+  @Mutation(() => ReportEntry, {})
+  @UseGuards(AuthGuard)
+  async generateReportEntry(
+    @Args('input') input: CreateReportEntryInput,
+  ): Promise<ReportEntry> {
+    return this.reportService.generateReportEntry(input) as any;
   }
 }

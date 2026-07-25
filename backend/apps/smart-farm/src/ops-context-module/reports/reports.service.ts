@@ -1,7 +1,10 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types, Document } from 'mongoose';
+import { IPlantHealth } from '../../farm-context-module/plan-health/plan-health.service';
+import { IWaterUsage } from '../../farm-context-module/water-usage/water-usage.service';
 import {
+  ReportEntryStatus,
   GetReportInput,
   SaveReportInput,
   FullGreenhouseReport,
@@ -12,9 +15,10 @@ import {
   AlertsSummaryReport,
   SensorTrendChart,
   ReportPeriod,
+  CreateReportEntryInput,
+  GetReportEntriesInput,
+  PaginatedReportEntries,
 } from '../../libs/dto/ops-context-dto/reports/report';
-import { IPlantHealth } from '../../farm-context-module/plan-health/plan-health.service';
-import { IWaterUsage } from '../../farm-context-module/water-usage/water-usage.service';
 
 interface IGreenhouse extends Document {
   greenHouseName: string;
@@ -46,6 +50,35 @@ interface IReport extends Document {
   generatedAt: Date;
   greenHousesId: Types.ObjectId;
 }
+interface ISection extends Document {
+  _id: Types.ObjectId;
+  sectionName: string;
+  sectionArea: number;
+  currentHealthIndex?: number;
+  greenHouseId: Types.ObjectId;
+  cropsId?: Types.ObjectId;
+}
+interface ICrop extends Document {
+  _id: Types.ObjectId;
+  cropsName: string;
+}
+export interface IReportEntry extends Document {
+  _id: Types.ObjectId;
+  entryDate: Date;
+  greenHouseId: Types.ObjectId;
+  sectionId: Types.ObjectId;
+  sectionName: string;
+  plantName?: string;
+  areaM2?: number;
+  healthIndex: number;
+  status: string;
+  harvestPrediction?: Date;
+  soilMoisture?: number;
+  humidity?: number;
+  pestDisease?: string;
+  description?: string;
+  createdAt: Date;
+}
 
 @Injectable()
 export class ReportsService {
@@ -75,8 +108,16 @@ export class ReportsService {
 
     @InjectModel('reports')
     private readonly reportModel: Model<IReport>,
-  ) {}
 
+    @InjectModel('sections')
+    private readonly sectionModel: Model<ISection>,
+
+    @InjectModel('crops')
+    private readonly cropModel: Model<ICrop>,
+
+    @InjectModel('reportEntries')
+    private readonly reportEntryModel: Model<IReportEntry>,
+  ) {}
 
   async getFullReport(input: GetReportInput): Promise<FullGreenhouseReport> {
     const { from, to } = this.resolvePeriod(input);
@@ -85,6 +126,7 @@ export class ReportsService {
       .findById(input.greenHouseId)
       .exec();
     if (!greenhouse) throw new NotFoundException('Greenhouse not found.');
+
     const [
       summary,
       plantHealth,
@@ -133,6 +175,116 @@ export class ReportsService {
       .exec();
   }
 
+  async generateReportEntry(
+    input: CreateReportEntryInput,
+  ): Promise<IReportEntry> {
+    const section = await this.sectionModel.findById(input.sectionId).exec();
+    if (!section) throw new NotFoundException('Section not found.');
+
+    let plantName: string | undefined;
+    if (section.cropsId) {
+      const crop = await this.cropModel.findById(section.cropsId).exec();
+      plantName = crop?.cropsName;
+    }
+
+    const healthIndex = section.currentHealthIndex ?? 0;
+    const status = this.resolveEntryStatus(healthIndex);
+
+    // Oxirgi soil moisture / humidity o'qishlari — shu greenhouse sensorlaridan
+    const { soilMoisture, humidity } = await this.getLatestMoistureHumidity(
+      String(section.greenHouseId),
+    );
+
+    const entry = await this.reportEntryModel.create({
+      entryDate: new Date(),
+      greenHouseId: section.greenHouseId,
+      sectionId: section._id,
+      sectionName: section.sectionName,
+      plantName,
+      areaM2: section.sectionArea,
+      healthIndex,
+      status,
+      harvestPrediction: input.harvestPrediction
+        ? new Date(input.harvestPrediction)
+        : undefined,
+      soilMoisture,
+      humidity,
+      pestDisease: input.pestDisease ?? 'No pest',
+      description: input.description,
+    });
+
+    this.logger.log(
+      `Report entry created | section=${section.sectionName} | health=${healthIndex}`,
+    );
+    return entry;
+  }
+
+  async findReportEntries(
+    input: GetReportEntriesInput,
+  ): Promise<PaginatedReportEntries> {
+    const query: any = { greenHouseId: new Types.ObjectId(input.greenHouseId) };
+    if (input.sectionId) query.sectionId = new Types.ObjectId(input.sectionId);
+
+    const limit = input.limit ?? 10;
+    const page = input.page ?? 1;
+    const skip = (page - 1) * limit;
+
+    const [items, total] = await Promise.all([
+      this.reportEntryModel
+        .find(query)
+        .sort({ entryDate: -1 })
+        .skip(skip)
+        .limit(limit)
+        .exec(),
+      this.reportEntryModel.countDocuments(query),
+    ]);
+
+    return {
+      items: items as any,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
+
+  private resolveEntryStatus(healthIndex: number): ReportEntryStatus {
+    if (healthIndex >= 90) return ReportEntryStatus.DONE;
+    if (healthIndex >= 70) return ReportEntryStatus.OPTIMAL;
+    return ReportEntryStatus.ATTENTION;
+  }
+
+  private async getLatestMoistureHumidity(
+    greenHouseId: string,
+  ): Promise<{ soilMoisture?: number; humidity?: number }> {
+    const devices = await this.deviceModel
+      .find({ greenHouseId: new Types.ObjectId(greenHouseId) })
+      .select('_id')
+      .exec();
+    const deviceIds = devices.map((d) => d._id);
+
+    const result: { soilMoisture?: number; humidity?: number } = {};
+
+    for (const type of ['SOIL_MOISTURE', 'HUMIDITY'] as const) {
+      const sensor = await this.sensorModel
+        .findOne({ deviceId: { $in: deviceIds }, sensorType: type })
+        .exec();
+      if (!sensor) continue;
+
+      const latest = await this.sensorDataModel
+        .findOne({ sensorId: sensor._id })
+        .sort({ recordedAt: -1 })
+        .exec();
+
+      if (latest) {
+        if (type === 'SOIL_MOISTURE')
+          result.soilMoisture = latest.sensorDataValue;
+        if (type === 'HUMIDITY') result.humidity = latest.sensorDataValue;
+      }
+    }
+
+    return result;
+  }
+
   private async buildSummary(
     greenHouseId: string,
     greenHouseName: string,
@@ -168,9 +320,11 @@ export class ReportsService {
     const avgs: Record<string, number> = {};
     avgResult.forEach((r) => (avgs[r._id] = Math.round(r.avg * 10) / 10));
 
+    // Alert sonlari
     const totalAlerts = await this.countAlerts(sensorIds, from, to);
-    const unresolvedAlerts = totalAlerts;
+    const unresolvedAlerts = totalAlerts; // Alert moduli tayyor bo\'lganda filter qo\'shiladi
 
+    // Jami suv sarfi
     const waterResult = await this.waterUsageModel.aggregate([
       {
         $match: {
@@ -181,6 +335,7 @@ export class ReportsService {
       { $group: { _id: null, total: { $sum: '$waterAmount' } } },
     ]);
 
+    // O\'simlik sog\'ligi
     const latestHealth = await this.plantHealthModel
       .findOne()
       .sort({ recordeAt: -1 })
@@ -313,6 +468,7 @@ export class ReportsService {
     const days = dailyResult.length || 1;
     const dailyAverage = Math.round((totalUsage / days) * 10) / 10;
 
+    // Oldingi davr
     const periodLen = to.getTime() - from.getTime();
     const prevFrom = new Date(from.getTime() - periodLen);
     const prevResult = await this.waterUsageModel.aggregate([
@@ -431,6 +587,8 @@ export class ReportsService {
 
     return charts;
   }
+
+  // ─── Helpers ─────────────────────────────────────────────────────────────
 
   private async getSensorIds(greenHouseId: string): Promise<Types.ObjectId[]> {
     const devices = await this.deviceModel
