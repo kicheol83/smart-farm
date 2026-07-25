@@ -1,23 +1,30 @@
-import { Schema } from 'mongoose';
-import { generate } from 'rxjs';
+import * as mongoose from 'mongoose';
 
-export const ReportsSchema = new Schema(
+const ReportsSchema = new mongoose.Schema(
   {
     reportsType: {
       type: String,
       required: true,
+      enum: ['DAILY', 'WEEKLY', 'MONTHLY'],
     },
     generatedAt: {
       type: Date,
+      required: true,
       default: Date.now,
     },
     greenHousesId: {
-      type: Schema.Types.ObjectId,
-      ref: 'GreenHouse',
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'greenHouses',
       required: true,
+      index: true,
     },
   },
-  { timestamps: true, collection: 'reports' },
+  {
+    timestamps: false,
+    collection: 'reports',
+  },
 );
+
+ReportsSchema.index({ greenHousesId: 1, generatedAt: -1 });
 
 export default ReportsSchema;

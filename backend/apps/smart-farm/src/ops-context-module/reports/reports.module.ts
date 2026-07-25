@@ -12,17 +12,23 @@ import { ReportsService } from './reports.service';
 import PlantHealthSchema from '../../schemas/farm/PlantHealth';
 import WaterUsageSchema from '../../schemas/farm/WaterUsage';
 import { AuthModule } from '../../account-context-module/auth/auth.module';
+import ReportEntriesSchema from '../../schemas/ops/ReportEntries.model';
+import CropsSchema from '../../schemas/farm/Crops.model';
+import SectionsSchema from '../../schemas/farm/Sections.model';
 @Module({
   imports: [
     MongooseModule.forFeature([
-      { name: 'greenHouses',  schema: GreenHouseSchema  },
-      { name: 'sensor_data',  schema: SensorDataSchema  },
-      { name: 'sensors',      schema: SensorsSchema     },
-      { name: 'devices',      schema: DevicesSchema     },
-      { name: 'plantHealth',  schema: PlantHealthSchema },
-      { name: 'waterUsages',  schema: WaterUsageSchema  },
-      { name: 'alerts',       schema: AlertsSchema      },
-      { name: 'reports',      schema: ReportsSchema     },
+      { name: 'greenHouses', schema: GreenHouseSchema },
+      { name: 'sensor_data', schema: SensorDataSchema },
+      { name: 'sensors', schema: SensorsSchema },
+      { name: 'devices', schema: DevicesSchema },
+      { name: 'plantHealth', schema: PlantHealthSchema },
+      { name: 'waterUsages', schema: WaterUsageSchema },
+      { name: 'alerts', schema: AlertsSchema },
+      { name: 'reports', schema: ReportsSchema },
+      { name: 'sections', schema: SectionsSchema },
+      { name: 'crops', schema: CropsSchema },
+      { name: 'reportEntries', schema: ReportEntriesSchema },
     ]),
     AuthModule,
   ],
