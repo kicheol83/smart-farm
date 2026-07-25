@@ -9,23 +9,49 @@ import {
   Select,
   MenuItem,
   Typography,
+  Chip,
 } from "@mui/material";
 import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded";
 import { format } from "date-fns";
 
-interface SavedReport {
+type EntryStatus = "DONE" | "OPTIMAL" | "ATTENTION";
+
+interface ReportEntry {
   _id: string;
-  reportsType: string;
-  generatedAt: string;
+  entryDate: string;
+  sectionName: string;
+  plantName?: string;
+  areaM2?: number;
+  healthIndex: number;
+  status: EntryStatus;
+  harvestPrediction?: string;
+  soilMoisture?: number;
+  humidity?: number;
+  pestDisease?: string;
+  description?: string;
 }
 
 interface ReportDetailsTableProps {
-  reports: SavedReport[];
+  entries: ReportEntry[];
+  total: number;
   page: number;
   pageSize: number;
   onPageChange: (page: number) => void;
   onPageSizeChange: (size: number) => void;
 }
+
+const STATUS_STYLE: Record<
+  EntryStatus,
+  { label: string; color: string; bg: string }
+> = {
+  DONE: { label: "Done", color: "#1a7a4c", bg: "rgba(53,197,110,0.14)" },
+  OPTIMAL: { label: "Optimal", color: "#a06a0a", bg: "rgba(249,173,25,0.14)" },
+  ATTENTION: {
+    label: "Attention",
+    color: "#c62828",
+    bg: "rgba(229,57,53,0.14)",
+  },
+};
 
 const COLUMNS = [
   "Date",
@@ -41,14 +67,14 @@ const COLUMNS = [
 ];
 
 export function ReportDetailsTable({
-  reports,
+  entries,
+  total,
   page,
   pageSize,
   onPageChange,
   onPageSizeChange,
 }: ReportDetailsTableProps) {
-  const totalPages = Math.max(1, Math.ceil(reports.length / pageSize));
-  const paged = reports.slice((page - 1) * pageSize, page * pageSize);
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
   return (
     <Box
@@ -76,22 +102,22 @@ export function ReportDetailsTable({
             </TableRow>
           </TableHead>
           <TableBody>
-            {paged.map((r) => (
-              <TableRow key={r._id} hover>
-                <TableCell
-                  sx={{
-                    fontFamily: "Satoshi, sans-serif",
-                    fontSize: 13,
-                    color: "text.primary",
-                    borderColor: "divider",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {format(new Date(r.generatedAt), "dd MMM yy")}
-                </TableCell>
-                {COLUMNS.slice(1).map((c) => (
+            {entries.map((e) => {
+              const style = STATUS_STYLE[e.status];
+              return (
+                <TableRow key={e._id} hover>
                   <TableCell
-                    key={c}
+                    sx={{
+                      fontFamily: "Satoshi, sans-serif",
+                      fontSize: 13,
+                      color: "text.primary",
+                      borderColor: "divider",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {format(new Date(e.entryDate), "dd MMM yy")}
+                  </TableCell>
+                  <TableCell
                     sx={{
                       fontFamily: "Inter, sans-serif",
                       fontSize: 13,
@@ -99,18 +125,106 @@ export function ReportDetailsTable({
                       borderColor: "divider",
                     }}
                   >
-                    —
+                    {e.plantName ?? "—"}
                   </TableCell>
-                ))}
-                <TableCell sx={{ borderColor: "divider" }}>
-                  <IconButton size="small">
-                    <MoreVertRoundedIcon fontSize="small" />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
+                  <TableCell
+                    sx={{
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: 13,
+                      color: "text.secondary",
+                      borderColor: "divider",
+                    }}
+                  >
+                    {e.areaM2 !== undefined ? `${e.areaM2} m²` : "—"}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: 13,
+                      color: "text.secondary",
+                      borderColor: "divider",
+                    }}
+                  >
+                    {Math.round(e.healthIndex)}%
+                  </TableCell>
+                  <TableCell sx={{ borderColor: "divider" }}>
+                    <Chip
+                      label={style.label}
+                      size="small"
+                      sx={{
+                        bgcolor: style.bg,
+                        color: style.color,
+                        fontWeight: 600,
+                        fontSize: 11,
+                      }}
+                    />
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: 13,
+                      color: "text.secondary",
+                      borderColor: "divider",
+                    }}
+                  >
+                    {e.harvestPrediction
+                      ? format(new Date(e.harvestPrediction), "dd MMM yy")
+                      : "—"}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: 13,
+                      color: "text.secondary",
+                      borderColor: "divider",
+                    }}
+                  >
+                    {e.soilMoisture !== undefined
+                      ? `${Math.round(e.soilMoisture)}%`
+                      : "—"}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: 13,
+                      color: "text.secondary",
+                      borderColor: "divider",
+                    }}
+                  >
+                    {e.humidity !== undefined
+                      ? `${Math.round(e.humidity)}%`
+                      : "—"}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: 13,
+                      color: "text.secondary",
+                      borderColor: "divider",
+                    }}
+                  >
+                    {e.pestDisease ?? "No pest"}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: 13,
+                      color: "text.secondary",
+                      borderColor: "divider",
+                    }}
+                  >
+                    {e.description ?? "—"}
+                  </TableCell>
+                  <TableCell sx={{ borderColor: "divider" }}>
+                    <IconButton size="small">
+                      <MoreVertRoundedIcon fontSize="small" />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
 
-            {paged.length === 0 && (
+            {entries.length === 0 && (
               <TableRow>
                 <TableCell
                   colSpan={COLUMNS.length + 1}
@@ -123,7 +237,7 @@ export function ReportDetailsTable({
                       color: "text.secondary",
                     }}
                   >
-                    Hali saqlangan report yo'q
+                    Hali report entry yo'q
                   </Typography>
                 </TableCell>
               </TableRow>
@@ -132,6 +246,7 @@ export function ReportDetailsTable({
         </Table>
       </Box>
 
+      {/* Pastki sahifalash */}
       <Box
         sx={{
           display: "flex",
@@ -171,7 +286,7 @@ export function ReportDetailsTable({
               color: "text.secondary",
             }}
           >
-            Out of {reports.length}
+            Out of {total}
           </Typography>
         </Box>
 

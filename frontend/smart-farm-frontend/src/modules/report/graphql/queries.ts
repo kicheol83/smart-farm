@@ -1,24 +1,5 @@
 import { gql } from "@apollo/client";
 
-/**
- * Backend: module2/report.resolver.ts → greenhouseFullReport(input: GetReportInput!)
- *
- * Bitta so'rov 6 ta panelni qaytaradi — barcha Report sahifalari
- * (Greenhouse Report, Overall Plant Health, Soil Moisture Trend,
- * Water Usage Analytics, Alerts Summary) shu queryning turli qismlaridan
- * foydalanadi.
- *
- * MUHIM: har bir maydon nomi report.dto.ts fayli bilan qator-baqator
- * solishtirilgan — quyidagi "g'alati" nomlarga alohida e'tibor bering:
- *   - sensorAverages ichida "avg" prefiksi bor (avgTemperature, avgPh...)
- *   - top-level panel nomi "sensorTrends" emas — "trendCharts"
- *   - OverallPlantHealthReport: "currentHealthIndex" (currentScore emas)
- *   - WaterUsageReport: "totalUsage" + "dataPoints" (total/points emas),
- *     WaterUsagePoint ichida "amount" (liters emas)
- *   - SoilMoistureTrendReport: "dataPoints" (trend emas), "current" YO'Q
- *     (faqat average/min/max bor), SoilMoistureTrendPoint da "recordedAt"
- *   - SensorTrendChart: "dataPoints" (points emas), TrendChartPoint da "timestamp"
- */
 export const GET_FULL_GREENHOUSE_REPORT = gql`
   query GreenhouseFullReport($input: GetReportInput!) {
     greenhouseFullReport(input: $input) {
@@ -108,22 +89,93 @@ export const GET_ACTIVE_ALERTS_SUMMARY = gql`
         _id
         alertsType
         alertsThreshold
-        alertsActualValues
         alertsSeverity
-        sensorsId
-        createdAt
-        updatedAt
       }
     }
   }
 `;
 
-export const GET_SAVED_REPORTS = gql`
-  query SavedReports($greenHouseId: ID!) {
-    savedReports(greenHouseId: $greenHouseId) {
+export const GET_REPORT_ENTRIES = gql`
+  query ReportEntries($input: GetReportEntriesInput!) {
+    reportEntries(input: $input) {
+      items {
+        _id
+        entryDate
+        sectionName
+        plantName
+        areaM2
+        healthIndex
+        status
+        harvestPrediction
+        soilMoisture
+        humidity
+        pestDisease
+        description
+      }
+      total
+      page
+      totalPages
+    }
+  }
+`;
+
+export const GENERATE_REPORT_ENTRY = gql`
+  mutation GenerateReportEntry($input: CreateReportEntryInput!) {
+    generateReportEntry(input: $input) {
       _id
-      reportsType
-      generatedAt
+      sectionName
+      healthIndex
+      status
+    }
+  }
+`;
+
+export const GET_WATER_EFFICIENCY_REPORT = gql`
+  query WaterEfficiencyReport($input: GetWaterAnalyticsInput!) {
+    waterEfficiencyReport(input: $input) {
+      efficiencyScore
+      averageWaterPerPlant
+      irrigationDurationMinutes
+      totalUsage
+    }
+  }
+`;
+
+export const GET_WATER_ANOMALY_DETECTION = gql`
+  query WaterAnomalyDetection($input: GetWaterAnalyticsInput!) {
+    waterAnomalyDetection(input: $input) {
+      anomalyCount
+      alertThresholdPercent
+      lastScan
+      anomalies {
+        date
+        amount
+        deviationPercent
+      }
+    }
+  }
+`;
+
+export const GET_WATER_COST_ESTIMATION = gql`
+  query WaterCostEstimation($input: GetWaterAnalyticsInput!) {
+    waterCostEstimation(input: $input) {
+      costPerDay
+      trendPercent
+      status
+      costPerLiter
+    }
+  }
+`;
+
+export const GET_WATER_ZONE_USAGE_REPORT = gql`
+  query WaterZoneUsageReport($input: GetWaterAnalyticsInput!) {
+    waterZoneUsageReport(input: $input) {
+      zones {
+        sectionId
+        sectionName
+        totalUsage
+        note
+      }
     }
   }
 `;

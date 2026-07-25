@@ -1,11 +1,22 @@
 import { useState } from "react";
-import { useQuery } from "@apollo/client";
-import { Box, Typography, Button } from "@mui/material";
+import { useQuery, useMutation } from "@apollo/client";
+import {
+  Box,
+  Typography,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  MenuItem,
+} from "@mui/material";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
-import CalendarTodayRoundedIcon from "@mui/icons-material/CalendarTodayRounded";
+import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import { Header } from "@/components/layout/Header";
 import { ReportDetailsTable } from "../components/ReportDetailsTable";
-import { GET_SAVED_REPORTS } from "../graphql/queries";
+import { GET_REPORT_ENTRIES, GENERATE_REPORT_ENTRY } from "../graphql/queries";
+import { GET_SECTIONS_BY_GREENHOUSE } from "@/modules/plant-health/graphql/queries";
 
 export function ReportDetailsPage() {
   localStorage.setItem("greenHouseId", "6a2daf715e4567e07ca5d328");
@@ -14,20 +25,74 @@ export function ReportDetailsPage() {
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedSectionId, setSelectedSectionId] = useState("");
+  const [pestDisease, setPestDisease] = useState("");
+  const [description, setDescription] = useState("");
 
-  const { data } = useQuery(GET_SAVED_REPORTS, {
+  const { data, refetch } = useQuery(GET_REPORT_ENTRIES, {
+    variables: { input: { greenHouseId, page, limit: pageSize } },
+    skip: !hasGreenhouse,
+  });
+
+  const { data: sectionsData } = useQuery(GET_SECTIONS_BY_GREENHOUSE, {
     variables: { greenHouseId },
     skip: !hasGreenhouse,
   });
 
-  const reports = data?.savedReports ?? [];
+  const [generateEntry, { loading: generating }] = useMutation(
+    GENERATE_REPORT_ENTRY,
+  );
+
+  const entries = data?.reportEntries?.items ?? [];
+  const total = data?.reportEntries?.total ?? 0;
+  const sections = sectionsData?.sectionsByGreenhouse ?? [];
+
+  async function handleGenerate() {
+    if (!selectedSectionId) return;
+    await generateEntry({
+      variables: {
+        input: {
+          sectionId: selectedSectionId,
+          pestDisease: pestDisease || undefined,
+          description: description || undefined,
+        },
+      },
+    });
+    setDialogOpen(false);
+    setSelectedSectionId("");
+    setPestDisease("");
+    setDescription("");
+    refetch();
+  }
 
   function handleExport() {
     const rows = [
-      ["Date", "Type"],
-      ...reports.map((r: any) => [
-        new Date(r.generatedAt).toISOString().slice(0, 10),
-        r.reportsType,
+      [
+        "Date",
+        "Plant",
+        "Area",
+        "Health",
+        "Status",
+        "Harvest Prediction",
+        "Moisture",
+        "Humidity",
+        "Pest Disease",
+        "Description",
+      ],
+      ...entries.map((e: any) => [
+        new Date(e.entryDate).toISOString().slice(0, 10),
+        e.plantName ?? "",
+        e.areaM2 ?? "",
+        e.healthIndex,
+        e.status,
+        e.harvestPrediction
+          ? new Date(e.harvestPrediction).toISOString().slice(0, 10)
+          : "",
+        e.soilMoisture ?? "",
+        e.humidity ?? "",
+        e.pestDisease ?? "",
+        e.description ?? "",
       ]),
     ];
     const csv = rows.map((r) => r.join(",")).join("\n");
@@ -82,11 +147,12 @@ export function ReportDetailsPage() {
           Export
         </Button>
         <Button
-          variant="outlined"
-          startIcon={<CalendarTodayRoundedIcon fontSize="small" />}
+          variant="contained"
+          startIcon={<AddRoundedIcon fontSize="small" />}
+          onClick={() => setDialogOpen(true)}
           sx={{ textTransform: "none", borderRadius: 2 }}
         >
-          Date Range
+          Generate Entry
         </Button>
       </Box>
 
@@ -103,7 +169,8 @@ export function ReportDetailsPage() {
       </Typography>
 
       <ReportDetailsTable
-        reports={reports}
+        entries={entries}
+        total={total}
         page={page}
         pageSize={pageSize}
         onPageChange={setPage}
@@ -112,6 +179,70 @@ export function ReportDetailsPage() {
           setPage(1);
         }}
       />
+
+      <Dialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle
+          sx={{ fontFamily: "Satoshi, sans-serif", fontWeight: 700 }}
+        >
+          Generate Report Entry
+        </DialogTitle>
+        <DialogContent
+          sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 1 }}
+        >
+          <TextField
+            select
+            label="Section"
+            fullWidth
+            size="small"
+            value={selectedSectionId}
+            onChange={(e) => setSelectedSectionId(e.target.value)}
+          >
+            {sections.map((s: any) => (
+              <MenuItem key={s._id} value={s._id}>
+                {s.sectionName}
+              </MenuItem>
+            ))}
+          </TextField>
+          <TextField
+            label="Pest / Disease (ixtiyoriy)"
+            fullWidth
+            size="small"
+            placeholder="No pest"
+            value={pestDisease}
+            onChange={(e) => setPestDisease(e.target.value)}
+          />
+          <TextField
+            label="Description (ixtiyoriy)"
+            fullWidth
+            multiline
+            rows={2}
+            size="small"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button
+            onClick={() => setDialogOpen(false)}
+            sx={{ textTransform: "none" }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleGenerate}
+            variant="contained"
+            disabled={!selectedSectionId || generating}
+            sx={{ textTransform: "none" }}
+          >
+            Generate
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
