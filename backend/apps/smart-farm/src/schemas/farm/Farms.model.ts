@@ -1,31 +1,32 @@
-import { Schema } from 'mongoose';
+import * as mongoose from 'mongoose';
 
-export const FarmsSchema = new Schema(
+const FarmsSchema = new mongoose.Schema(
   {
     farmName: {
       type: String,
       required: true,
+      trim: true,
     },
     farmLocation: {
       type: String,
       required: true,
+      trim: true,
     },
-    createdAt: {
-      type: Date,
-      default: Date.now,
+    farmDescription: {
+      type: String,
+      required: false,
     },
-    updatedAt: {
-      type: Date,
-      default: Date.now,
-    },
-
     memberId: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: 'members',
       required: true,
+      index: true,
     },
   },
-  { timestamps: true, collection: 'farms' },
+  {
+    timestamps: true,
+    collection: 'farms',
+  },
 );
 
 export default FarmsSchema;

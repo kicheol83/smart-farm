@@ -10,14 +10,13 @@ import {
   CreateFarmInput,
   UpdateFarmInput,
 } from '../../libs/dto/farm-context-dto/farms/farm';
-import { MESSAGES } from '@nestjs/core/constants';
-import { Message } from '../../libs/types/common';
 import { Member } from '../../libs/dto/account-context-dto/member/member';
 
 export interface IFarm extends Document {
   _id: Types.ObjectId;
   farmName: string;
   farmLocation: string;
+  farmDescription?: string;
   memberId: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
@@ -35,7 +34,7 @@ export class FarmsService {
     private readonly memberModel: Model<Member>,
   ) {}
 
-  public async create(
+  async create(
     memberId: Types.ObjectId,
     input: CreateFarmInput,
   ): Promise<IFarm> {
@@ -47,57 +46,43 @@ export class FarmsService {
     if (!member) {
       throw new NotFoundException('Member not found');
     }
-    console.log('memberId:', memberId);
-
-    const result = await this.farmModel.create({ ...input, memberId });
-    this.logger.log(`Farm created | ${result.farmName} | memberId=${memberId}`);
-    console.log('Created Farm:', result);
-    return result;
+    const farm = await this.farmModel.create({ ...input, memberId });
+    this.logger.log(`Farm created | ${farm.farmName} | memberId=${memberId}`);
+    return farm;
   }
 
-  public async findAll(memberId: Types.ObjectId): Promise<IFarm[]> {
-    const result = await this.farmModel
-      .find({ memberId })
-      .sort({ createdAt: -1 })
-      .exec();
-    return result;
+  async findAll(memberId: Types.ObjectId): Promise<IFarm[]> {
+    return this.farmModel.find({ memberId }).sort({ createdAt: -1 }).exec();
   }
 
-  public async findOne(
-    farmId: string,
-    memberId: Types.ObjectId,
-  ): Promise<IFarm> {
-    const result = await this.farmModel
+  async findOne(farmId: string, memberId: Types.ObjectId): Promise<IFarm> {
+    const farm = await this.farmModel
       .findOne({ _id: new Types.ObjectId(farmId), memberId })
       .exec();
-    if (!result) throw new NotFoundException(Message.NO_FARM_FOUND);
-    return result;
+    if (!farm) throw new NotFoundException('Farm not found.');
+    return farm;
   }
 
-  public async update(
+  async update(
     farmId: string,
     memberId: Types.ObjectId,
     input: UpdateFarmInput,
   ): Promise<IFarm> {
-    const result = await this.farmModel
+    const farm = await this.farmModel
       .findOneAndUpdate({ _id: new Types.ObjectId(farmId), memberId }, input, {
         new: true,
       })
       .exec();
-    console.log('Updated Farm:', result);
-    if (!result) throw new NotFoundException(Message.NO_FARM_FOUND);
-    return result;
+    if (!farm) throw new NotFoundException('Farm not found.');
+    return farm;
   }
 
-  public async remove(
-    farmId: string,
-    memberId: Types.ObjectId,
-  ): Promise<boolean> {
+  async remove(farmId: string, memberId: Types.ObjectId): Promise<boolean> {
     const result = await this.farmModel
       .deleteOne({ _id: new Types.ObjectId(farmId), memberId })
       .exec();
     if (result.deletedCount === 0)
-      throw new NotFoundException(Message.NO_FARM_FOUND);
+      throw new NotFoundException('Farm not found.');
     return true;
   }
 }
