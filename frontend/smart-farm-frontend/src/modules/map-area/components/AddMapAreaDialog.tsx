@@ -89,7 +89,8 @@ export function AddMapAreaDialog({
     reader.onload = () => {
       try {
         const json = JSON.parse(reader.result as string);
-        const ring: number[][] =
+
+        const ring =
           json?.geometry?.coordinates?.[0] ??
           json?.coordinates?.[0] ??
           json?.features?.[0]?.geometry?.coordinates?.[0];

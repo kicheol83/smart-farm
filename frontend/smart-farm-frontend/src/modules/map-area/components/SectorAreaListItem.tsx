@@ -10,6 +10,7 @@ interface SectorAreaListItemProps {
   sectorName: string;
   sectorArea: number;
   centerPoint: CenterPoint;
+  locationName?: string;
   selected?: boolean;
   onClick: () => void;
   onMenuOpen: (e: React.MouseEvent<HTMLElement>) => void;
@@ -25,6 +26,7 @@ export function SectorAreaListItem({
   sectorName,
   sectorArea,
   centerPoint,
+  locationName,
   selected,
   onClick,
   onMenuOpen,
@@ -71,6 +73,7 @@ export function SectorAreaListItem({
         </IconButton>
       </Box>
 
+      <FieldRow label="Location" value={locationName ?? "—"} />
       <FieldRow label="Land Area" value={`${sectorArea} m²`} />
       <FieldRow
         label="Coordinates"

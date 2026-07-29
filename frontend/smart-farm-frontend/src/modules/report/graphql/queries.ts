@@ -6,6 +6,12 @@ export const GET_FULL_GREENHOUSE_REPORT = gql`
       summary {
         greenHouseId
         greenHouseName
+        totalAlerts
+        unresolvedAlerts
+        totalWaterUsage
+        plantHealthScore
+        periodStart
+        periodEnd
         sensorAverages {
           avgTemperature
           avgHumidity
@@ -14,12 +20,6 @@ export const GET_FULL_GREENHOUSE_REPORT = gql`
           avgSoilMoisture
           avgLight
         }
-        totalAlerts
-        unresolvedAlerts
-        totalWaterUsage
-        plantHealthScore
-        periodStart
-        periodEnd
       }
       plantHealth {
         currentHealthIndex
@@ -89,7 +89,13 @@ export const GET_ACTIVE_ALERTS_SUMMARY = gql`
         _id
         alertsType
         alertsThreshold
+        alertsActualValues
         alertsSeverity
+        sensorsId
+        sectionId
+        deviceId
+        createdAt
+        updatedAt
       }
     }
   }
