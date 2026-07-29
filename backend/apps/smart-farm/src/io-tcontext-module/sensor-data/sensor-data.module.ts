@@ -11,6 +11,7 @@ import { SensorsModule } from '../sensors/sensors.module';
 import { DevicesModule } from '../devices/devices.module';
 import { GreenhouseModule } from '../../farm-context-module/greenhouse/greenhouse.module';
 import DevicesSchema from '../../schemas/iot/Devices.model';
+import { ActuatorModule } from '../../actuator/actuator.module';
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -23,6 +24,7 @@ import DevicesSchema from '../../schemas/iot/Devices.model';
     SensorsModule,
     DevicesModule,
     GreenhouseModule,
+    ActuatorModule
   ],
   providers: [SensorDataResolver, SensorDataService],
   exports: [SensorDataService],
