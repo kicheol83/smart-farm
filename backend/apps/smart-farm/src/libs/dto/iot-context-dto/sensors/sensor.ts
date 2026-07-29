@@ -6,7 +6,36 @@ import {
   registerEnumType,
 } from '@nestjs/graphql';
 import { IsEnum, IsNotEmpty, IsString, IsMongoId } from 'class-validator';
-import { SensorsType } from '../../../enums/sensors.enum';
+
+export enum SensorsType {
+  TEMPERATURE = 'TEMPERATURE',
+  HUMIDITY = 'HUMIDITY',
+  PH = 'PH',
+  LIGHT = 'LIGHT',
+  CO2 = 'CO2',
+  SOIL_MOISTURE = 'SOIL_MOISTURE',
+  WATER_LEVEL = 'WATER_LEVEL',
+  WATER_EC = 'WATER_EC',
+  RAIN = 'RAIN',
+}
+
+registerEnumType(SensorsType, {
+  name: 'SensorsType',
+  description: 'Sensor turlari',
+  valuesMap: {
+    TEMPERATURE: { description: 'Harorat (°C)' },
+    HUMIDITY: { description: 'Namlik (%)' },
+    PH: { description: 'pH qiymati' },
+    LIGHT: { description: "Yorug'lik (lux)" },
+    CO2: { description: 'CO2 (ppm)' },
+    SOIL_MOISTURE: { description: 'Tuproq namligi (%)' },
+    WATER_LEVEL: { description: 'Suv tanki darajasi (%)' },
+    WATER_EC: {
+      description: "Suv elektr o'tkazuvchanligi / TDS (ppm yoki µS/cm)",
+    },
+    RAIN: { description: "Yomg'ir/tomchi aniqlash (0-100%, 0=quruq)" },
+  },
+});
 
 @ObjectType()
 export class Sensor {
@@ -16,7 +45,7 @@ export class Sensor {
   @Field(() => SensorsType)
   sensorType: SensorsType;
 
-  @Field({ description: ' => °C, %, pH, lux, ppm' })
+  @Field()
   sensorsUnit: string;
 
   @Field(() => ID)
@@ -32,12 +61,12 @@ export class Sensor {
 @InputType()
 export class CreateSensorInput {
   @Field(() => SensorsType)
-  @IsEnum(SensorsType, { message: 'Invalid sensor type' })
+  @IsEnum(SensorsType)
   sensorType: SensorsType;
 
-  @Field({ description: ' => °C, %, pH, lux, ppm' })
+  @Field()
   @IsString()
-  @IsNotEmpty({ message: 'sensorsUnit is required' })
+  @IsNotEmpty()
   sensorsUnit: string;
 
   @Field(() => ID)
