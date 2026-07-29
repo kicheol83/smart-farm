@@ -14,6 +14,7 @@ import PieChartRoundedIcon from "@mui/icons-material/PieChartRounded";
 import MapRoundedIcon from "@mui/icons-material/MapRounded";
 import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
 import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
+import BoltRoundedIcon from "@mui/icons-material/BoltRounded";
 import AdminPanelSettingsRoundedIcon from "@mui/icons-material/AdminPanelSettingsRounded";
 import { GRADIENT_DARK, GRADIENT_DARK_MODE } from "@/theme/theme";
 import { Logo } from "@/components/icons/Logo";
@@ -22,6 +23,7 @@ import { useAuthStore } from "@/modules/auth/auth.store";
 const NAV_ITEMS = [
   { to: "/dashboard", icon: HomeRoundedIcon, label: "Home" },
   { to: "/devices", icon: DesktopWindowsRoundedIcon, label: "Device" },
+  { to: "/automation", icon: BoltRoundedIcon, label: "Automation" },
   { to: "/report", icon: PieChartRoundedIcon, label: "Report" },
   { to: "/map-area", icon: MapRoundedIcon, label: "Map" },
 ];

@@ -29,6 +29,7 @@ import { AlertsSummaryPage } from "./modules/report/pages/AlertsSummaryPage";
 import { WaterUsageAnalyticsPage } from "./modules/report/pages/WaterUsageAnalyticsPage";
 import { SoilMoistureTrendPage } from "./modules/report/pages/SoilMoistureTrendPage";
 import { OverallPlantHealthPage } from "./modules/report/pages/OverallPlantHealthPage";
+import { AutomationPage } from "./modules/automation/pages/AutomationPage";
 
 export default function App() {
   return (
@@ -59,6 +60,7 @@ export default function App() {
       >
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/devices" element={<DeviceListPage />} />
+        <Route path="/automation" element={<AutomationPage />} />
         <Route path="/report" element={<ReportPage />} />
         <Route path="/report/details" element={<ReportDetailsPage />} />
         <Route path="/report/alerts" element={<AlertsSummaryPage />} />
