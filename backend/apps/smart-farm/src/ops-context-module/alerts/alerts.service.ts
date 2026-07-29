@@ -176,25 +176,17 @@ export class AlertsService {
       .exec();
 
     for (const config of alertConfigs) {
-      console.log({
-        currentValue: input.currentValue,
-        threshold: config.alertsThreshold,
-        actual: config.alertsActualValues,
-      });
       const breached = this.isThresholdBreached(
         input.currentValue,
         config.alertsThreshold,
         config.alertsActualValues as AlertsActualValues,
       );
 
-      console.log('breached =', breached);
-
       if (breached) {
         await this.createNotificationForAlert(config, input.currentValue);
         this.logger.log(
           `Threshold breached | sensor=${input.sensorsId} | value=${input.currentValue} | threshold=${config.alertsThreshold}`,
         );
-        console.log('notifications =>', config);
         return config;
       }
     }

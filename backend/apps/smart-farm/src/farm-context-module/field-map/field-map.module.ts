@@ -4,10 +4,10 @@ import { FieldMapService } from './field-map.service';
 import { NdviAnalyticsSchema } from '../../schemas/farm/Ndvi.model';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MapSectorSchema } from '../../schemas/farm/Map.model';
-import { FarmsSchema } from '../../schemas/farm/Farms.model';
 import { AuthModule } from '../../account-context-module/auth/auth.module';
 import { FarmsModule } from '../farms/farms.module';
 import FieldMapSchema from '../../schemas/farm/FieldsMap.model';
+import FarmsSchema from '../../schemas/farm/Farms.model';
 
 @Module({
   imports: [

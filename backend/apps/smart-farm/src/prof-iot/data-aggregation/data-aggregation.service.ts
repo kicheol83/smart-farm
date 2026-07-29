@@ -112,7 +112,6 @@ export class DataAggregationService {
     to: Date,
   ) {
     const count = await this.aggModel.countDocuments();
-    console.log('Aggregation count:', count);
     const result = await this.aggModel
       .find({
         sensorId: new Types.ObjectId(sensorId),
@@ -121,7 +120,6 @@ export class DataAggregationService {
       })
       .sort({ periodStart: 1 })
       .exec();
-    console.log('getAggregated result:', result);
     return result;
   }
 

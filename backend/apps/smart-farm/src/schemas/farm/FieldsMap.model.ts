@@ -14,6 +14,10 @@ export const FieldMapSchema = new Schema(
       type: String,
       required: true,
     },
+    locationName: {
+      type: String,
+      required: false,
+    },
     totalArea: {
       type: Number,
       required: true,

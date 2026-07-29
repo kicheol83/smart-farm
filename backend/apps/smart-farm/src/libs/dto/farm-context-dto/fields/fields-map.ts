@@ -27,44 +27,40 @@ export enum SectorStatus {
 }
 
 export enum NdviLevel {
-  VERY_LOW = 'VERY_LOW', // 0.0 - 0.2 (red)
-  LOW = 'LOW', // 0.2 - 0.4 (yellow)
-  MODERATE = 'MODERATE', // 0.4 - 0.6 (light green)
-  HIGH = 'HIGH', // 0.6 - 0.8 (green)
-  VERY_HIGH = 'VERY_HIGH', // 0.8 - 1.0 (dark green)
+  VERY_LOW = 'VERY_LOW',
+  LOW = 'LOW',
+  MODERATE = 'MODERATE',
+  HIGH = 'HIGH',
+  VERY_HIGH = 'VERY_HIGH',
 }
 
 registerEnumType(SectorStatus, {
   name: 'SectorStatus',
   valuesMap: {
-    ACTIVE: { description: 'Active sector' },
-    INACTIVE: { description: 'Inactive sector' },
-    PLANNING: { description: 'Sector in planning stage' },
+    ACTIVE: { description: 'Faol sector' },
+    INACTIVE: { description: 'Faol emas' },
+    PLANNING: { description: 'Rejalashtirilmoqda' },
   },
 });
 
 registerEnumType(NdviLevel, {
   name: 'NdviLevel',
-  description: 'NDVI level - vegetation health indicator',
+  description: "NDVI darajasi — o'simlik sog'ligi ko'rsatkichi",
   valuesMap: {
-    VERY_LOW: { description: '0.0 - 0.2 (red) - very low vegetation health' },
-    LOW: { description: '0.2 - 0.4 (yellow) - low vegetation health' },
-    MODERATE: {
-      description: '0.4 - 0.6 (light green) - moderate vegetation health',
-    },
-    HIGH: { description: '0.6 - 0.8 (green) - high vegetation health' },
-    VERY_HIGH: {
-      description: '0.8 - 1.0 (dark green) - very high vegetation health',
-    },
+    VERY_LOW: { description: '0.0 - 0.2 (qizil) — juda past' },
+    LOW: { description: '0.2 - 0.4 (sariq) — past' },
+    MODERATE: { description: "0.4 - 0.6 (och yashil) — o'rtacha" },
+    HIGH: { description: '0.6 - 0.8 (yashil) — yuqori' },
+    VERY_HIGH: { description: "0.8 - 1.0 (to'q yashil) — juda yuqori" },
   },
 });
 
 @ObjectType()
 export class Coordinate {
-  @Field(() => Float)
+  @Field(() => Float, { description: 'Kenglik (latitude)' })
   lat: number;
 
-  @Field(() => Float)
+  @Field(() => Float, { description: 'Uzunlik (longitude)' })
   lng: number;
 }
 
@@ -99,13 +95,13 @@ export class MapSector {
   @Field(() => Coordinate)
   centerPoint: Coordinate;
 
-  @Field(() => Float)
+  @Field(() => Float, { nullable: true })
   ndviValue?: number;
 
   @Field(() => NdviLevel, { nullable: true })
   ndviLevel?: NdviLevel;
 
-  @Field(() => Float)
+  @Field(() => Float, { nullable: true })
   healthIndex?: number;
 
   @Field(() => ID)
@@ -128,6 +124,11 @@ export class FieldMap {
 
   @Field()
   fieldName: string;
+
+  @Field({
+    nullable: true,
+  })
+  locationName?: string;
 
   @Field(() => Float)
   totalArea: number;
@@ -186,7 +187,7 @@ export class FieldMapAnalytics {
   @Field(() => Int)
   activeSectors: number;
 
-  @Field(() => [FieldAnalyticsPoint])
+  @Field(() => [FieldAnalyticsPoint], {})
   analyticsHistory: FieldAnalyticsPoint[];
 }
 
@@ -228,7 +229,7 @@ export class FieldNdviMap {
   @Field()
   lastUpdated: Date;
 
-  @Field(() => [NdviSectorData])
+  @Field(() => [NdviSectorData], {})
   sectors: NdviSectorData[];
 }
 
@@ -239,6 +240,11 @@ export class CreateFieldMapInput {
   @IsNotEmpty()
   fieldName: string;
 
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  locationName?: string;
+
   @Field(() => Float)
   @IsNumber()
   totalArea: number;
@@ -246,7 +252,7 @@ export class CreateFieldMapInput {
   @Field(() => [CoordinateInput])
   @IsArray()
   @ValidateNested({ each: true })
-  @ArrayMinSize(3)
+  @ArrayMinSize(3, { message: 'At least 3 coordinates required for polygon' })
   @Type(() => CoordinateInput)
   boundaryCoordinates: CoordinateInput[];
 
@@ -267,6 +273,11 @@ export class UpdateFieldMapInput {
   @IsString()
   fieldName?: string;
 
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  locationName?: string;
+
   @Field(() => Float, { nullable: true })
   @IsOptional()
   @IsNumber()
@@ -282,7 +293,7 @@ export class UpdateFieldMapInput {
 export class CreateSectorInput {
   @Field()
   @IsString()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'sectorName is required' })
   sectorName: string;
 
   @Field(() => Float)

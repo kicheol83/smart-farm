@@ -4,10 +4,10 @@ import { DevicesResolver } from './devices.resolver';
 import { SensorsSchema } from '../../schemas/iot/Sensors.model';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GreenHouseSchema } from '../../schemas/farm/GreenHouse.model';
-import DevicesSchema from '../../schemas/iot/Devices.model';
 import { AuthModule } from '../../account-context-module/auth/auth.module';
 import { ActionLogModule } from '../action-log/action-log.module';
 import { AlertsModule } from '../../ops-context-module/alerts/alerts.module';
+import DevicesSchema from '../../schemas/iot/Devices.model';
 
 @Module({
   imports: [
