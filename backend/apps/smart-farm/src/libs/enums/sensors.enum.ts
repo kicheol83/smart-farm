@@ -18,6 +18,8 @@ export enum SensorsType {
   CO2 = 'CO2',
   SOIL_MOISTURE = 'SOIL_MOISTURE',
   WATER_LEVEL = 'WATER_LEVEL',
+  WATER_EC = 'WATER_EC',
+  RAIN = 'RAIN',
 }
 
 registerEnumType(SensorsType, {
