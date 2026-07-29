@@ -23,6 +23,7 @@ interface MapAreaViewProps {
   sectors: Sector[];
   selectedSector?: Sector;
   averageNdvi?: number;
+  locationName?: string;
   onSelectSector: (id: string) => void;
   onOpenInfoMenu: (e: React.MouseEvent<HTMLElement>) => void;
 }
@@ -33,6 +34,7 @@ export function MapAreaView({
   sectors,
   selectedSector,
   averageNdvi,
+  locationName,
   onSelectSector,
   onOpenInfoMenu,
 }: MapAreaViewProps) {
@@ -188,6 +190,17 @@ export function MapAreaView({
               <MoreVertRoundedIcon fontSize="small" />
             </IconButton>
           </Box>
+          {locationName && (
+            <Typography
+              sx={{
+                fontFamily: "Inter, sans-serif",
+                fontSize: 12,
+                color: "text.secondary",
+              }}
+            >
+              {locationName}
+            </Typography>
+          )}
           <Typography
             sx={{
               fontFamily: "Inter, sans-serif",

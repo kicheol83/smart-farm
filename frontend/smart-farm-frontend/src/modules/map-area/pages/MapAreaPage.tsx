@@ -15,6 +15,8 @@ import { Header } from "@/components/layout/Header";
 import { SectorAreaListItem } from "../components/SectorAreaListItem";
 import { MapAreaView } from "../components/MapAreaView";
 import { AddMapAreaDialog } from "../components/AddMapAreaDialog";
+import { DateSelectorRow } from "../components/DateSelectorRow";
+import { MapAreaTrendChart } from "../components/MapAreaTrendChart";
 import {
   GET_GREENHOUSE_FARM_ID,
   GET_FIELD_MAPS_BY_FARM,
@@ -24,8 +26,6 @@ import {
   CREATE_SECTOR_MUTATION,
   DELETE_SECTOR_MUTATION,
 } from "../graphql/queries";
-import { DateSelectorRow } from "../components/DateSelectorRow";
-import { MapAreaTrendChart } from "../components/MapAreaTrendChart";
 
 export function MapAreaPage() {
   localStorage.setItem("greenHouseId", "6a2daf715e4567e07ca5d328");
@@ -131,6 +131,7 @@ export function MapAreaPage() {
     <>
       <Header title="Map" />
 
+      {/* Import + Add Map Area */}
       <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1, mb: 2 }}>
         <Button
           variant="outlined"
@@ -158,6 +159,7 @@ export function MapAreaPage() {
           height: { lg: "calc(100vh - 200px)" },
         }}
       >
+        {/* Chap panel */}
         <Box
           sx={{
             display: "flex",
@@ -187,6 +189,7 @@ export function MapAreaPage() {
               sectorName={s.sectorName}
               sectorArea={s.sectorArea}
               centerPoint={s.centerPoint}
+              locationName={fieldMap?.locationName}
               selected={s._id === selectedSector?._id}
               onClick={() => setSelectedSectorId(s._id)}
               onMenuOpen={(e) => {
@@ -213,10 +216,12 @@ export function MapAreaPage() {
           )}
         </Box>
 
+        {/* Xarita */}
         <MapAreaView
           sectors={sectors}
           selectedSector={selectedSector}
           averageNdvi={ndviData?.fieldNdviMap?.averageNdvi}
+          locationName={fieldMap?.locationName}
           onSelectSector={setSelectedSectorId}
           onOpenInfoMenu={(e) => {
             setMenuAnchor(e.currentTarget);
@@ -225,6 +230,7 @@ export function MapAreaPage() {
         />
       </Box>
 
+      {/* Sana tanlagich + trend grafigi */}
       {fieldId && (
         <Box sx={{ mt: 2 }}>
           <DateSelectorRow
