@@ -8,20 +8,21 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types, Document } from 'mongoose';
 import {
   CreateFieldMapInput,
-  UpdateFieldMapInput,
   CreateSectorInput,
-  UpdateSectorInput,
-  UpdateNdviInput,
   FieldMap,
   FieldMapAnalytics,
   FieldNdviMap,
   NdviLevel,
+  UpdateFieldMapInput,
+  UpdateNdviInput,
+  UpdateSectorInput,
 } from '../../libs/dto/farm-context-dto/fields/fields-map';
 import { IFarm } from '../farms/farms.service';
 
 export interface IFieldMap extends Document {
   _id: Types.ObjectId;
   fieldName: string;
+  locationName?: string;
   totalArea: number;
   boundaryCoordinates: { lat: number; lng: number }[];
   centerPoint: { lat: number; lng: number };
@@ -82,13 +83,12 @@ export class FieldMapService {
     if (!farm) {
       throw new NotFoundException('Farm not found');
     }
-
-    const result = await this.fieldMapModel.create({
+    const map = await this.fieldMapModel.create({
       ...input,
       farmId: new Types.ObjectId(input.farmId),
     });
-    this.logger.log(`FieldMap created | ${result.fieldName}`);
-    return result;
+    this.logger.log(`FieldMap created | ${map.fieldName}`);
+    return map;
   }
 
   async findFieldMapsByFarm(farmId: string): Promise<IFieldMap[]> {
@@ -99,31 +99,40 @@ export class FieldMapService {
   }
 
   async findFieldMapById(id: string): Promise<IFieldMap> {
-    const result = await this.fieldMapModel.findById(id).exec();
-    if (!result) throw new NotFoundException('FieldMap not found.');
-    return result;
+    const map = await this.fieldMapModel.findById(id).exec();
+    if (!map) throw new NotFoundException('FieldMap not found.');
+    return map;
   }
 
   async updateFieldMap(
     id: string,
     input: UpdateFieldMapInput,
   ): Promise<IFieldMap> {
-    const result = await this.fieldMapModel
+    const map = await this.fieldMapModel
       .findByIdAndUpdate(id, input, { new: true })
       .exec();
-    if (!result) throw new NotFoundException('FieldMap not found.');
-    return result;
+    if (!map) throw new NotFoundException('FieldMap not found.');
+    return map;
   }
 
-  public async removeFieldMap(id: string): Promise<boolean> {
+  async removeFieldMap(id: string): Promise<boolean> {
     const result = await this.fieldMapModel.deleteOne({ _id: id }).exec();
     if (result.deletedCount === 0)
       throw new NotFoundException('FieldMap not found.');
+    // Bog'liq sectorlarni ham o'chirish
     await this.sectorModel.deleteMany({ fieldId: new Types.ObjectId(id) });
     return true;
   }
 
-  public async createSector(input: CreateSectorInput): Promise<IMapSector> {
+  async createSector(input: CreateSectorInput): Promise<IMapSector> {
+    if (!Types.ObjectId.isValid(input.fieldId)) {
+      throw new BadRequestException('Invalid fieldId');
+    }
+
+    const farm = await this.fieldMapModel.findById(input.fieldId);
+    if (!farm) {
+      throw new NotFoundException('Field not found');
+    }
     const sector = await this.sectorModel.create({
       ...input,
       fieldId: new Types.ObjectId(input.fieldId),
@@ -135,20 +144,20 @@ export class FieldMapService {
     return sector;
   }
 
-  public async findSectorsByField(fieldId: string): Promise<IMapSector[]> {
+  async findSectorsByField(fieldId: string): Promise<IMapSector[]> {
     return this.sectorModel
       .find({ fieldId: new Types.ObjectId(fieldId) })
       .sort({ createdAt: 1 })
       .exec();
   }
 
-  public async findSectorById(id: string): Promise<IMapSector> {
+  async findSectorById(id: string): Promise<IMapSector> {
     const sector = await this.sectorModel.findById(id).exec();
     if (!sector) throw new NotFoundException('Sector not found.');
     return sector;
   }
 
-  public async updateSector(
+  async updateSector(
     id: string,
     input: UpdateSectorInput,
   ): Promise<IMapSector> {
@@ -162,14 +171,14 @@ export class FieldMapService {
     return sector;
   }
 
-  public async removeSector(id: string): Promise<boolean> {
+  async removeSector(id: string): Promise<boolean> {
     const result = await this.sectorModel.deleteOne({ _id: id }).exec();
     if (result.deletedCount === 0)
       throw new NotFoundException('Sector not found.');
     return true;
   }
 
-  public async updateSectorNdvi(input: UpdateNdviInput): Promise<IMapSector> {
+  async updateSectorNdvi(input: UpdateNdviInput): Promise<IMapSector> {
     const ndviLevel = this.resolveNdviLevel(input.ndviValue);
 
     const sector = await this.sectorModel
@@ -187,30 +196,30 @@ export class FieldMapService {
     return sector;
   }
 
-  public async getFieldMapWithSectors(fieldId: string): Promise<FieldMap> {
-    const result = await this.fieldMapModel.findById(fieldId).exec();
-    if (!result) throw new NotFoundException('FieldMap not found.');
+  async getFieldMapWithSectors(fieldId: string): Promise<FieldMap> {
+    const map = await this.fieldMapModel.findById(fieldId).exec();
+    if (!map) throw new NotFoundException('FieldMap not found.');
 
     const sectors = await this.sectorModel
       .find({ fieldId: new Types.ObjectId(fieldId) })
       .exec();
 
     return {
-      _id: String(result._id),
-      fieldName: result.fieldName,
-      totalArea: result.totalArea,
-      boundaryCoordinates: result.boundaryCoordinates,
-      centerPoint: result.centerPoint,
+      _id: String(map._id),
+      fieldName: map.fieldName,
+      totalArea: map.totalArea,
+      boundaryCoordinates: map.boundaryCoordinates,
+      centerPoint: map.centerPoint,
       sectors: sectors as any,
-      farmId: String(result.farmId),
-      createdAt: result.createdAt,
-      updatedAt: result.updatedAt,
+      farmId: String(map.farmId),
+      createdAt: map.createdAt,
+      updatedAt: map.updatedAt,
     };
   }
 
-  public async getFieldNdviMap(fieldId: string): Promise<FieldNdviMap> {
-    const result = await this.fieldMapModel.findById(fieldId).exec();
-    if (!result) throw new NotFoundException('FieldMap not found.');
+  async getFieldNdviMap(fieldId: string): Promise<FieldNdviMap> {
+    const map = await this.fieldMapModel.findById(fieldId).exec();
+    if (!map) throw new NotFoundException('FieldMap not found.');
 
     const sectors = await this.sectorModel
       .find({ fieldId: new Types.ObjectId(fieldId) })
@@ -237,20 +246,20 @@ export class FieldMapService {
 
     return {
       fieldId,
-      fieldName: result.fieldName,
+      fieldName: map.fieldName,
       averageNdvi: Math.round(avgNdvi * 100) / 100,
       lastUpdated,
       sectors: ndviSectors,
     };
   }
 
-  public async getFieldAnalytics(
+  async getFieldAnalytics(
     fieldId: string,
     from?: Date,
     to?: Date,
   ): Promise<FieldMapAnalytics> {
-    const result = await this.fieldMapModel.findById(fieldId).exec();
-    if (!result) throw new NotFoundException('FieldMap not found.');
+    const map = await this.fieldMapModel.findById(fieldId).exec();
+    if (!map) throw new NotFoundException('FieldMap not found.');
 
     const sectors = await this.sectorModel
       .find({ fieldId: new Types.ObjectId(fieldId) })
@@ -288,7 +297,7 @@ export class FieldMapService {
 
     return {
       fieldId,
-      fieldName: result.fieldName,
+      fieldName: map.fieldName,
       avgNdvi: Math.round(avgNdvi * 100) / 100,
       avgHealthIndex: Math.round(avgHealth * 10) / 10,
       totalSectors: sectors.length,

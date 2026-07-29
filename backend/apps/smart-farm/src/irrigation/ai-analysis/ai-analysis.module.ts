@@ -4,8 +4,8 @@ import { AiAnalysisService, IrrigationLogSchema } from './ai-analysis.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import SensorDataSchema from '../../schemas/iot/SensorData.model';
 import SensorsSchema from '../../schemas/iot/Sensors.model';
-import { DevicesSchema } from '../../schemas/iot/Devices.model';
 import { AuthModule } from '../../account-context-module/auth/auth.module';
+import DevicesSchema from '../../schemas/iot/Devices.model';
 
 @Module({
   imports: [

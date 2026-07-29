@@ -62,7 +62,9 @@ export class Camera {
   })
   resolution?: string;
 
-  @Field()
+  @Field({
+    nullable: true,
+  })
   encoding?: string;
 
   @Field()

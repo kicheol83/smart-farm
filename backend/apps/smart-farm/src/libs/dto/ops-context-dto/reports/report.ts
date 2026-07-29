@@ -49,10 +49,10 @@ export class ReportSensorAvg {
   @Field(() => Float, { nullable: true })
   avgHumidity?: number;
 
-  @Field(() => Float)
+  @Field(() => Float, { nullable: true })
   avgPh?: number;
 
-  @Field(() => Float)
+  @Field(() => Float, {nullable: true})
   avgCo2?: number;
 
   @Field(() => Float, {
@@ -60,7 +60,7 @@ export class ReportSensorAvg {
   })
   avgSoilMoisture?: number;
 
-  @Field(() => Float)
+  @Field(() => Float, {nullable: true})
   avgLight?: number;
 }
 

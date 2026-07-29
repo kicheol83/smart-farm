@@ -4,8 +4,8 @@ import { SensorsResolver } from './sensors.resolver';
 import { SensorsSchema } from '../../schemas/iot/Sensors.model';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from '../../account-context-module/auth/auth.module';
-import { DevicesSchema } from '../../schemas/iot/Devices.model';
 import { DevicesModule } from '../devices/devices.module';
+import DevicesSchema from '../../schemas/iot/Devices.model';
 
 @Module({
   imports: [

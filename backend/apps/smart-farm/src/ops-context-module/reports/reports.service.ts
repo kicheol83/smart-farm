@@ -319,12 +319,8 @@ export class ReportsService {
 
     const avgs: Record<string, number> = {};
     avgResult.forEach((r) => (avgs[r._id] = Math.round(r.avg * 10) / 10));
-
-    // Alert sonlari
     const totalAlerts = await this.countAlerts(sensorIds, from, to);
-    const unresolvedAlerts = totalAlerts; // Alert moduli tayyor bo\'lganda filter qo\'shiladi
-
-    // Jami suv sarfi
+    const unresolvedAlerts = totalAlerts;
     const waterResult = await this.waterUsageModel.aggregate([
       {
         $match: {
@@ -335,7 +331,6 @@ export class ReportsService {
       { $group: { _id: null, total: { $sum: '$waterAmount' } } },
     ]);
 
-    // O\'simlik sog\'ligi
     const latestHealth = await this.plantHealthModel
       .findOne()
       .sort({ recordeAt: -1 })

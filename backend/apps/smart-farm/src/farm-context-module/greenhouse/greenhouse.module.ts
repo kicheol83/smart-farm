@@ -4,8 +4,8 @@ import { GreenhouseResolver } from './greenhouse.resolver';
 import { GreenHouseSchema } from '../../schemas/farm/GreenHouse.model';
 import { MongooseModule } from '@nestjs/mongoose/dist/mongoose.module';
 import { AuthModule } from '../../account-context-module/auth/auth.module';
-import { FarmsSchema } from '../../schemas/farm/Farms.model';
 import { FarmsModule } from '../farms/farms.module';
+import FarmsSchema from '../../schemas/farm/Farms.model';
 
 @Module({
   imports: [

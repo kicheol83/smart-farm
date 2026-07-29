@@ -5,8 +5,8 @@ import { DeviceCommandSchema } from '../../libs/dto/command.dto';
 import { MqttModule } from '../mqtt/mqtt.module';
 import { AuthModule } from '../../account-context-module/auth/auth.module';
 import { CommandResolver } from '../../iot/command/command.resolver';
-import { DevicesSchema } from '../../schemas/iot/Devices.model';
 import { DevicesModule } from '../../io-tcontext-module/devices/devices.module';
+import DevicesSchema from '../../schemas/iot/Devices.model';
 
 @Module({
   imports: [
