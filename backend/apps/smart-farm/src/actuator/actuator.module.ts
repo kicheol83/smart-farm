@@ -7,6 +7,7 @@ import AutomationRulesSchema from '../schemas/ops/AutomationRules.model';
 import DevicesSchema from '../schemas/iot/Devices.model';
 import { ActionLogModule } from '../io-tcontext-module/action-log/action-log.module';
 import { DeviceAuthModule } from '../iot/device-auth/device-auth.module';
+import { AuthModule } from '../account-context-module/auth/auth.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { DeviceAuthModule } from '../iot/device-auth/device-auth.module';
     ]),
     ActionLogModule,
     DeviceAuthModule,
+    AuthModule
   ],
   providers: [ActuatorResolver, ActuatorService],
   exports: [ActuatorService],

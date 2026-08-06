@@ -27,7 +27,6 @@ import { CommandModule } from './iot/command/command.module';
 import { ProfIotModule } from './prof-iot/prof-iot.module';
 import { MidIotModule } from './mid-iot/mid-iot.module';
 import { IrrigationModule } from './irrigation/irrigation.module';
-import { ActuatorModule } from './src/actuator/actuator.module';
 import { ActuatorModule } from './actuator/actuator.module';
 
 @Module({

@@ -143,7 +143,7 @@ export class SensorDataService {
     for (const sensor of sensors) {
       const latest = await this.sensorDataModel
         .findOne({ sensorId: sensor._id })
-        .sort({ recordedAt: -1 })
+        .sort({ createdAt: -1 })
         .exec();
 
       if (!latest) continue;
