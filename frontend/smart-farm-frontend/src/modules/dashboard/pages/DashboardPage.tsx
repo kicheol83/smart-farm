@@ -19,19 +19,41 @@ import {
   GET_CAMERAS_BY_GREENHOUSE,
   GET_TASK_BOARD_OVERVIEW,
 } from "../graphql/queries";
+import { GET_GREENHOUSE_FARM_ID } from "@/modules/map-area/graphql/queries";
+import { GET_FARM } from "@/modules/settings/graphql/queries";
+import { GET_TODAY_TEMPERATURE_RANGE } from "../graphql/queries";
 
 export function DashboardPage() {
-  localStorage.setItem("greenHouseId", "6a2daf715e4567e07ca5d328");
-  const greenHouseId = localStorage.getItem("greenHouseId") || "";
+  const greenHouseId = localStorage.getItem("currentGreenhouseId") || "";
   const hasGreenhouse = greenHouseId.length > 0;
 
   const { data: summaryData } = useQuery(GET_GREENHOUSE_SUMMARY, {
     variables: { greenHouseId },
     skip: !hasGreenhouse,
+    fetchPolicy: "network-only",
   });
 
   const { data: detailData } = useQuery(GET_GREENHOUSE_DETAIL, {
     variables: { id: greenHouseId },
+    skip: !hasGreenhouse,
+    fetchPolicy: "network-only",
+  });
+
+  const { data: ghFarmData } = useQuery(GET_GREENHOUSE_FARM_ID, {
+    variables: { id: greenHouseId },
+    skip: !hasGreenhouse,
+    fetchPolicy: "network-only",
+  });
+
+  const farmsId = ghFarmData?.greenhouse?.farmsId;
+  const { data: farmData } = useQuery(GET_FARM, {
+    variables: { farmId: farmsId },
+    skip: !farmsId,
+    fetchPolicy: "network-only",
+  });
+
+  const { data: tempRangeData } = useQuery(GET_TODAY_TEMPERATURE_RANGE, {
+    variables: { greenHouseId },
     skip: !hasGreenhouse,
   });
 
@@ -100,6 +122,9 @@ export function DashboardPage() {
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <WeatherMapCard
             temperature={summary?.temperature}
+            location={farmData?.farm?.farmLocation}
+            highTemp={tempRangeData?.todayTemperatureRange?.high}
+            lowTemp={tempRangeData?.todayTemperatureRange?.low}
             greenhouseName={detail?.greenHouseName}
             greenhouseCode={
               detail?._id ? detail._id.slice(-6).toUpperCase() : "—"

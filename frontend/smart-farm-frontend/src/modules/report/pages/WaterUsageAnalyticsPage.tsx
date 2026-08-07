@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@apollo/client";
 import { Box, Typography, Card, IconButton } from "@mui/material";
 import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded";
@@ -14,12 +15,17 @@ import {
 } from "../graphql/queries";
 
 export function WaterUsageAnalyticsPage() {
+  localStorage.setItem("greenHouseId", "6a2daf715e4567e07ca5d328");
   const greenHouseId = localStorage.getItem("greenHouseId") || "";
   const hasGreenhouse = greenHouseId.length > 0;
   const analyticsInput = { greenHouseId };
 
+  const [period, setPeriod] = useState<
+    "LAST_7_DAYS" | "LAST_30_DAYS" | "LAST_90_DAYS"
+  >("LAST_7_DAYS");
+
   const { data } = useQuery(GET_FULL_GREENHOUSE_REPORT, {
-    variables: { input: { greenHouseId, period: "LAST_7_DAYS" } },
+    variables: { input: { greenHouseId, period } },
     skip: !hasGreenhouse,
   });
 
@@ -117,7 +123,11 @@ export function WaterUsageAnalyticsPage() {
         }}
       >
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-          <WaterUsageDistributionChart points={waterUsage?.dataPoints ?? []} />
+          <WaterUsageDistributionChart
+            points={waterUsage?.dataPoints ?? []}
+            period={period}
+            onPeriodChange={setPeriod}
+          />
 
           <Box
             sx={{
