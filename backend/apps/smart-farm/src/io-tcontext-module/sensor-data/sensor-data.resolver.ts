@@ -6,6 +6,7 @@ import {
   CreateSensorDataInput,
   GreenhouseSensorSummary,
   SensorData,
+  TodayTemperatureRange,
 } from '../../libs/dto/iot-context-dto/sensors/sensor.data';
 
 @Resolver()
@@ -58,5 +59,13 @@ export class SensorDataResolver {
       new Date(to),
     );
     return result as any;
+  }
+
+  @Query(() => TodayTemperatureRange)
+  @UseGuards(AuthGuard)
+  async todayTemperatureRange(
+    @Args('greenHouseId', { type: () => ID }) greenHouseId: string,
+  ): Promise<TodayTemperatureRange> {
+    return this.sensorDataService.getTodayTemperatureRange(greenHouseId);
   }
 }

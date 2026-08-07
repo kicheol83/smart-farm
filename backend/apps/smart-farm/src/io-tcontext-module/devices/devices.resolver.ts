@@ -1,8 +1,6 @@
 import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { DevicesService } from './devices.service';
-import { ActionLogService } from '../action-log/action-log.service';
-import { AlertsService } from '../../ops-context-module/alerts/alerts.service';
 import {
   CreateDeviceInput,
   Device,
@@ -13,9 +11,11 @@ import {
   UpdateDeviceInput,
   UpdateDeviceTelemetryInput,
 } from '../../libs/dto/iot-context-dto/devices/device';
+import { ActionLogService } from '../action-log/action-log.service';
+import { AlertsService } from '../../ops-context-module/alerts/alerts.service';
 import { AuthGuard } from '../../account-context-module/auth/guards/auth.guard';
-import { AuthMember } from '../../account-context-module/auth/decorators/authMember.decorator';
 import { Member } from '../../libs/dto/account-context-dto/member/member';
+import { AuthMember } from '../../account-context-module/auth/decorators/authMember.decorator';
 import { RequestMeta } from '../../account-context-module/auth/decorators/requesr.meta.decorator';
 import {
   ActionResource,
@@ -24,7 +24,7 @@ import {
 import { AlertSeverity } from '../../libs/enums/alerts.enum';
 
 @Resolver(() => Device)
-export class DevicesResolver {
+export class DeviceResolver {
   constructor(
     private readonly deviceService: DevicesService,
     private readonly actionLogService: ActionLogService,
@@ -63,7 +63,7 @@ export class DevicesResolver {
     return this.deviceService.findWithSensors(id);
   }
 
-  @Query(() => GreenhouseDeviceOverview)
+  @Query(() => GreenhouseDeviceOverview, {})
   @UseGuards(AuthGuard)
   public async greenhouseDeviceOverview(
     @Args('greenHouseId', { type: () => ID }) greenHouseId: string,
@@ -71,7 +71,7 @@ export class DevicesResolver {
     return this.deviceService.getGreenhouseOverview(greenHouseId);
   }
 
-  @Query(() => [Device])
+  @Query(() => [Device], {})
   @UseGuards(AuthGuard)
   public async filterDevices(
     @Args('input') input: FilterDevicesInput,
@@ -79,7 +79,7 @@ export class DevicesResolver {
     return this.deviceService.filter(input) as any;
   }
 
-  @Mutation(() => Device)
+  @Mutation(() => Device, { description: 'Device yangilash' })
   @UseGuards(AuthGuard)
   public async updateDevice(
     @Args('id', { type: () => ID }) id: string,
@@ -143,7 +143,7 @@ export class DevicesResolver {
     return device as any;
   }
 
-  @Mutation(() => Device)
+  @Mutation(() => Device, {})
   @UseGuards(AuthGuard)
   public async updateDeviceTelemetry(
     @Args('input') input: UpdateDeviceTelemetryInput,

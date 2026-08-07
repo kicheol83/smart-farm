@@ -12,6 +12,8 @@ import { DevicesModule } from '../devices/devices.module';
 import { GreenhouseModule } from '../../farm-context-module/greenhouse/greenhouse.module';
 import DevicesSchema from '../../schemas/iot/Devices.model';
 import { ActuatorModule } from '../../actuator/actuator.module';
+import { DeviceAuthModule } from '../../iot/device-auth/device-auth.module';
+import { DeviceApiKeyGuard } from '../../account-context-module/auth/guards/device.api.key.guard';
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -24,9 +26,11 @@ import { ActuatorModule } from '../../actuator/actuator.module';
     SensorsModule,
     DevicesModule,
     GreenhouseModule,
-    ActuatorModule
+    ActuatorModule,
+    ActuatorModule,
+    DeviceAuthModule,
   ],
-  providers: [SensorDataResolver, SensorDataService],
+  providers: [SensorDataResolver, SensorDataService, DeviceApiKeyGuard],
   exports: [SensorDataService],
 })
 export class SensorDataModule {}

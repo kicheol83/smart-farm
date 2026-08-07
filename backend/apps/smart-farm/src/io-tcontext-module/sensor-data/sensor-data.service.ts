@@ -190,4 +190,38 @@ export class SensorDataService {
       .sort({ recordedAt: 1 })
       .exec();
   }
+
+  async getTodayTemperatureRange(
+    greenHouseId: string,
+  ): Promise<{ high?: number; low?: number }> {
+    const devices = await this.deviceModel
+      .find({ greenHouseId: new Types.ObjectId(greenHouseId) })
+      .select('_id')
+      .exec();
+    const deviceIds = devices.map((d) => d._id);
+
+    const tempSensors = await this.sensorModel
+      .find({ deviceId: { $in: deviceIds }, sensorType: 'TEMPERATURE' })
+      .select('_id')
+      .exec();
+    const sensorIds = tempSensors.map((s) => s._id);
+
+    if (sensorIds.length === 0) return {};
+
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const readings = await this.sensorDataModel
+      .find({ sensorId: { $in: sensorIds }, recordedAt: { $gte: startOfDay } })
+      .select('sensorDataValue')
+      .exec();
+
+    if (readings.length === 0) return {};
+
+    const values = readings.map((r) => r.sensorDataValue);
+    return {
+      high: Math.max(...values),
+      low: Math.min(...values),
+    };
+  }
 }

@@ -2,15 +2,14 @@ import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types, Document } from 'mongoose';
 import {
+  DeviceWithSensors,
   CreateDeviceInput,
   UpdateDeviceInput,
   FilterDevicesInput,
   DeviceStatus,
   DeviceType,
   GreenhouseDeviceOverview,
-  DeviceWithSensors,
 } from '../../libs/dto/iot-context-dto/devices/device';
-import { Member } from '../../libs/dto/account-context-dto/member/member';
 
 export interface IDevice extends Document {
   _id: Types.ObjectId;
@@ -27,6 +26,7 @@ export interface IDevice extends Document {
   lastDataReceived?: Date;
   latitude?: number;
   longitude?: number;
+  apiKeyHash?: string;
   updatedAt: Date;
 }
 
@@ -56,7 +56,7 @@ export class DevicesService {
     private readonly sensorModel: Model<ISensor>,
   ) {}
 
-  public async create(input: CreateDeviceInput): Promise<IDevice> {
+  async create(input: CreateDeviceInput): Promise<IDevice> {
     const device = await this.deviceModel.create({
       ...input,
       installedAt: new Date(input.installedAt),
@@ -72,13 +72,13 @@ export class DevicesService {
     return device;
   }
 
-  public async findOne(id: string): Promise<IDevice> {
+  async findOne(id: string): Promise<IDevice> {
     const device = await this.deviceModel.findById(id).exec();
     if (!device) throw new NotFoundException('Device not found.');
     return device;
   }
 
-  public async update(id: string, input: UpdateDeviceInput): Promise<IDevice> {
+  async update(id: string, input: UpdateDeviceInput): Promise<IDevice> {
     const device = await this.deviceModel
       .findByIdAndUpdate(id, input, { new: true })
       .exec();
@@ -86,17 +86,14 @@ export class DevicesService {
     return device;
   }
 
-  public async remove(id: string): Promise<boolean> {
+  async remove(id: string): Promise<boolean> {
     const result = await this.deviceModel.deleteOne({ _id: id }).exec();
     if (result.deletedCount === 0)
       throw new NotFoundException('Device not found.');
     return true;
   }
 
-  public async updateStatus(
-    id: string,
-    status: DeviceStatus,
-  ): Promise<IDevice> {
+  async updateStatus(id: string, status: DeviceStatus): Promise<IDevice> {
     const device = await this.deviceModel
       .findByIdAndUpdate(id, { deviceStatus: status }, { new: true })
       .exec();
@@ -105,7 +102,7 @@ export class DevicesService {
     return device;
   }
 
-  public async updateTelemetry(
+  async updateTelemetry(
     deviceId: string,
     rssi?: number,
     snr?: number,
@@ -126,7 +123,7 @@ export class DevicesService {
     return device;
   }
 
-  public async filter(input: FilterDevicesInput): Promise<IDevice[]> {
+  async filter(input: FilterDevicesInput): Promise<IDevice[]> {
     const query: any = {
       greenHouseId: new Types.ObjectId(input.greenHouseId),
     };
@@ -136,7 +133,7 @@ export class DevicesService {
     return this.deviceModel.find(query).sort({ installedAt: -1 }).exec();
   }
 
-  public async findWithSensors(id: string): Promise<DeviceWithSensors> {
+  async findWithSensors(id: string): Promise<DeviceWithSensors> {
     const device = await this.deviceModel.findById(id).exec();
     if (!device) throw new NotFoundException('Device not found.');
 
@@ -144,7 +141,7 @@ export class DevicesService {
       .find({ deviceId: device._id })
       .exec();
 
-    const result = {
+    return {
       _id: String(device._id),
       deviceName: device.deviceName,
       deviceType: device.deviceType as DeviceType,
@@ -166,10 +163,9 @@ export class DevicesService {
         sensorsUnit: s.sensorsUnit,
       })),
     };
-    return result;
   }
 
-  public async getGreenhouseOverview(
+  async getGreenhouseOverview(
     greenHouseId: string,
   ): Promise<GreenhouseDeviceOverview> {
     const greenhouse = await this.greenhouseModel.findById(greenHouseId).exec();
