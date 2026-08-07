@@ -141,3 +141,12 @@ export const GET_TASK_BOARD_OVERVIEW = gql`
     }
   }
 `;
+
+export const GET_TODAY_TEMPERATURE_RANGE = gql`
+  query TodayTemperatureRange($greenHouseId: ID!) {
+    todayTemperatureRange(greenHouseId: $greenHouseId) {
+      high
+      low
+    }
+  }
+`;

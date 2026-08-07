@@ -66,7 +66,6 @@ export function WeatherMapCard({
           <path d="M210 15 L340 25 L330 130 L215 125 Z" strokeDasharray="5 4" />
           <path d="M65 155 L195 135 L215 250 L85 270 Z" strokeDasharray="5 4" />
         </g>
-        {/* Faol plot — qora karta */}
         <g transform="rotate(-8 265 195)">
           <rect x="220" y="150" width="90" height="95" rx="10" fill="#2a2a2a" />
           <text

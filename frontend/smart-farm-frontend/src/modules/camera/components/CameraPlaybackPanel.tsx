@@ -1,6 +1,16 @@
-import { Box, Typography, Button } from "@mui/material";
+import { useState } from "react";
+import {
+  Box,
+  Typography,
+  Button,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material";
 import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
-import { format, isToday, isYesterday } from "date-fns";
+import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
+import { format, isToday, isYesterday, isThisWeek } from "date-fns";
 
 interface Snapshot {
   _id: string;
@@ -13,11 +23,24 @@ interface CameraPlaybackPanelProps {
   cameraLabel: string;
 }
 
+type FilterOption = "ALL" | "TODAY" | "YESTERDAY" | "THIS_WEEK";
+
+const FILTER_LABEL: Record<FilterOption, string> = {
+  ALL: "All",
+  TODAY: "Today",
+  YESTERDAY: "Yesterday",
+  THIS_WEEK: "This Week",
+};
+
 export function CameraPlaybackPanel({
   snapshots,
   cameraLabel,
 }: CameraPlaybackPanelProps) {
-  const groups = groupByDate(snapshots);
+  const [filter, setFilter] = useState<FilterOption>("ALL");
+  const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
+
+  const filtered = applyFilter(snapshots, filter);
+  const groups = groupByDate(filtered);
 
   return (
     <Box
@@ -53,10 +76,35 @@ export function CameraPlaybackPanel({
           size="small"
           variant="outlined"
           startIcon={<TuneRoundedIcon fontSize="small" />}
+          onClick={(e) => setMenuAnchor(e.currentTarget)}
           sx={{ textTransform: "none", borderRadius: 2 }}
         >
-          Filter
+          {FILTER_LABEL[filter]}
         </Button>
+        <Menu
+          anchorEl={menuAnchor}
+          open={Boolean(menuAnchor)}
+          onClose={() => setMenuAnchor(null)}
+        >
+          {(Object.keys(FILTER_LABEL) as FilterOption[]).map((f) => (
+            <MenuItem
+              key={f}
+              onClick={() => {
+                setFilter(f);
+                setMenuAnchor(null);
+              }}
+            >
+              {filter === f && (
+                <ListItemIcon>
+                  <CheckRoundedIcon fontSize="small" />
+                </ListItemIcon>
+              )}
+              <ListItemText inset={filter !== f}>
+                {FILTER_LABEL[f]}
+              </ListItemText>
+            </MenuItem>
+          ))}
+        </Menu>
       </Box>
 
       {groups.map(([label, items]) => (
@@ -134,7 +182,7 @@ export function CameraPlaybackPanel({
         </Box>
       ))}
 
-      {snapshots.length === 0 && (
+      {filtered.length === 0 && (
         <Typography
           sx={{
             fontFamily: "Inter, sans-serif",
@@ -144,11 +192,24 @@ export function CameraPlaybackPanel({
             py: 3,
           }}
         >
-          Hali snapshot yo'q
+          {snapshots.length === 0
+            ? "Hali snapshot yo'q"
+            : "Bu davr uchun snapshot topilmadi"}
         </Typography>
       )}
     </Box>
   );
+}
+
+function applyFilter(snapshots: Snapshot[], filter: FilterOption): Snapshot[] {
+  if (filter === "ALL") return snapshots;
+  return snapshots.filter((s) => {
+    const d = new Date(s.captureAt);
+    if (filter === "TODAY") return isToday(d);
+    if (filter === "YESTERDAY") return isYesterday(d);
+    if (filter === "THIS_WEEK") return isThisWeek(d, { weekStartsOn: 1 });
+    return true;
+  });
 }
 
 function groupByDate(snapshots: Snapshot[]): [string, Snapshot[]][] {
