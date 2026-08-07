@@ -33,26 +33,39 @@ export class GreenhouseSensorSummary {
   @Field()
   greenHouseName: string;
 
-  @Field(() => Float, { nullable: true, description: '°C' })
+  @Field(() => Float)
   temperature?: number;
 
-  @Field(() => Float, { nullable: true, description: '%' })
+  @Field(() => Float)
   humidity?: number;
 
-  @Field(() => Float, { nullable: true, description: 'pH' })
+  @Field(() => Float)
   ph?: number;
 
-  @Field(() => Float, { nullable: true, description: 'light (lux)' })
+  @Field(() => Float)
   light?: number;
 
-  @Field(() => Float, { nullable: true, description: 'CO2 (ppm)' })
+  @Field(() => Float)
   co2?: number;
 
-  @Field(() => Float, { nullable: true, description: 'Soil Moisture (%)' })
+  @Field(() => Float)
   soilMoisture?: number;
 
   @Field()
   lastUpdated: Date;
+}
+
+@ObjectType()
+export class TodayTemperatureRange {
+  @Field(() => Float, {
+    nullable: true,
+  })
+  high?: number;
+
+  @Field(() => Float, {
+    nullable: true,
+  })
+  low?: number;
 }
 
 @InputType()

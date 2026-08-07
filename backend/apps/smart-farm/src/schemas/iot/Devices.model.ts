@@ -54,12 +54,10 @@ const DevicesSchema = new mongoose.Schema(
     rssi: {
       type: Number,
       required: false,
-      description: 'Signal quvvati (dBm), masalan -85',
     },
     snr: {
       type: Number,
       required: false,
-      description: 'Signal-shovqin nisbati (dB), masalan 6.5',
     },
     lastDataReceived: {
       type: Date,
