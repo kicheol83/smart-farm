@@ -1,13 +1,18 @@
+import { useMemo, useState } from "react";
 import { Box, IconButton, Card, Typography } from "@mui/material";
-import AddRoundedIcon from "@mui/icons-material/AddRounded";
-import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded";
-import MyLocationRoundedIcon from "@mui/icons-material/MyLocationRounded";
 import EditRoundedIcon from "@mui/icons-material/EditRounded";
 import ViewSidebarRoundedIcon from "@mui/icons-material/ViewSidebarRounded";
 import FullscreenRoundedIcon from "@mui/icons-material/FullscreenRounded";
-import CloudRoundedIcon from "@mui/icons-material/CloudRounded";
 import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded";
-import { useState } from "react";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  ZoomControl,
+  useMap,
+} from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import { NdviLegend } from "./NdviLegend";
 
 interface Sector {
@@ -28,7 +33,51 @@ interface MapAreaViewProps {
   onOpenInfoMenu: (e: React.MouseEvent<HTMLElement>) => void;
 }
 
-const MAP_IMAGE = "https://picsum.photos/seed/smartfarm-drone-field/1400/900";
+const NDVI_COLOR: Record<string, string> = {
+  VERY_LOW: "#c62828",
+  LOW: "#e58e26",
+  MODERATE: "#f9ad19",
+  HIGH: "#7cb342",
+  VERY_HIGH: "#1a7a4c",
+};
+
+function buildMarkerIcon(
+  label: string,
+  selected: boolean,
+  ndviColor?: string,
+): L.DivIcon {
+  const bg = ndviColor ?? (selected ? "#35C56E" : "rgba(0,0,0,0.75)");
+  return L.divIcon({
+    className: "",
+    html: `
+      <div style="display:flex;flex-direction:column;align-items:center;gap:2px;transform:translate(-50%,-100%);">
+        <div style="background:#fff;border-radius:8px;padding:3px 8px;font-size:11px;font-family:Inter,sans-serif;font-weight:${selected ? 700 : 500};white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,0.25);border:${selected ? "2px solid #35C56E" : "none"};">
+          ${label}
+        </div>
+        <div style="width:${selected ? 14 : 10}px;height:${selected ? 14 : 10}px;border-radius:50%;background:${bg};border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,0.4);"></div>
+      </div>
+    `,
+    iconSize: [0, 0],
+  });
+}
+
+function FitBoundsToSectors({ sectors }: { sectors: Sector[] }) {
+  const map = useMap();
+  useMemo(() => {
+    if (sectors.length === 0) return;
+    if (sectors.length === 1) {
+      map.setView([sectors[0].centerPoint.lat, sectors[0].centerPoint.lng], 17);
+      return;
+    }
+    const bounds = L.latLngBounds(
+      sectors.map(
+        (s) => [s.centerPoint.lat, s.centerPoint.lng] as [number, number],
+      ),
+    );
+    map.fitBounds(bounds, { padding: [60, 60] });
+  }, [sectors.map((s) => s._id).join(",")]);
+  return null;
+}
 
 export function MapAreaView({
   sectors,
@@ -38,8 +87,12 @@ export function MapAreaView({
   onSelectSector,
   onOpenInfoMenu,
 }: MapAreaViewProps) {
-  const otherSectors = sectors.filter((s) => s._id !== selectedSector?._id);
   const [showNdvi, setShowNdvi] = useState(false);
+
+  const initialCenter: [number, number] =
+    sectors.length > 0
+      ? [sectors[0].centerPoint.lat, sectors[0].centerPoint.lng]
+      : [41.2995, 69.2401];
 
   return (
     <Box
@@ -49,11 +102,36 @@ export function MapAreaView({
         overflow: "hidden",
         height: "100%",
         minHeight: 420,
-        backgroundImage: `url(${MAP_IMAGE})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
       }}
     >
+      <MapContainer
+        center={initialCenter}
+        zoom={17}
+        zoomControl={false}
+        style={{ height: "100%", width: "100%" }}
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        <ZoomControl position="bottomright" />
+        <FitBoundsToSectors sectors={sectors} />
+
+        {sectors.map((s) => {
+          const isSelected = s._id === selectedSector?._id;
+          const ndviColor =
+            showNdvi && s.ndviLevel ? NDVI_COLOR[s.ndviLevel] : undefined;
+          return (
+            <Marker
+              key={s._id}
+              position={[s.centerPoint.lat, s.centerPoint.lng]}
+              icon={buildMarkerIcon(s.sectorName, isSelected, ndviColor)}
+              eventHandlers={{ click: () => onSelectSector(s._id) }}
+            />
+          );
+        })}
+      </MapContainer>
+
       <Box
         sx={{
           position: "absolute",
@@ -62,6 +140,7 @@ export function MapAreaView({
           display: "flex",
           flexDirection: "column",
           gap: 1,
+          zIndex: 1000,
         }}
       >
         <IconButton
@@ -75,84 +154,9 @@ export function MapAreaView({
           <ViewSidebarRoundedIcon fontSize="small" />
         </IconButton>
         <IconButton size="small" sx={{ bgcolor: "rgba(255,255,255,0.85)" }}>
-          <AddRoundedIcon fontSize="small" />
-        </IconButton>
-        <IconButton size="small" sx={{ bgcolor: "rgba(255,255,255,0.85)" }}>
-          <RemoveRoundedIcon fontSize="small" />
-        </IconButton>
-        <IconButton
-          size="small"
-          sx={{ bgcolor: "rgba(255,255,255,0.85)", mt: 1 }}
-        >
-          <MyLocationRoundedIcon fontSize="small" />
-        </IconButton>
-        <IconButton size="small" sx={{ bgcolor: "rgba(255,255,255,0.85)" }}>
           <EditRoundedIcon fontSize="small" />
         </IconButton>
       </Box>
-
-      {selectedSector && (
-        <Box
-          onClick={() => onSelectSector(selectedSector._id)}
-          sx={{
-            position: "absolute",
-            top: "38%",
-            left: "42%",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 0.5,
-            cursor: "pointer",
-          }}
-        >
-          <Box
-            sx={{
-              bgcolor: "#fff",
-              borderRadius: 2,
-              px: 1.5,
-              py: 0.5,
-              fontSize: 12,
-              fontFamily: "Satoshi, sans-serif",
-              fontWeight: 500,
-              whiteSpace: "nowrap",
-            }}
-          >
-            {selectedSector.sectorName}
-          </Box>
-          <Box
-            sx={{
-              width: 8,
-              height: 8,
-              borderRadius: "50%",
-              bgcolor: "#fff",
-              border: "2px solid #35C56E",
-            }}
-          />
-        </Box>
-      )}
-
-      {otherSectors.slice(0, 6).map((s, i) => (
-        <Box
-          key={s._id}
-          onClick={() => onSelectSector(s._id)}
-          sx={{
-            position: "absolute",
-            top: `${50 + (i % 3) * 12}%`,
-            left: `${62 + Math.floor(i / 3) * 14}%`,
-            bgcolor: "rgba(0,0,0,0.65)",
-            color: "#fff",
-            borderRadius: 1.5,
-            px: 1.25,
-            py: 0.5,
-            fontSize: 12,
-            fontFamily: "Inter, sans-serif",
-            cursor: "pointer",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {s.sectorName}
-        </Box>
-      ))}
 
       {selectedSector && (
         <Card
@@ -166,6 +170,7 @@ export function MapAreaView({
             overflowY: "auto",
             borderRadius: 2,
             p: 2,
+            zIndex: 1000,
           }}
         >
           <Box
@@ -253,40 +258,18 @@ export function MapAreaView({
         </Card>
       )}
 
-      <Box
+      <IconButton
+        size="small"
+        onClick={() =>
+          document.getElementById("map-area-container")?.requestFullscreen?.()
+        }
         sx={{
           position: "absolute",
           bottom: 16,
           left: 16,
-          display: "flex",
-          alignItems: "center",
-          gap: 1,
-          bgcolor: "rgba(255,255,255,0.9)",
-          borderRadius: 2,
-          px: 1.5,
-          py: 0.75,
-        }}
-      >
-        <CloudRoundedIcon sx={{ fontSize: 16, color: "text.secondary" }} />
-        <Typography
-          sx={{
-            fontFamily: "Inter, sans-serif",
-            fontSize: 12,
-            color: "text.secondary",
-          }}
-        >
-          Clouds
-        </Typography>
-      </Box>
-
-      <IconButton
-        size="small"
-        sx={{
-          position: "absolute",
-          bottom: 16,
-          right: 16,
           bgcolor: "rgba(0,0,0,0.6)",
           color: "#fff",
+          zIndex: 1000,
         }}
       >
         <FullscreenRoundedIcon fontSize="small" />
