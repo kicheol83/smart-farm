@@ -1,0 +1,9 @@
+# Environment variables
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Vite
+.env.*.local
