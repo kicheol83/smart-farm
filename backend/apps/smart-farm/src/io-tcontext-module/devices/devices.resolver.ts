@@ -24,7 +24,7 @@ import {
 import { AlertSeverity } from '../../libs/enums/alerts.enum';
 
 @Resolver(() => Device)
-export class DeviceResolver {
+export class DevicesResolver {
   constructor(
     private readonly deviceService: DevicesService,
     private readonly actionLogService: ActionLogService,

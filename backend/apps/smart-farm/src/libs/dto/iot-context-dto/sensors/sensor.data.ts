@@ -45,7 +45,9 @@ export class GreenhouseSensorSummary {
   @Field(() => Float)
   light?: number;
 
-  @Field(() => Float)
+  @Field(() => Float, {
+    nullable: true,
+  })
   co2?: number;
 
   @Field(() => Float)
@@ -90,7 +92,7 @@ export class CreateSensorDataInput {
 
 @InputType()
 export class IotSensorDataInput extends CreateSensorDataInput {
-  @Field(() => ID, { description: 'Real-time broadcast uchun greenhouse ID' })
+  @Field(() => ID)
   @IsMongoId()
   greenHouseId: string;
 }
