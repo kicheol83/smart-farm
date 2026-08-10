@@ -42,21 +42,14 @@ const LOGIN_MUTATION = gql`
   }
 `;
 
-const GOOGLE_AUTH_URL = `${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3000"}/auth/google`;
-const APPLE_AUTH_URL = `${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3000"}/auth/apple`;
+const GOOGLE_AUTH_URL = `${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3010"}/auth/google`;
+const APPLE_AUTH_URL = `${import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3010"}/auth/apple`;
 
-// Placeholder onboarding rasm — o'zingizning fermer fotosiga almashtiring:
-// public/onboarding.jpg ga qo'ying va pastdagi ONBOARDING_IMAGE ni "/onboarding.jpg" qiling
 const ONBOARDING_IMAGE =
   "https://picsum.photos/seed/smartfarm-greenhouse/800/1200";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/**
- * Figma "Login / Empty" (2678:26552), "Login / Filled" (2678:26831),
- * "Login / Error" holatlari birlashtirilgan — piksel-aniq.
- * Backend: nestjs-otp-auth/auth.resolver.ts → login mutation
- */
 export function LoginPage() {
   const navigate = useNavigate();
   const theme = useTheme();

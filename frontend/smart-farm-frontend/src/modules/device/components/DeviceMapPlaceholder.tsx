@@ -1,4 +1,7 @@
 import { Box, Typography } from "@mui/material";
+import { MapContainer, TileLayer, Marker } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
 interface DeviceMapPlaceholderProps {
   deviceName: string;
@@ -6,12 +9,61 @@ interface DeviceMapPlaceholderProps {
   longitude?: number;
 }
 
+function buildDeviceIcon(label: string): L.DivIcon {
+  return L.divIcon({
+    className: "",
+    html: `
+      <div style="display:flex;flex-direction:column;align-items:center;gap:2px;transform:translate(-50%,-100%);">
+        <div style="background:#2a2a2a;color:#fff;border-radius:8px;padding:4px 10px;font-size:11px;font-family:Satoshi,sans-serif;font-weight:500;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,0.3);">
+          ${label}
+        </div>
+        <div style="width:12px;height:12px;border-radius:50%;background:#35C56E;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,0.4);"></div>
+      </div>
+    `,
+    iconSize: [0, 0],
+  });
+}
+
 export function DeviceMapPlaceholder({
   deviceName,
   latitude,
   longitude,
 }: DeviceMapPlaceholderProps) {
+  console.log({
+    latitude,
+    longitude,
+    latType: typeof latitude,
+    lngType: typeof longitude,
+  });
   const hasRealCoords = latitude !== undefined && longitude !== undefined;
+
+  if (hasRealCoords) {
+    return (
+      <Box
+        sx={{
+          borderRadius: 2,
+          overflow: "hidden",
+          minHeight: 220,
+          height: 220,
+        }}
+      >
+        <MapContainer
+          center={[latitude!, longitude!]}
+          zoom={17}
+          style={{ height: "100%", width: "100%" }}
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          <Marker
+            position={[latitude!, longitude!]}
+            icon={buildDeviceIcon(deviceName)}
+          />
+        </MapContainer>
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -61,29 +113,23 @@ export function DeviceMapPlaceholder({
         </g>
       </Box>
 
-      {!hasRealCoords && (
-        <Box
-          sx={{
-            position: "absolute",
-            bottom: 8,
-            right: 8,
-            bgcolor: "rgba(0,0,0,0.55)",
-            borderRadius: 1,
-            px: 1,
-            py: 0.25,
-          }}
+      <Box
+        sx={{
+          position: "absolute",
+          bottom: 8,
+          right: 8,
+          bgcolor: "rgba(0,0,0,0.55)",
+          borderRadius: 1,
+          px: 1,
+          py: 0.25,
+        }}
+      >
+        <Typography
+          sx={{ fontFamily: "Inter, sans-serif", fontSize: 10, color: "#fff" }}
         >
-          <Typography
-            sx={{
-              fontFamily: "Inter, sans-serif",
-              fontSize: 10,
-              color: "#fff",
-            }}
-          >
-            Taxminiy joylashuv — GPS ulanmagan
-          </Typography>
-        </Box>
-      )}
+          Koordinata kiritilmagan — GPS ulanmagan
+        </Typography>
+      </Box>
     </Box>
   );
 }

@@ -57,6 +57,19 @@ export const CREATE_DEVICE_MUTATION = gql`
     createDevice(input: $input) {
       _id
       deviceName
+      deviceType
+      deviceStatus
+      installedAt
+      greenHouseId
+      sectionId
+      networkType
+      powerSource
+      rssi
+      snr
+      lastDataReceived
+      latitude
+      longitude
+      updatedAt
     }
   }
 `;

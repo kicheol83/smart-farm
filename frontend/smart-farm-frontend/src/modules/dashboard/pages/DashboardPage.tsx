@@ -24,7 +24,8 @@ import { GET_FARM } from "@/modules/settings/graphql/queries";
 import { GET_TODAY_TEMPERATURE_RANGE } from "../graphql/queries";
 
 export function DashboardPage() {
-  const greenHouseId = localStorage.getItem("currentGreenhouseId") || "";
+ localStorage.setItem("greenHouseId", "6a2daf715e4567e07ca5d328");
+  const greenHouseId = localStorage.getItem("greenHouseId") || "";
   const hasGreenhouse = greenHouseId.length > 0;
 
   const { data: summaryData } = useQuery(GET_GREENHOUSE_SUMMARY, {
