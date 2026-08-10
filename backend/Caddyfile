@@ -1,0 +1,13 @@
+:80 {
+	reverse_proxy backend:3010
+
+	header {
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+	}
+
+	log {
+		output file /data/access.log
+	}
+}
