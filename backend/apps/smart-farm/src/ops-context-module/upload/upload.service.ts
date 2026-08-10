@@ -17,6 +17,8 @@ import {
   UploadFolder,
   UploadedFile,
 } from '../../libs/dto/upload/upload';
+import { GetObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const ALLOWED_DOC_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
@@ -48,6 +50,17 @@ export class UploadService {
           'AWS_SECRET_ACCESS_KEY',
         ),
       },
+    });
+  }
+
+  async getPresignedUrl(key: string): Promise<string> {
+    const command = new GetObjectCommand({
+      Bucket: this.bucket,
+      Key: key,
+    });
+
+    return getSignedUrl(this.s3, command, {
+      expiresIn: 3600,
     });
   }
 
@@ -83,7 +96,7 @@ export class UploadService {
       throw new InternalServerErrorException('File upload failed.');
     }
 
-    const url = this.buildUrl(key);
+    const url = await this.getPresignedUrl(key);
 
     this.logger.log(`File uploaded | key=${key} | size=${buffer.length}b`);
 
