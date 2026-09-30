@@ -27,12 +27,12 @@ import {
   UPDATE_DEVICE_STATUS_MUTATION,
   DELETE_DEVICE_MUTATION,
 } from "../graphql/queries";
+import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
 
 type DeviceStatus = "ONLINE" | "OFFLINE" | "MAINTENANCE" | "ERROR";
 
 export function DeviceListPage() {
-  localStorage.setItem("greenHouseId", "6a2daf715e4567e07ca5d328");
-  const greenHouseId = localStorage.getItem("greenHouseId") || "";
+  const { greenHouseId } = useActiveGreenhouse();
   const hasGreenhouse = greenHouseId.length > 0;
 
   const [search, setSearch] = useState("");

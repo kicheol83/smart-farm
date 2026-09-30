@@ -18,11 +18,12 @@ import {
   MOVE_TASK_MUTATION,
   DELETE_TASK_MUTATION,
 } from "../graphql/queries";
+import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
 
 type TaskStatus = "TODO" | "IN_PROGRESS" | "DONE";
 
 export function TaskListPage() {
-  const greenHouseId = localStorage.getItem("greenHouseId") || "";
+  const { greenHouseId } = useActiveGreenhouse();
   const hasGreenhouse = greenHouseId.length > 0;
 
   const [tab, setTab] = useState<"board" | "list">("board");

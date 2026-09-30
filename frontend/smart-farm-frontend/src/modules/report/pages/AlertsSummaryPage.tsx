@@ -6,6 +6,7 @@ import { Header } from "@/components/layout/Header";
 import { AlertCategoryCard } from "../components/AlertCategoryCard";
 import { AlertCard } from "../components/AlertCard";
 import { GET_ACTIVE_ALERTS_SUMMARY } from "../graphql/queries";
+import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
 
 type Severity = "INFO" | "WARNING" | "CRITICAL";
 
@@ -30,8 +31,7 @@ const COLUMN_MAP: { key: Severity; label: string; dotColor: string }[] = [
 ];
 
 export function AlertsSummaryPage() {
-  localStorage.setItem("greenHouseId", "6a2daf715e4567e07ca5d328");
-  const greenHouseId = localStorage.getItem("greenHouseId") || "";
+  const { greenHouseId } = useActiveGreenhouse();
   const hasGreenhouse = greenHouseId.length > 0;
 
   const { data } = useQuery(GET_ACTIVE_ALERTS_SUMMARY, {

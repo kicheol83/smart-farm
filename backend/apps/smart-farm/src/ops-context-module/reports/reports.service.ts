@@ -1,4 +1,10 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  OnApplicationBootstrap,
+} from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types, Document } from 'mongoose';
 import { IPlantHealth } from '../../farm-context-module/plan-health/plan-health.service';
@@ -81,7 +87,7 @@ export interface IReportEntry extends Document {
 }
 
 @Injectable()
-export class ReportsService {
+export class ReportsService implements OnApplicationBootstrap {
   private readonly logger = new Logger(ReportsService.name);
 
   constructor(
@@ -118,6 +124,43 @@ export class ReportsService {
     @InjectModel('reportEntries')
     private readonly reportEntryModel: Model<IReportEntry>,
   ) {}
+
+  onApplicationBootstrap(): void {
+    this.generateDailyEntries().catch((err: Error) =>
+      this.logger.error(`Initial report entry generation failed | ${err.message}`),
+    );
+  }
+
+  @Cron('0 10 0 * * *')
+  async generateDailyEntries(): Promise<number> {
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const sections = await this.sectionModel.find().select('_id').exec();
+    let created = 0;
+
+    for (const section of sections) {
+      const exists = await this.reportEntryModel.exists({
+        sectionId: section._id,
+        entryDate: { $gte: startOfDay },
+      });
+      if (exists) continue;
+
+      try {
+        await this.generateReportEntry({ sectionId: String(section._id) });
+        created += 1;
+      } catch (err) {
+        this.logger.error(
+          `Daily report entry failed | section=${String(section._id)} | ${err instanceof Error ? err.message : String(err)}`,
+        );
+      }
+    }
+
+    if (created > 0) {
+      this.logger.log(`Daily report entries created | count=${created}`);
+    }
+    return created;
+  }
 
   async getFullReport(input: GetReportInput): Promise<FullGreenhouseReport> {
     const { from, to } = this.resolvePeriod(input);

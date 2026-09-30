@@ -6,6 +6,7 @@ import { PlantHealthHeroCard } from "../components/PlantHealthHeroCard";
 import { PlantsHealthTrendsChart } from "../components/PlantsHealthTrendsChart";
 import { PlantHealthSectionCard } from "../components/PlantHealthSectionCard";
 import { GET_FULL_GREENHOUSE_REPORT } from "../graphql/queries";
+import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
 
 const SECTION_NAMES = [
   "Section 01",
@@ -19,8 +20,7 @@ const SECTION_NAMES = [
 ];
 
 export function OverallPlantHealthPage() {
-  localStorage.setItem("greenHouseId", "6a2daf715e4567e07ca5d328");
-  const greenHouseId = localStorage.getItem("greenHouseId") || "";
+  const { greenHouseId } = useActiveGreenhouse();
   const hasGreenhouse = greenHouseId.length > 0;
 
   const { data } = useQuery(GET_FULL_GREENHOUSE_REPORT, {

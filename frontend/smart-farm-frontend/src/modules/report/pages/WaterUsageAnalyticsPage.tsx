@@ -13,10 +13,10 @@ import {
   GET_WATER_COST_ESTIMATION,
   GET_WATER_ZONE_USAGE_REPORT,
 } from "../graphql/queries";
+import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
 
 export function WaterUsageAnalyticsPage() {
-  localStorage.setItem("greenHouseId", "6a2daf715e4567e07ca5d328");
-  const greenHouseId = localStorage.getItem("greenHouseId") || "";
+  const { greenHouseId } = useActiveGreenhouse();
   const hasGreenhouse = greenHouseId.length > 0;
   const analyticsInput = { greenHouseId };
 

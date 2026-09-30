@@ -9,12 +9,12 @@ import {
   TOGGLE_ACTUATOR,
 } from "@/modules/automation/graphql/queries";
 import { GET_WATER_ZONE_USAGE_REPORT } from "@/modules/report/graphql/queries";
+import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
 
 const IRRIGATION_ACTUATOR_TYPES = ["WATER_PUMP", "SOLENOID_VALVE"];
 
 export function IrrigationPage() {
-  localStorage.setItem("greenHouseId", "6a2daf715e4567e07ca5d328");
-  const greenHouseId = localStorage.getItem("greenHouseId") || "";
+  const { greenHouseId } = useActiveGreenhouse();
   const hasGreenhouse = greenHouseId.length > 0;
 
   const [togglingId, setTogglingId] = useState<string | null>(null);

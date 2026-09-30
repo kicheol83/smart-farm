@@ -17,10 +17,10 @@ import { Header } from "@/components/layout/Header";
 import { ReportDetailsTable } from "../components/ReportDetailsTable";
 import { GET_REPORT_ENTRIES, GENERATE_REPORT_ENTRY } from "../graphql/queries";
 import { GET_SECTIONS_BY_GREENHOUSE } from "@/modules/plant-health/graphql/queries";
+import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
 
 export function ReportDetailsPage() {
-  localStorage.setItem("greenHouseId", "6a2daf715e4567e07ca5d328");
-  const greenHouseId = localStorage.getItem("greenHouseId") || "";
+  const { greenHouseId } = useActiveGreenhouse();
   const hasGreenhouse = greenHouseId.length > 0;
 
   const [page, setPage] = useState(1);

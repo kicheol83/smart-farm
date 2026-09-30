@@ -7,6 +7,7 @@ import { SoilMoistureLineChart } from "../components/SoilMoistureLineChart";
 import { SoilMoistureGauge } from "../components/SoilMoistureGauge";
 import { SoilMoistureOverviewCard } from "../components/SoilMoistureOverviewCard";
 import { GET_FULL_GREENHOUSE_REPORT } from "../graphql/queries";
+import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
 
 function gradeFromValue(value: number): {
   label: string;
@@ -21,8 +22,7 @@ function gradeFromValue(value: number): {
 }
 
 export function SoilMoistureTrendPage() {
-  localStorage.setItem("greenHouseId", "6a2daf715e4567e07ca5d328");
-  const greenHouseId = localStorage.getItem("greenHouseId") || "";
+  const { greenHouseId } = useActiveGreenhouse();
   const hasGreenhouse = greenHouseId.length > 0;
 
   const { data } = useQuery(GET_FULL_GREENHOUSE_REPORT, {

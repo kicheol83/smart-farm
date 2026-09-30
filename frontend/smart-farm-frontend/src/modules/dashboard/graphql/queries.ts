@@ -74,19 +74,6 @@ export const GET_GREENHOUSE_DEVICE_OVERVIEW = gql`
   }
 `;
 
-export const GET_TASK_LIST = gql`
-  query GetTaskList($greenHouseId: ID!) {
-    tasks(greenHouseId: $greenHouseId) {
-      _id
-      taskTitle
-      taskDescription
-      taskStatus
-      startTime
-      endTime
-    }
-  }
-`;
-
 export const SUBSCRIBE_SENSOR_ALERT = gql`
   subscription OnSensorAlert($greenHouseId: ID!) {
     sensorAlert(greenHouseId: $greenHouseId) {

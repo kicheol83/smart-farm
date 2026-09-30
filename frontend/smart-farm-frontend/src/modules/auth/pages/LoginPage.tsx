@@ -259,6 +259,12 @@ export function LoginPage() {
                   }
                 />
 
+                {serverError && (
+                  <Typography role="alert" sx={{ fontSize: 13, color: "error.main" }}>
+                    {serverError}
+                  </Typography>
+                )}
+
                 {/* Remember Me row */}
                 <Box
                   sx={{

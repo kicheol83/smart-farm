@@ -63,3 +63,5 @@ docker-compose.override.yml
 secrets/
 *.pem
 *.key
+mosquitto/data/
+mosquitto/log/

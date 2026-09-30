@@ -4,6 +4,7 @@ import ArrowOutwardRoundedIcon from "@mui/icons-material/ArrowOutwardRounded";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { GET_REPORT_ENTRIES } from "../graphql/queries";
+import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
 
 type EntryStatus = "DONE" | "OPTIMAL" | "ATTENTION";
 
@@ -22,7 +23,7 @@ const STATUS_STYLE: Record<
 
 export function ReportDetailsPreview() {
   const navigate = useNavigate();
-  const greenHouseId = localStorage.getItem("greenHouseId") || "";
+  const { greenHouseId } = useActiveGreenhouse();
 
   const { data } = useQuery(GET_REPORT_ENTRIES, {
     variables: { input: { greenHouseId, page: 1, limit: 3 } },

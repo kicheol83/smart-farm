@@ -16,6 +16,7 @@ import { MessageBuffersModule } from '../../mid-iot/message-buffers/message-buff
 import { TimeseriesModule } from '../../mid-iot/timeseries/timeseries.module';
 import { IotRateLimiterModule } from '../../prof-iot/iot-rate-limiter/iot-rate-limiter.module';
 import { IotErrorHandlerModule } from '../../prof-iot/iot-error-handler/iot-error-handler.module';
+import { ActuatorModule } from '../../actuator/actuator.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { IotErrorHandlerModule } from '../../prof-iot/iot-error-handler/iot-erro
       { name: 'alertNotifications', schema: AlertNotificationsSchema },
     ]),
     MqttModule,
+    ActuatorModule,
     DeviceAuthModule,
     TimeseriesModule,
     MessageBuffersModule,

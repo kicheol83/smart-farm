@@ -33,16 +33,16 @@ export class GreenhouseSensorSummary {
   @Field()
   greenHouseName: string;
 
-  @Field(() => Float)
+  @Field(() => Float, { nullable: true })
   temperature?: number;
 
-  @Field(() => Float)
+  @Field(() => Float, { nullable: true })
   humidity?: number;
 
-  @Field(() => Float)
+  @Field(() => Float, { nullable: true })
   ph?: number;
 
-  @Field(() => Float)
+  @Field(() => Float, { nullable: true })
   light?: number;
 
   @Field(() => Float, {
@@ -50,7 +50,7 @@ export class GreenhouseSensorSummary {
   })
   co2?: number;
 
-  @Field(() => Float)
+  @Field(() => Float, { nullable: true })
   soilMoisture?: number;
 
   @Field()

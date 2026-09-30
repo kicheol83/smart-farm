@@ -18,6 +18,7 @@ import {
   UPDATE_FARM,
 } from "../graphql/queries";
 import { GET_GREENHOUSE_FARM_ID } from "@/modules/map-area/graphql/queries";
+import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
 
 export function SettingsPage() {
   const [tab, setTab] = useState("general");
@@ -30,7 +31,7 @@ export function SettingsPage() {
   const [updateUnits, { loading: savingUnits }] =
     useMutation(UPDATE_UNIT_SETTINGS);
 
-  const greenHouseId = localStorage.getItem("greenHouseId") || "";
+  const { greenHouseId } = useActiveGreenhouse();
   const { data: ghData } = useQuery(GET_GREENHOUSE_FARM_ID, {
     variables: { id: greenHouseId },
     skip: !greenHouseId,
