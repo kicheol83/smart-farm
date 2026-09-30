@@ -26,10 +26,10 @@ import {
   CREATE_SECTOR_MUTATION,
   DELETE_SECTOR_MUTATION,
 } from "../graphql/queries";
+import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
 
 export function MapAreaPage() {
-  localStorage.setItem("greenHouseId", "6a2daf715e4567e07ca5d328");
-  const greenHouseId = localStorage.getItem("greenHouseId") || "";
+  const { greenHouseId } = useActiveGreenhouse();
   const hasGreenhouse = greenHouseId.length > 0;
 
   const [selectedSectorId, setSelectedSectorId] = useState<string | null>(null);

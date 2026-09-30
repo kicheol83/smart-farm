@@ -11,10 +11,10 @@ import {
   GET_CAMERA_SNAPSHOTS,
   SAVE_SNAPSHOT_MUTATION,
 } from "../graphql/queries";
+import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
 
 export function LiveViewPage() {
-  localStorage.setItem("greenHouseId", "6a2daf715e4567e07ca5d328");
-  const greenHouseId = localStorage.getItem("greenHouseId") || "";
+  const { greenHouseId, greenHouseName } = useActiveGreenhouse();
   const hasGreenhouse = greenHouseId.length > 0;
 
   const [search, setSearch] = useState("");
@@ -77,6 +77,7 @@ export function LiveViewPage() {
         }}
       >
         <CameraLocationSidebar
+          greenHouseName={greenHouseName}
           cameras={cameras}
           selectedId={selectedId}
           onSelect={setSelectedId}

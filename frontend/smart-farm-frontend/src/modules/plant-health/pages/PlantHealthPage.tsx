@@ -19,6 +19,7 @@ import { GET_TASK_LIST } from "@/modules/task/graphql/queries";
 import { GET_GREENHOUSE_DEVICE_OVERVIEW } from "@/modules/device/graphql/queries";
 import { PlantHealthOverviewCard } from "../components/lantHealthOverviewCard";
 import { ActivityTabListItem } from "../components/ActivityTabListItem";
+import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
 
 const TABS = [
   { key: "details", label: "Details" },
@@ -29,8 +30,7 @@ const TABS = [
 ];
 
 export function PlantHealthPage() {
-  localStorage.setItem("greenHouseId", "6a2daf715e4567e07ca5d328");
-  const greenHouseId = localStorage.getItem("greenHouseId") || "";
+  const { greenHouseId } = useActiveGreenhouse();
   const hasGreenhouse = greenHouseId.length > 0;
 
   const [tab, setTab] = useState("details");

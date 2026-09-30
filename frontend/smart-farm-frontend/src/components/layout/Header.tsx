@@ -13,6 +13,7 @@ import { useQuery } from "@apollo/client";
 import { GET_ACTIVE_ALERTS_COUNT } from "@/modules/dashboard/graphql/queries";
 import { ThemeToggle } from "./ThemeToggle";
 import { GRADIENT_DARK, GRADIENT_DARK_MODE } from "@/theme/theme";
+import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
 
 interface HeaderProps {
   title?: string;
@@ -23,7 +24,7 @@ export function Header({ title = "Greenhouse Monitoring" }: HeaderProps) {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const gradient =
     theme.palette.mode === "dark" ? GRADIENT_DARK_MODE : GRADIENT_DARK;
-  const greenHouseId = localStorage.getItem("greenHouseId") || "";
+  const { greenHouseId } = useActiveGreenhouse();
   const { data } = useQuery(GET_ACTIVE_ALERTS_COUNT, {
     variables: {
       greenHouseId,

@@ -57,7 +57,7 @@ export function GreenhouseMapView({
         backgroundPosition: "center",
       }}
     >
-      {positioned.map((s, i) => {
+      {positioned.map((s) => {
         const pos = { top: s.mapPositionY!, left: s.mapPositionX! };
         return (
           <Box

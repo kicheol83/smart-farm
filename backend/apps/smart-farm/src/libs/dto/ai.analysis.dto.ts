@@ -142,7 +142,7 @@ export class IrrigationLog {
   @Field(() => Float, {})
   soilMoistureBefore: number;
 
-  @Field(() => Float)
+  @Field(() => Float, { nullable: true })
   soilMoistureAfter?: number;
 
   @Field()

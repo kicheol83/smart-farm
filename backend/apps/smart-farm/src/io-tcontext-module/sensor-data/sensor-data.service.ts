@@ -7,6 +7,8 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types, Document } from 'mongoose';
 import { ActuatorService } from '../../actuator/actuator.service';
+import { TimeseriesService } from '../../mid-iot/timeseries/timeseries.service';
+import { AnomalyDetectionService } from '../../mid-iot/anomaly-detection/anomaly-detection.service';
 import {
   CreateSensorDataInput,
   GreenhouseSensorSummary,
@@ -56,6 +58,8 @@ export class SensorDataService {
     private readonly greenhouseModel: Model<IGreenhouse>,
 
     private readonly actuatorService: ActuatorService,
+    private readonly timeseriesService: TimeseriesService,
+    private readonly anomalyDetectionService: AnomalyDetectionService,
   ) {}
 
   async verifySensorBelongsToDevice(
@@ -90,7 +94,38 @@ export class SensorDataService {
       );
     });
 
+    this.recordDerivedData(sensor, record).catch((err) => {
+      this.logger.error(
+        `Derived data write failed | sensorId=${input.sensorId} | ${err.message}`,
+      );
+    });
+
     return record;
+  }
+
+  private async recordDerivedData(
+    sensor: ISensor,
+    record: ISensorData,
+  ): Promise<void> {
+    const device = await this.deviceModel.findById(sensor.deviceId).exec();
+    if (!device) return;
+
+    await this.timeseriesService.insert(
+      String(sensor._id),
+      sensor.sensorType,
+      String(device._id),
+      sensor.sensorsUnit || 'unknown',
+      record.sensorDataValue,
+      record.recordedAt,
+    );
+
+    await this.anomalyDetectionService.check(
+      String(sensor._id),
+      sensor.sensorType,
+      String(device._id),
+      String(device.greenHouseId),
+      record.sensorDataValue,
+    );
   }
 
   private async evaluateAutomationForSensor(

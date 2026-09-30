@@ -22,10 +22,10 @@ import {
 import { GET_GREENHOUSE_FARM_ID } from "@/modules/map-area/graphql/queries";
 import { GET_FARM } from "@/modules/settings/graphql/queries";
 import { GET_TODAY_TEMPERATURE_RANGE } from "../graphql/queries";
+import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
 
 export function DashboardPage() {
- localStorage.setItem("greenHouseId", "6a2daf715e4567e07ca5d328");
-  const greenHouseId = localStorage.getItem("greenHouseId") || "";
+  const { greenHouseId } = useActiveGreenhouse();
   const hasGreenhouse = greenHouseId.length > 0;
 
   const { data: summaryData } = useQuery(GET_GREENHOUSE_SUMMARY, {

@@ -14,6 +14,8 @@ import DevicesSchema from '../../schemas/iot/Devices.model';
 import { ActuatorModule } from '../../actuator/actuator.module';
 import { DeviceAuthModule } from '../../iot/device-auth/device-auth.module';
 import { DeviceApiKeyGuard } from '../../account-context-module/auth/guards/device.api.key.guard';
+import { TimeseriesModule } from '../../mid-iot/timeseries/timeseries.module';
+import { AnomalyDetectionModule } from '../../mid-iot/anomaly-detection/anomaly-detection.module';
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -27,7 +29,8 @@ import { DeviceApiKeyGuard } from '../../account-context-module/auth/guards/devi
     DevicesModule,
     GreenhouseModule,
     ActuatorModule,
-    ActuatorModule,
+    TimeseriesModule,
+    AnomalyDetectionModule,
     DeviceAuthModule,
   ],
   providers: [SensorDataResolver, SensorDataService, DeviceApiKeyGuard],

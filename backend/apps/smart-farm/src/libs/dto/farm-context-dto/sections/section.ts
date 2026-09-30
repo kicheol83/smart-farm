@@ -117,16 +117,16 @@ export class SectionHealthSummary {
   @Field(() => Float)
   healthIndex: number;
 
-  @Field(() => Float)
+  @Field(() => Float, { nullable: true })
   temperature?: number;
 
-  @Field(() => Float)
+  @Field(() => Float, { nullable: true })
   humidity?: number;
 
-  @Field(() => Float)
+  @Field(() => Float, { nullable: true })
   soilMoisture?: number;
 
-  @Field(() => Float)
+  @Field(() => Float, { nullable: true })
   ph?: number;
 
   @Field(() => Float, {

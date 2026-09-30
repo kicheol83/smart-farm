@@ -20,6 +20,7 @@ import {
   RateLimitType,
 } from '../../prof-iot/iot-rate-limiter/iot-rate-limiter.service';
 import { IotErrorHandlerService } from '../../prof-iot/iot-error-handler/iot-error-handler.service';
+import { ActuatorService } from '../../actuator/actuator.service';
 
 interface ISensorData extends Document {
   sensorDataName: string;
@@ -40,6 +41,7 @@ interface IDevice extends Document {
   deviceName: string;
   deviceStatus: string;
   greenHouseId: Types.ObjectId;
+  sectionId?: Types.ObjectId;
 }
 
 interface IAlert extends Document {
@@ -83,6 +85,7 @@ export class IotPipelineService implements OnModuleInit {
     private readonly calibrationService: CalibrationService,
     private readonly rateLimiter: IotRateLimiterService,
     private readonly errorHandler: IotErrorHandlerService,
+    private readonly actuatorService: ActuatorService,
 
     @InjectModel('sensor_data')
     private readonly sensorDataModel: Model<ISensorData>,
@@ -137,6 +140,7 @@ export class IotPipelineService implements OnModuleInit {
         payloadBuffer.toString(),
         error,
       );
+      return;
     }
 
     let messageId: string;
@@ -155,18 +159,12 @@ export class IotPipelineService implements OnModuleInit {
       RateLimitType.SENSOR_DATA,
     );
     if (!allowed) {
+      this.logger.warn(`Rate limited | deviceId=${payload.deviceId}`);
       await this.messageBuffer.acknowledge(messageId);
       return;
     }
 
-    try {
-      await this.deviceAuthService.validateApiKey(payload.apiKey);
-    } catch {
-      await this.messageBuffer.acknowledge(messageId);
-      return;
-    }
-
-    const device = await this.deviceModel.findById(payload.deviceId).exec();
+    const device = await this.authorizeDevice(payload.deviceId, payload.apiKey);
     if (!device) {
       await this.messageBuffer.acknowledge(messageId);
       return;
@@ -216,6 +214,19 @@ export class IotPipelineService implements OnModuleInit {
             String(device.greenHouseId),
             calibratedValue,
           );
+
+          this.actuatorService
+            .evaluateRules(
+              String(device.greenHouseId),
+              reading.type,
+              calibratedValue,
+              device.sectionId ? String(device.sectionId) : undefined,
+            )
+            .catch((err: Error) =>
+              this.logger.error(
+                `Automation evaluation failed | sensorId=${reading.sensorId} | ${err.message}`,
+              ),
+            );
 
           if (anomaly.isAnomaly) {
             this.broadcastAlert({
@@ -272,10 +283,11 @@ export class IotPipelineService implements OnModuleInit {
       return;
     }
 
-    try {
-      await this.deviceAuthService.validateApiKey(payload.apiKey);
-    } catch {
-      this.logger.warn(`Invalid API key | deviceId=${payload.deviceId}`);
+    const authorized = await this.authorizeDevice(
+      payload.deviceId,
+      payload.apiKey,
+    );
+    if (!authorized) {
       return;
     }
 
@@ -298,6 +310,43 @@ export class IotPipelineService implements OnModuleInit {
       status: payload.status,
       timestamp: new Date().toISOString(),
     });
+  }
+
+  private async authorizeDevice(
+    deviceId: string,
+    apiKey: string,
+  ): Promise<IDevice | null> {
+    let keyDeviceId: Types.ObjectId;
+    try {
+      keyDeviceId = await this.deviceAuthService.validateApiKey(apiKey);
+    } catch (err) {
+      await this.errorHandler.handleAuthError(
+        String(deviceId),
+        err instanceof Error ? err.message : String(err),
+      );
+      return null;
+    }
+
+    if (String(keyDeviceId) !== String(deviceId)) {
+      await this.errorHandler.handleAuthError(
+        String(deviceId),
+        'API key does not belong to this device.',
+      );
+      return null;
+    }
+
+    const device = Types.ObjectId.isValid(deviceId)
+      ? await this.deviceModel.findById(deviceId).exec()
+      : null;
+    if (!device) {
+      await this.errorHandler.handleAuthError(
+        String(deviceId),
+        'Device not found.',
+      );
+      return null;
+    }
+
+    return device;
   }
 
   private async checkAndCreateAlert(

@@ -33,6 +33,7 @@ export const useAuthStore = create<AuthState>()(
 
       logout: () => {
         localStorage.removeItem("accessToken");
+        localStorage.removeItem("greenHouseId");
         set({ user: null, accessToken: null, isAuthenticated: false });
       },
     }),

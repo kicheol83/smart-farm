@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+  <head>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  </head>
+  <body>
+    <script>
+      const socket = io("http://localhost:3010/monitoring");
+
+      socket.on("connect", () => {
+        console.log("connected", socket.id);
+
+        socket.emit("subscribe-greenhouse", {
+          greenHouseId: "6a2daf715e4567e07ca5d328",
+        });
+      });
+
+      socket.on("greenhouse-summary", (data) => {
+        console.log("SUMMARY", data);
+      });
+
+      socket.on("sensor-update", (data) => {
+        console.log("UPDATE", data);
+      });
+
+      socket.on("alert", (data) => {
+        console.log("ALERT", data);
+      });
+    </script>
+  </body>
+</html>
