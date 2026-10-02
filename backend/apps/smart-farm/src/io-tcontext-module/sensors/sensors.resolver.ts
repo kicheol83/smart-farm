@@ -7,6 +7,7 @@ import {
 } from '../../libs/dto/iot-context-dto/sensors/sensor';
 import { AuthGuard } from '../../account-context-module/auth/guards/auth.guard';
 import { SensorsService } from './sensors.service';
+import { OwnedBy } from '../../ownership/owned-by.decorator';
 
 @Resolver(() => Sensor)
 export class SensorsResolver {
@@ -34,6 +35,7 @@ export class SensorsResolver {
 
   @Query(() => Sensor)
   @UseGuards(AuthGuard)
+  @OwnedBy('sensor')
   public async sensor(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<Sensor> {
@@ -44,6 +46,7 @@ export class SensorsResolver {
 
   @Mutation(() => Sensor)
   @UseGuards(AuthGuard)
+  @OwnedBy('sensor')
   public async updateSensor(
     @Args('id', { type: () => ID }) id: string,
     @Args('input') input: UpdateSensorInput,
@@ -55,6 +58,7 @@ export class SensorsResolver {
 
   @Mutation(() => Boolean)
   @UseGuards(AuthGuard)
+  @OwnedBy('sensor')
   public async deleteSensor(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {

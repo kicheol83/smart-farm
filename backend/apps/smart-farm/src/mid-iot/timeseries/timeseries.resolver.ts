@@ -4,8 +4,11 @@ import {
   TimeSeriesGranularity,
 } from '../../libs/dto/mid-iot/timeseries';
 import { TimeseriesService } from './timeseries.service';
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from '../../account-context-module/auth/guards/auth.guard';
 
 @Resolver()
+@UseGuards(AuthGuard)
 export class TimeseriesResolver {
   constructor(private readonly tsService: TimeseriesService) {}
 

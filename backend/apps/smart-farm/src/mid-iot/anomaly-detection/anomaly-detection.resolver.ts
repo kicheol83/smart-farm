@@ -1,8 +1,11 @@
 import { Resolver, Query, Mutation, Args, ID, Int } from '@nestjs/graphql';
 import { AnomalyDetectionService } from './anomaly-detection.service';
 import { AnomalyLog } from '../../libs/dto/mid-iot/anomaly-detection';
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from '../../account-context-module/auth/guards/auth.guard';
 
 @Resolver()
+@UseGuards(AuthGuard)
 export class AnomalyDetectionResolver {
   constructor(private readonly anomalyService: AnomalyDetectionService) {}
 

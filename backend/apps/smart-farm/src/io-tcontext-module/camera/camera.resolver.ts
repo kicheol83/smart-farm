@@ -10,6 +10,7 @@ import {
   UpdateCameraInput,
 } from '../../libs/dto/iot-context-dto/camera/camera';
 import { AuthGuard } from '../../account-context-module/auth/guards/auth.guard';
+import { OwnedBy } from '../../ownership/owned-by.decorator';
 
 @Resolver(() => Camera)
 export class CameraResolver {
@@ -35,6 +36,7 @@ export class CameraResolver {
 
   @Query(() => Camera)
   @UseGuards(AuthGuard)
+  @OwnedBy('camera')
   public async camera(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<Camera> {
@@ -44,6 +46,7 @@ export class CameraResolver {
 
   @Mutation(() => Camera)
   @UseGuards(AuthGuard)
+  @OwnedBy('camera')
   public async updateCamera(
     @Args('id', { type: () => ID }) id: string,
     @Args('input') input: UpdateCameraInput,
@@ -54,6 +57,7 @@ export class CameraResolver {
 
   @Mutation(() => Camera)
   @UseGuards(AuthGuard)
+  @OwnedBy('camera')
   public async updateCameraStatus(
     @Args('id', { type: () => ID }) id: string,
     @Args('status', { type: () => CameraStatus }) status: CameraStatus,
@@ -64,6 +68,7 @@ export class CameraResolver {
 
   @Mutation(() => Boolean)
   @UseGuards(AuthGuard)
+  @OwnedBy('camera')
   public async deleteCamera(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {

@@ -22,6 +22,7 @@ import {
   ActionType,
 } from '../../libs/dto/iot-context-dto/action-log/action-log';
 import { AlertSeverity } from '../../libs/enums/alerts.enum';
+import { OwnedBy } from '../../ownership/owned-by.decorator';
 
 @Resolver(() => Device)
 export class DevicesResolver {
@@ -57,6 +58,7 @@ export class DevicesResolver {
 
   @Query(() => DeviceWithSensors)
   @UseGuards(AuthGuard)
+  @OwnedBy('device')
   public async deviceWithSensors(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<DeviceWithSensors> {
@@ -81,6 +83,7 @@ export class DevicesResolver {
 
   @Mutation(() => Device, { description: 'Device yangilash' })
   @UseGuards(AuthGuard)
+  @OwnedBy('device')
   public async updateDevice(
     @Args('id', { type: () => ID }) id: string,
     @Args('input') input: UpdateDeviceInput,
@@ -106,6 +109,7 @@ export class DevicesResolver {
 
   @Mutation(() => Device)
   @UseGuards(AuthGuard)
+  @OwnedBy('device')
   public async updateDeviceStatus(
     @Args('id', { type: () => ID }) id: string,
     @Args('status', { type: () => DeviceStatus }) status: DeviceStatus,
@@ -157,6 +161,7 @@ export class DevicesResolver {
 
   @Mutation(() => Boolean)
   @UseGuards(AuthGuard)
+  @OwnedBy('device')
   public async deleteDevice(
     @Args('id', { type: () => ID }) id: string,
     @AuthMember() user: Member,

@@ -28,10 +28,12 @@ import { ProfIotModule } from './prof-iot/prof-iot.module';
 import { MidIotModule } from './mid-iot/mid-iot.module';
 import { IrrigationModule } from './irrigation/irrigation.module';
 import { ActuatorModule } from './actuator/actuator.module';
+import { OwnershipModule } from './ownership/ownership.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    OwnershipModule,
     GraphQLModule.forRoot({
       driver: ApolloDriver,
       playground: true,
