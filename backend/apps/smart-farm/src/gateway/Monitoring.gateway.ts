@@ -6,28 +6,54 @@ import {
   ConnectedSocket,
   OnGatewayConnection,
   OnGatewayDisconnect,
+  OnGatewayInit,
 } from '@nestjs/websockets';
 import { Logger } from '@nestjs/common';
-import { Server, Socket } from 'socket.io';
+import { Namespace, Socket } from 'socket.io';
 import { SensorDataService } from '../io-tcontext-module/sensor-data/sensor-data.service';
-import { IotSensorDataInput } from '../libs/dto/iot-context-dto/sensors/sensor.data';
+import { AuthService } from '../account-context-module/auth/auth.service';
+import { OwnershipService } from '../ownership/ownership.service';
+import { IotPipelineService } from '../iot/iot-pipeline/iot-pipeline.service';
+import { MemberRole } from '../libs/enums/member.enum';
 
 @WebSocketGateway({
   cors: { origin: '*' },
   namespace: '/monitoring',
 })
 export class MonitoringGateway
-  implements OnGatewayConnection, OnGatewayDisconnect
+  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   @WebSocketServer()
-  server: Server;
+  server: Namespace;
 
   private readonly logger = new Logger(MonitoringGateway.name);
 
-  constructor(private readonly sensorDataService: SensorDataService) {}
+  constructor(
+    private readonly sensorDataService: SensorDataService,
+    private readonly authService: AuthService,
+    private readonly ownershipService: OwnershipService,
+    private readonly pipelineService: IotPipelineService,
+  ) {}
 
-  handleConnection(client: Socket) {
-    this.logger.log(`Client connected | id=${client.id}`);
+  afterInit(server: Namespace) {
+    this.pipelineService.setWsServer(server as never);
+  }
+
+  async handleConnection(client: Socket) {
+    const token = client.handshake.auth?.token as string | undefined;
+    if (!token) {
+      client.emit('unauthorized', 'Missing token');
+      client.disconnect(true);
+      return;
+    }
+
+    try {
+      client.data.member = await this.authService.verifyToken(token);
+      this.logger.log(`Client connected | id=${client.id}`);
+    } catch {
+      client.emit('unauthorized', 'Invalid token');
+      client.disconnect(true);
+    }
   }
 
   handleDisconnect(client: Socket) {
@@ -39,37 +65,39 @@ export class MonitoringGateway
     @MessageBody() data: { greenHouseId: string },
     @ConnectedSocket() client: Socket,
   ) {
+    const member = client.data.member;
+    if (!member || !data?.greenHouseId) {
+      client.emit('subscribe-error', 'Not allowed');
+      return;
+    }
+
+    if (member.memberRole !== MemberRole.ADMIN) {
+      try {
+        await this.ownershipService.assertOwner(
+          String(member._id),
+          'greenhouse',
+          data.greenHouseId,
+        );
+      } catch {
+        client.emit('subscribe-error', 'Not allowed');
+        return;
+      }
+    }
+
+    for (const room of client.rooms) {
+      if (room.startsWith('greenhouse:')) {
+        await client.leave(room);
+      }
+    }
+
     const room = `greenhouse:${data.greenHouseId}`;
-    client.join(room);
+    await client.join(room);
     this.logger.log(`Client ${client.id} → room ${room}`);
 
     const summary = await this.sensorDataService.getGreenhouseSummary(
       data.greenHouseId,
     );
     client.emit('greenhouse-summary', summary);
-  }
-
-  @SubscribeMessage('sensor-data')
-  async handleSensorData(
-    @MessageBody() data: IotSensorDataInput,
-    @ConnectedSocket() _client: Socket,
-  ) {
-    await this.sensorDataService.create(data);
-
-    const summary = await this.sensorDataService.getGreenhouseSummary(
-      data.greenHouseId,
-    );
-
-    const room = `greenhouse:${data.greenHouseId}`;
-
-    this.server.to(room).emit('greenhouse-summary', summary);
-
-    this.server.to(room).emit('sensor-update', {
-      sensorId: data.sensorId,
-      sensorDataName: data.sensorDataName,
-      sensorDataValue: data.sensorDataValue,
-      recordedAt: data.recordedAt,
-    });
   }
 
   emitAlert(greenHouseId: string, alert: any) {

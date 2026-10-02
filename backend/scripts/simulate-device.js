@@ -1,4 +1,5 @@
 const mqtt = require('mqtt');
+const { FarmModel } = require('./lib/farm-model');
 
 const BASE_VALUES = {
   TEMPERATURE: { base: 24, step: 0.4, min: 5, max: 45 },
@@ -26,6 +27,8 @@ const deviceId = required('DEVICE_ID');
 const apiKey = required('API_KEY');
 const intervalMs = Number(process.env.INTERVAL_MS || 2000);
 const count = Number(process.env.COUNT || 60);
+const mode = process.env.MODE || 'realistic';
+const farm = new FarmModel({ utcOffsetHours: Number(process.env.UTC_OFFSET_HOURS || 9) });
 const spikeEvery = Number(process.env.SPIKE_EVERY || 40);
 
 const sensors = required('SENSORS')
@@ -58,9 +61,20 @@ function nextValue(sensor, spike) {
   return Math.round(reported * 100) / 100;
 }
 
+function realisticValues(spike) {
+  const { values } = farm.step(new Date());
+  return Object.fromEntries(
+    sensors.map((sensor) => {
+      const value = values[sensor.type];
+      return [sensor.sensorId, spike ? farm.spike(sensor.type, value) : value];
+    }),
+  );
+}
+
 function publish() {
   sent += 1;
   const spike = spikeEvery > 0 && sent % spikeEvery === 0;
+  const modelled = mode === 'realistic' ? realisticValues(spike) : null;
   const payload = {
     apiKey,
     deviceId,
@@ -69,7 +83,7 @@ function publish() {
       sensorId: sensor.sensorId,
       type: sensor.type,
       unit: sensor.unit,
-      value: nextValue(sensor, spike),
+      value: modelled ? modelled[sensor.sensorId] : nextValue(sensor, spike),
     })),
   };
 
@@ -79,10 +93,10 @@ function publish() {
       return;
     }
     const values = payload.readings.map((r) => `${r.type}=${r.value}`).join(' ');
-    console.log(`[${sent}/${count}]${spike ? ' SPIKE' : ''} ${values}`);
+    console.log(`[${sent}/${count > 0 ? count : '∞'}]${spike ? ' SPIKE' : ''} ${values}`);
   });
 
-  if (sent >= count) {
+  if (count > 0 && sent >= count) {
     clearInterval(timer);
     setTimeout(() => client.end(), 1000);
   }
@@ -91,7 +105,7 @@ function publish() {
 let timer;
 
 client.on('connect', () => {
-  console.log(`Connected to ${brokerUrl}, sending ${count} messages every ${intervalMs} ms`);
+  console.log(`Connected to ${brokerUrl} | mode=${mode} | ${count > 0 ? count : 'unlimited'} messages every ${intervalMs} ms`);
   client.publish(
     `sf/devices/${deviceId}/status`,
     JSON.stringify({ apiKey, deviceId, status: 'ONLINE' }),

@@ -305,6 +305,7 @@ export class IotPipelineService implements OnModuleInit {
 
     this.broadcastDeviceStatus({
       type: 'DEVICE_STATUS',
+      greenHouseId: String(device.greenHouseId),
       deviceId: payload.deviceId,
       deviceName: device.deviceName,
       status: payload.status,
@@ -422,6 +423,8 @@ export class IotPipelineService implements OnModuleInit {
 
   private broadcastDeviceStatus(event: WsDeviceStatusEvent): void {
     if (!this.wsServer) return;
-    this.wsServer.emit('device-status', event);
+    this.wsServer
+      .to(`greenhouse:${event.greenHouseId}`)
+      .emit('device-status', event);
   }
 }

@@ -57,5 +57,6 @@ export interface WsDeviceStatusEvent {
   deviceName: string;
   status: string;
   timestamp: string;
+  greenHouseId: string;
 }
 

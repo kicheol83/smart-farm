@@ -123,6 +123,30 @@ services:
     networks:
       - smartfarm-network
 
+  device-simulator:
+    build:
+      context: ./scripts
+      dockerfile: Dockerfile.simulator
+    container_name: smartfarm-device-simulator
+    restart: unless-stopped
+    profiles: ['demo']
+    environment:
+      MQTT_URL: mqtt://mosquitto:1883
+      MQTT_USERNAME: ${MQTT_USERNAME:-}
+      MQTT_PASSWORD: ${MQTT_PASSWORD:-}
+      DEVICE_ID: ${SIM_DEVICE_ID:-}
+      API_KEY: ${SIM_API_KEY:-}
+      SENSORS: ${SIM_SENSORS:-}
+      MODE: realistic
+      COUNT: '0'
+      INTERVAL_MS: '15000'
+      SPIKE_EVERY: '480'
+    depends_on:
+      - mosquitto
+      - backend
+    networks:
+      - smartfarm-network
+
 networks:
   smartfarm-network:
     driver: bridge
