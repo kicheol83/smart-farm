@@ -10,6 +10,7 @@ import {
 } from '../../libs/dto/farm-context-dto/sections/sections';
 import { SectionsService } from './sections.service';
 import { AuthGuard } from '../../account-context-module/auth/guards/auth.guard';
+import { OwnedBy } from '../../ownership/owned-by.decorator';
 
 @Resolver(() => Section)
 export class SectionsResolver {
@@ -35,6 +36,7 @@ export class SectionsResolver {
 
   @Query(() => Section)
   @UseGuards(AuthGuard)
+  @OwnedBy('section')
   public async section(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<Section> {
@@ -44,6 +46,7 @@ export class SectionsResolver {
 
   @Mutation(() => Section)
   @UseGuards(AuthGuard)
+  @OwnedBy('section')
   public async updateSection(
     @Args('id', { type: () => ID }) id: string,
     @Args('input') input: UpdateSectionInput,
@@ -54,6 +57,7 @@ export class SectionsResolver {
 
   @Mutation(() => Boolean, { description: "Section o'chirish" })
   @UseGuards(AuthGuard)
+  @OwnedBy('section')
   public async deleteSection(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {

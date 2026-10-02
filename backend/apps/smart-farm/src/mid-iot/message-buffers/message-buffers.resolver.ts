@@ -4,8 +4,14 @@ import {
   BufferStats,
   DeadLetterMessage,
 } from '../../libs/dto/mid-iot/message-buffer';
+import { UseGuards } from '@nestjs/common';
+import { RolesGuard } from '../../account-context-module/auth/guards/roles.guard';
+import { Roles } from '../../account-context-module/auth/decorators/roles.decorator';
+import { MemberRole } from '../../libs/enums/member.enum';
 
 @Resolver()
+@UseGuards(RolesGuard)
+@Roles(MemberRole.ADMIN)
 export class MessageBuffersResolver {
   constructor(private readonly bufferService: MessageBuffersService) {}
 

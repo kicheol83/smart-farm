@@ -7,6 +7,7 @@ import {
   Greenhouse,
   UpdateGreenhouseInput,
 } from '../../libs/dto/farm-context-dto/greenhouse/greenhouse';
+import { OwnedBy } from '../../ownership/owned-by.decorator';
 
 @Resolver(() => Greenhouse)
 export class GreenhouseResolver {
@@ -32,6 +33,7 @@ export class GreenhouseResolver {
 
   @Query(() => Greenhouse)
   @UseGuards(AuthGuard)
+  @OwnedBy('greenhouse')
   public async greenhouse(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<Greenhouse> {
@@ -41,6 +43,7 @@ export class GreenhouseResolver {
 
   @Mutation(() => Greenhouse)
   @UseGuards(AuthGuard)
+  @OwnedBy('greenhouse')
   public async updateGreenhouse(
     @Args('id', { type: () => ID }) id: string,
     @Args('input') input: UpdateGreenhouseInput,
@@ -51,6 +54,7 @@ export class GreenhouseResolver {
 
   @Mutation(() => Boolean)
   @UseGuards(AuthGuard)
+  @OwnedBy('greenhouse')
   public async deleteGreenhouse(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {

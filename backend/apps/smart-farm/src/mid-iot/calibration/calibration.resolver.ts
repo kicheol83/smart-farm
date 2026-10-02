@@ -5,15 +5,19 @@ import {
   SensorCalibration,
   SetCalibrationInput,
 } from '../../libs/dto/mid-iot/calibration';
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from '../../account-context-module/auth/guards/auth.guard';
+import { AuthMember } from '../../account-context-module/auth/decorators/authMember.decorator';
 
 @Resolver()
+@UseGuards(AuthGuard)
 export class CalibrationResolver {
   constructor(private readonly calibService: CalibrationService) {}
 
   @Mutation(() => SensorCalibration)
   public async setSensorCalibration(
     @Args('input') input: SetCalibrationInput,
-    @Args('memberId', { type: () => ID }) memberId: string,
+    @AuthMember('_id') memberId: string,
   ): Promise<SensorCalibration> {
     return this.calibService.setCalibration(input, memberId) as any;
   }

@@ -13,6 +13,7 @@ import {
   TaskBoardOverview,
   UpdateTaskInput,
 } from '../../libs/dto/ops-context-dto/tasks/task';
+import { OwnedBy } from '../../ownership/owned-by.decorator';
 
 @Resolver(() => Task)
 export class TasksResolver {
@@ -28,12 +29,14 @@ export class TasksResolver {
 
   @Query(() => Task)
   @UseGuards(AuthGuard)
+  @OwnedBy('task')
   public async task(@Args('id', { type: () => ID }) id: string): Promise<Task> {
     return this.taskService.findOne(id);
   }
 
   @Mutation(() => Task)
   @UseGuards(AuthGuard)
+  @OwnedBy('task')
   public async updateTask(
     @Args('id', { type: () => ID }) id: string,
     @Args('input') input: UpdateTaskInput,
@@ -43,6 +46,7 @@ export class TasksResolver {
 
   @Mutation(() => Boolean)
   @UseGuards(AuthGuard)
+  @OwnedBy('task')
   public async deleteTask(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {

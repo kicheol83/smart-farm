@@ -23,6 +23,7 @@ import {
 import { RequestMeta } from '../account-context-module/auth/decorators/requesr.meta.decorator';
 import { CurrentDevice } from '../account-context-module/auth/decorators/current-device.decorator';
 import { DeviceApiKeyGuard } from '../account-context-module/auth/guards/device.api.key.guard';
+import { OwnedBy } from '../ownership/owned-by.decorator';
 
 @Resolver(() => Actuator)
 export class ActuatorResolver {
@@ -49,6 +50,7 @@ export class ActuatorResolver {
 
   @Query(() => Actuator)
   @UseGuards(AuthGuard)
+  @OwnedBy('actuator')
   public async actuator(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<Actuator> {
@@ -57,6 +59,7 @@ export class ActuatorResolver {
 
   @Mutation(() => Actuator)
   @UseGuards(AuthGuard)
+  @OwnedBy('actuator')
   public async updateActuator(
     @Args('id', { type: () => ID }) id: string,
     @Args('input') input: UpdateActuatorInput,
@@ -66,6 +69,7 @@ export class ActuatorResolver {
 
   @Mutation(() => Boolean)
   @UseGuards(AuthGuard)
+  @OwnedBy('actuator')
   public async deleteActuator(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {
@@ -146,6 +150,7 @@ export class ActuatorResolver {
 
   @Mutation(() => AutomationRule)
   @UseGuards(AuthGuard)
+  @OwnedBy('automationRule')
   public async updateAutomationRule(
     @Args('id', { type: () => ID }) id: string,
     @Args('input') input: UpdateAutomationRuleInput,
@@ -155,6 +160,7 @@ export class ActuatorResolver {
 
   @Mutation(() => Boolean)
   @UseGuards(AuthGuard)
+  @OwnedBy('automationRule')
   public async deleteAutomationRule(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {
