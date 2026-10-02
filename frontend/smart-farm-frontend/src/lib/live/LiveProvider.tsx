@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Alert, Snackbar } from "@mui/material";
 import { connectSocket, disconnectSocket, getSocket } from "@/lib/socket";
 import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
@@ -37,6 +37,8 @@ type LiveContextValue = {
   readings: Record<string, LiveReading>;
   lastUpdate: string | null;
   deviceStatus: Record<string, DeviceStatusEvent>;
+  messagesPerMinute: number;
+  messageCount: number;
 };
 
 const LiveContext = createContext<LiveContextValue>({
@@ -44,6 +46,8 @@ const LiveContext = createContext<LiveContextValue>({
   readings: {},
   lastUpdate: null,
   deviceStatus: {},
+  messagesPerMinute: 0,
+  messageCount: 0,
 });
 
 const SEVERITY: Record<string, "error" | "warning" | "info"> = {
@@ -61,6 +65,18 @@ export function LiveProvider({ children }: { children: ReactNode }) {
   const [lastUpdate, setLastUpdate] = useState<string | null>(null);
   const [deviceStatus, setDeviceStatus] = useState<Record<string, DeviceStatusEvent>>({});
   const [alerts, setAlerts] = useState<AlertEvent[]>([]);
+  const [messagesPerMinute, setMessagesPerMinute] = useState(0);
+  const [messageCount, setMessageCount] = useState(0);
+  const messageTimes = useRef<number[]>([]);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      const cutoff = Date.now() - 60000;
+      messageTimes.current = messageTimes.current.filter((time) => time >= cutoff);
+      setMessagesPerMinute(messageTimes.current.length);
+    }, 2000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   const subscribe = useCallback(() => {
     if (greenHouseId) {
@@ -86,6 +102,8 @@ export function LiveProvider({ children }: { children: ReactNode }) {
         [event.sensorType]: { value: event.value, unit: event.unit, timestamp: event.timestamp },
       }));
       setLastUpdate(event.timestamp);
+      messageTimes.current.push(Date.now());
+      setMessageCount((count) => count + 1);
     };
     const onAlert = (event: AlertEvent) => {
       setAlerts((previous) => [...previous.slice(-4), event]);
@@ -119,8 +137,8 @@ export function LiveProvider({ children }: { children: ReactNode }) {
   }, [greenHouseId, subscribe]);
 
   const value = useMemo(
-    () => ({ connected, readings, lastUpdate, deviceStatus }),
-    [connected, readings, lastUpdate, deviceStatus],
+    () => ({ connected, readings, lastUpdate, deviceStatus, messagesPerMinute, messageCount }),
+    [connected, readings, lastUpdate, deviceStatus, messagesPerMinute, messageCount],
   );
 
   const current = alerts[0];
