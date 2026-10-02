@@ -4,6 +4,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 
 // Auth (layout siz)
 import { LoginPage } from "@/modules/auth/pages/LoginPage";
+import { PipelinePage } from "@/modules/pipeline/pages/PipelinePage";
 import { SplashScreenPage } from "@/modules/auth/pages/SplashScreenPage";
 import { SignupPage } from "@/modules/auth/pages/SignupPage";
 import { EmailVerificationPage } from "@/modules/auth/pages/EmailVerificationPage";
@@ -60,6 +61,7 @@ export default function App() {
       >
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/devices" element={<DeviceListPage />} />
+        <Route path="/pipeline" element={<PipelinePage />} />
         <Route path="/automation" element={<AutomationPage />} />
         <Route path="/report" element={<ReportPage />} />
         <Route path="/report/details" element={<ReportDetailsPage />} />
