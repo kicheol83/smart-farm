@@ -58,6 +58,7 @@ async function main() {
       db.collection('aggregatedSensorData').deleteMany({ sensorId: { $in: sensorIds }, source: SOURCE }),
       db.collection('waterUsages').deleteMany({ greenHouseId: device.greenHouseId, source: SOURCE }),
       db.collection('reportEntries').deleteMany({ greenHouseId: device.greenHouseId, source: SOURCE }),
+      db.collection('plantHealth').deleteMany({ source: SOURCE, fieldsId: { $in: (await db.collection('sections').find({ greenHouseId: device.greenHouseId }).toArray()).map((x) => x._id) } }),
     ]);
     console.log(`Removed previous backfill: ${removed.map((r) => r.deletedCount).join(', ')}`);
   }
@@ -166,6 +167,8 @@ async function main() {
 
   const sections = await db.collection('sections').find({ greenHouseId: device.greenHouseId }).toArray();
   const entryDocs = [];
+  const healthDocs = [];
+  let latestHealth = null;
   const dayStarts = [...new Set([...daily.values()].map((d) => d.start.getTime()))].sort();
   for (const dayStart of dayStarts.slice(0, -1)) {
     const samples = {};
@@ -178,7 +181,15 @@ async function main() {
       }
     }
     const health = healthIndex(samples);
+    latestHealth = health;
     for (const section of sections) {
+      healthDocs.push({
+        plantHealthIndex: health,
+        plantValue: averages.SOIL_MOISTURE !== undefined ? Math.round(averages.SOIL_MOISTURE * 10) / 10 : health,
+        recordeAt: new Date(dayStart + 12 * 3600000),
+        fieldsId: section._id,
+        source: SOURCE,
+      });
       const entryDate = new Date(dayStart + 12 * 3600000);
       entryDocs.push({
         entryDate,
@@ -200,6 +211,16 @@ async function main() {
   if (entryDocs.length > 0) {
     await insertInBatches(db.collection('reportEntries'), entryDocs);
   }
+  if (healthDocs.length > 0) {
+    await insertInBatches(db.collection('plantHealth'), healthDocs);
+  }
+  if (latestHealth !== null && sections.length > 0) {
+    const status = latestHealth >= 80 ? 'HEALTHY' : latestHealth >= 50 ? 'WARNING' : 'CRITICAL';
+    await db.collection('sections').updateMany(
+      { _id: { $in: sections.map((section) => section._id) } },
+      { $set: { currentHealthIndex: latestHealth, sectionStatus: status } },
+    );
+  }
 
   console.log(`Device: ${device.deviceName} | ${days} days, every ${stepMinutes} min`);
   console.log(`sensor_data:          +${rawDocs.length}`);
@@ -207,6 +228,7 @@ async function main() {
   console.log(`aggregatedSensorData: +${aggregateDocs.length}`);
   console.log(`waterUsages:          +${waterDocs.length}`);
   console.log(`reportEntries:        +${entryDocs.length}`);
+  console.log(`plantHealth:          +${healthDocs.length}`);
   console.log(`sensorStats:          ${sensors.length} updated`);
 
   await mongoose.disconnect();

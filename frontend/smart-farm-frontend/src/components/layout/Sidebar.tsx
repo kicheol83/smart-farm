@@ -21,6 +21,7 @@ import AdminPanelSettingsRoundedIcon from "@mui/icons-material/AdminPanelSetting
 import { GRADIENT_DARK, GRADIENT_DARK_MODE } from "@/theme/theme";
 import { Logo } from "@/components/icons/Logo";
 import { useAuthStore } from "@/modules/auth/auth.store";
+import { FEATURES } from "@/lib/features";
 
 const NAV_ITEMS = [
   { to: "/dashboard", icon: HomeRoundedIcon, label: "Home" },
@@ -29,7 +30,7 @@ const NAV_ITEMS = [
   { to: "/automation", icon: BoltRoundedIcon, label: "Automation" },
   { to: "/irrigation", icon: InvertColorsRoundedIcon, label: "Irrigation" },
   { to: "/report", icon: PieChartRoundedIcon, label: "Report" },
-  { to: "/map-area", icon: MapRoundedIcon, label: "Map" },
+  ...(FEATURES.ndviMap ? [{ to: "/map-area", icon: MapRoundedIcon, label: "Map" }] : []),
 ];
 
 const BOTTOM_ITEMS = [

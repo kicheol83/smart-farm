@@ -9,6 +9,7 @@ import { SectionsModule } from './sections/sections.module';
 import { PlantHealthMonitoringModule } from './plant-health-monitoring/plant-health-monitoring.module';
 import { FieldMapModule } from './field-map/field-map.module';
 import { NdviModule } from './ndvi/ndvi.module';
+import { WeatherModule } from './weather/weather.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { NdviModule } from './ndvi/ndvi.module';
     PlantHealthMonitoringModule,
     FieldMapModule,
     NdviModule,
+    WeatherModule,
   ],
 })
 export class FarmContextModuleModule {}
