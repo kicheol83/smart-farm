@@ -14,6 +14,7 @@ import { ReportCameraCard } from "../components/ReportCameraCard";
 import { GET_FULL_GREENHOUSE_REPORT } from "../graphql/queries";
 import { GET_CAMERAS_BY_GREENHOUSE } from "@/modules/camera/graphql/queries";
 import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
+import { FEATURES } from "@/lib/features";
 
 export function ReportPage() {
   const { greenHouseId } = useActiveGreenhouse();
@@ -26,7 +27,7 @@ export function ReportPage() {
 
   const { data: cameraData } = useQuery(GET_CAMERAS_BY_GREENHOUSE, {
     variables: { greenHouseId },
-    skip: !hasGreenhouse,
+    skip: !hasGreenhouse || !FEATURES.camera,
   });
 
   const report = data?.greenhouseFullReport;
@@ -86,7 +87,7 @@ export function ReportPage() {
       <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: { xs: "1fr", lg: "repeat(3, 1fr) 1.2fr" },
+          gridTemplateColumns: { xs: "1fr", lg: FEATURES.camera ? "repeat(3, 1fr) 1.2fr" : "repeat(3, 1fr)" },
           gap: 2,
           mb: 2,
         }}
@@ -126,7 +127,7 @@ export function ReportPage() {
           description="Shows the average volume of water received by each plant daily."
           onExpand={() => (window.location.href = "/report/water-usage")}
         />
-        <ReportCameraCard cameras={cameras} />
+        {FEATURES.camera && <ReportCameraCard cameras={cameras} />}
       </Box>
 
       {/* Plants Health Trends grafigi */}

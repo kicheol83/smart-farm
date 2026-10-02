@@ -18,12 +18,15 @@ import {
   GET_GREENHOUSE_DEVICE_OVERVIEW,
   GET_CAMERAS_BY_GREENHOUSE,
   GET_TASK_BOARD_OVERVIEW,
+  GET_PLANT_HEALTH_OVERVIEW,
+  GET_CURRENT_WEATHER,
 } from "../graphql/queries";
 import { GET_GREENHOUSE_FARM_ID } from "@/modules/map-area/graphql/queries";
 import { GET_FARM } from "@/modules/settings/graphql/queries";
 import { GET_TODAY_TEMPERATURE_RANGE } from "../graphql/queries";
 import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
 import { useLive } from "@/lib/live/LiveProvider";
+import { FEATURES } from "@/lib/features";
 
 export function DashboardPage() {
   const { greenHouseId } = useActiveGreenhouse();
@@ -65,9 +68,21 @@ export function DashboardPage() {
     skip: !hasGreenhouse,
   });
 
-  const { data: cameraData } = useQuery(GET_CAMERAS_BY_GREENHOUSE, {
+  const { data: plantHealthData } = useQuery(GET_PLANT_HEALTH_OVERVIEW, {
     variables: { greenHouseId },
     skip: !hasGreenhouse,
+    pollInterval: 300000,
+  });
+
+  const { data: weatherData } = useQuery(GET_CURRENT_WEATHER, {
+    variables: { greenHouseId },
+    skip: !hasGreenhouse,
+    pollInterval: 600000,
+  });
+
+  const { data: cameraData } = useQuery(GET_CAMERAS_BY_GREENHOUSE, {
+    variables: { greenHouseId },
+    skip: !hasGreenhouse || !FEATURES.camera,
   });
 
   const { data: taskData } = useQuery(GET_TASK_BOARD_OVERVIEW, {
@@ -75,6 +90,22 @@ export function DashboardPage() {
     skip: !hasGreenhouse,
   });
 
+  const plantHealth = plantHealthData?.greenhousePlantHealthOverview;
+  const healthIndex =
+    plantHealth && plantHealth.overallHealthIndex > 0
+      ? Math.round(plantHealth.overallHealthIndex)
+      : undefined;
+  const healthDescription =
+    healthIndex === undefined
+      ? "Health is calculated from the last 24 hours of sensor readings"
+      : healthIndex >= 80
+        ? "Your plants are thriving and showing excellent health"
+        : healthIndex >= 50
+          ? "Some conditions are drifting outside the optimal range"
+          : "Several conditions are outside the optimal range";
+  const weather = weatherData?.currentWeather;
+  const compass = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
+  const windFrom = weather ? compass[Math.round(weather.windDirection / 45) % 8] : undefined;
   const baseSummary = summaryData?.greenhouseSensorSummary;
   const summary = baseSummary
     ? {
@@ -144,6 +175,7 @@ export function DashboardPage() {
               detail?._id ? detail._id.slice(-6).toUpperCase() : "—"
             }
             areaM2={detail?.greenHouseSize}
+            weatherCondition={weather?.condition}
           />
 
           <Box
@@ -156,18 +188,22 @@ export function DashboardPage() {
             <PlantReportCard
               icon={SpaRoundedIcon}
               label="Plant Health"
-              value={"--"}
+              value={healthIndex ?? "--"}
               unit="%"
               badge={undefined}
-              description="Your plants are thriving and showing excellent health"
+              description={healthDescription}
               variant="highlight"
             />
             <PlantReportCard
               icon={AirRoundedIcon}
               label="Wind"
-              value={"--"}
+              value={weather ? weather.windSpeed.toFixed(1) : "--"}
               unit="m/s"
-              description="Make sure there is still adequate airflow"
+              description={
+                weather
+                  ? `Outdoor wind from ${windFrom} · ${weather.source}`
+                  : "Make sure there is still adequate airflow"
+              }
             />
             <PlantReportCard
               icon={DeviceThermostatRoundedIcon}
@@ -206,7 +242,7 @@ export function DashboardPage() {
         />
 
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-          <DashboardCameraPanel cameras={cameras} />
+          {FEATURES.camera && <DashboardCameraPanel cameras={cameras} />}
           <DashboardTaskPanel
             totalTasks={taskOverview?.totalTasks}
             completedTasks={taskOverview?.completedTasks}

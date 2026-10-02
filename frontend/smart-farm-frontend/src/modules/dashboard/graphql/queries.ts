@@ -137,3 +137,29 @@ export const GET_TODAY_TEMPERATURE_RANGE = gql`
     }
   }
 `;
+
+export const GET_PLANT_HEALTH_OVERVIEW = gql`
+  query DashboardPlantHealth($greenHouseId: ID!) {
+    greenhousePlantHealthOverview(greenHouseId: $greenHouseId) {
+      greenHouseId
+      overallHealthIndex
+      healthyPlants
+      warningPlants
+      criticalPlants
+    }
+  }
+`;
+
+export const GET_CURRENT_WEATHER = gql`
+  query DashboardWeather($greenHouseId: ID!) {
+    currentWeather(greenHouseId: $greenHouseId) {
+      temperature
+      humidity
+      windSpeed
+      windDirection
+      condition
+      observedAt
+      source
+    }
+  }
+`;

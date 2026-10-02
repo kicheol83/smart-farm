@@ -5,6 +5,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 // Auth (layout siz)
 import { LoginPage } from "@/modules/auth/pages/LoginPage";
 import { PipelinePage } from "@/modules/pipeline/pages/PipelinePage";
+import { FEATURES } from "@/lib/features";
 import { SplashScreenPage } from "@/modules/auth/pages/SplashScreenPage";
 import { SignupPage } from "@/modules/auth/pages/SignupPage";
 import { EmailVerificationPage } from "@/modules/auth/pages/EmailVerificationPage";
@@ -78,11 +79,11 @@ export default function App() {
           path="/report/plant-health"
           element={<OverallPlantHealthPage />}
         />
-        <Route path="/map-area" element={<MapAreaPage />} />
+        {FEATURES.ndviMap && <Route path="/map-area" element={<MapAreaPage />} />}
         <Route path="/settings/*" element={<SettingsPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/tasks" element={<TaskListPage />} />
-        <Route path="/live-view" element={<LiveViewPage />} />
+        {FEATURES.camera && <Route path="/live-view" element={<LiveViewPage />} />}
         <Route path="/plant-health" element={<PlantHealthPage />} />
         <Route path="/irrigation" element={<IrrigationPage />} />
 

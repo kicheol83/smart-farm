@@ -3,7 +3,9 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  OnApplicationBootstrap,
 } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types, Document } from 'mongoose';
 import {
@@ -36,8 +38,17 @@ interface IGreenhouse extends Document {
   greenHouseName: string;
 }
 
+const OPTIMAL_RANGES: Record<string, [number, number]> = {
+  TEMPERATURE: [18, 28],
+  HUMIDITY: [50, 80],
+  SOIL_MOISTURE: [35, 70],
+  PH: [5.8, 7.0],
+  CO2: [400, 1000],
+  WATER_EC: [1.2, 2.5],
+};
+
 @Injectable()
-export class PlantHealthMonitoringService {
+export class PlantHealthMonitoringService implements OnApplicationBootstrap {
   private readonly logger = new Logger(PlantHealthMonitoringService.name);
 
   constructor(
@@ -52,7 +63,127 @@ export class PlantHealthMonitoringService {
 
     @InjectModel('fields')
     private readonly fieldModel: Model<IField>,
+
+    @InjectModel('devices')
+    private readonly deviceModel: Model<any>,
+
+    @InjectModel('sensors')
+    private readonly sensorModel: Model<any>,
+
+    @InjectModel('sensor_data')
+    private readonly sensorDataModel: Model<any>,
   ) {}
+
+  onApplicationBootstrap(): void {
+    this.computeFromSensors().catch((err: Error) =>
+      this.logger.error(`Initial plant health computation failed | ${err.message}`),
+    );
+  }
+
+  @Cron(CronExpression.EVERY_HOUR)
+  async computeFromSensors(): Promise<number> {
+    const since = new Date(Date.now() - 24 * 3600000);
+    const sections = await this.sectionModel.find().exec();
+    let updated = 0;
+
+    for (const section of sections) {
+      const sectionDevices = await this.deviceModel
+        .find({ sectionId: section._id })
+        .select('_id')
+        .lean<{ _id: Types.ObjectId }[]>()
+        .exec();
+      const devices =
+        sectionDevices.length > 0
+          ? sectionDevices
+          : await this.deviceModel
+              .find({ greenHouseId: (section as any).greenHouseId })
+              .select('_id')
+              .lean<{ _id: Types.ObjectId }[]>()
+              .exec();
+      if (devices.length === 0) continue;
+
+      const sensors = await this.sensorModel
+        .find({ deviceId: { $in: devices.map((d) => d._id) }, sensorType: { $in: Object.keys(OPTIMAL_RANGES) } })
+        .select('_id sensorType')
+        .lean<{ _id: Types.ObjectId; sensorType: string }[]>()
+        .exec();
+      if (sensors.length === 0) continue;
+
+      const typeBySensor = new Map(sensors.map((s) => [String(s._id), s.sensorType]));
+      const inRangeExpression = {
+        $switch: {
+          branches: Object.entries(OPTIMAL_RANGES).map(([type, [min, max]]) => ({
+            case: { $eq: ['$sensorDataName', type] },
+            then: {
+              $cond: [
+                { $and: [{ $gte: ['$sensorDataValue', min] }, { $lte: ['$sensorDataValue', max] }] },
+                1,
+                0,
+              ],
+            },
+          })),
+          default: 0,
+        },
+      };
+      const buckets = await this.sensorDataModel.aggregate<{
+        _id: Types.ObjectId;
+        total: number;
+        inRange: number;
+        sum: number;
+      }>([
+        { $match: { sensorId: { $in: sensors.map((s) => s._id) }, recordedAt: { $gte: since } } },
+        {
+          $group: {
+            _id: '$sensorId',
+            total: { $sum: 1 },
+            inRange: { $sum: inRangeExpression },
+            sum: { $sum: '$sensorDataValue' },
+          },
+        },
+      ]);
+      if (buckets.length === 0) continue;
+
+      const scores: number[] = [];
+      let soilSum = 0;
+      let soilCount = 0;
+      for (const bucket of buckets) {
+        const type = typeBySensor.get(String(bucket._id));
+        if (!type) continue;
+        scores.push((bucket.inRange / bucket.total) * 100);
+        if (type === 'SOIL_MOISTURE') {
+          soilSum += bucket.sum;
+          soilCount += bucket.total;
+        }
+      }
+      if (scores.length === 0) continue;
+
+      const healthIndex = Math.round(scores.reduce((sum, s) => sum + s, 0) / scores.length);
+      const plantValue = soilCount > 0 ? Math.round((soilSum / soilCount) * 10) / 10 : healthIndex;
+
+      await this.plantHealthModel.create({
+        plantHealthIndex: healthIndex,
+        plantValue,
+        recordeAt: new Date(),
+        fieldsId: section._id,
+      });
+      await this.sectionModel.updateOne(
+        { _id: section._id },
+        { currentHealthIndex: healthIndex, sectionStatus: this.toSectionStatus(healthIndex) },
+      );
+      updated += 1;
+    }
+
+    if (updated > 0) {
+      this.logger.log(`Plant health computed from sensors | sections=${updated}`);
+    }
+    return updated;
+  }
+
+  private toSectionStatus(index: number): string {
+    if (index >= 80) return 'HEALTHY';
+    if (index >= 50) return 'WARNING';
+    return 'CRITICAL';
+  }
 
   public async record(
     input: RecordSectionHealthInput,

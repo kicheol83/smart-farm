@@ -8,6 +8,9 @@ import { SectionsSchema } from '../../schemas/farm/Sections.model';
 import { AuthModule } from '../../account-context-module/auth/auth.module';
 import { FieldsSchema } from '../../schemas/farm/Fields.model';
 import { FieldsModule } from '../fields/fields.module';
+import DevicesSchema from '../../schemas/iot/Devices.model';
+import { SensorsSchema } from '../../schemas/iot/Sensors.model';
+import { SensorDataSchema } from '../../schemas/iot/SensorData.model';
 
 @Module({
   imports: [
@@ -16,6 +19,9 @@ import { FieldsModule } from '../fields/fields.module';
       { name: 'sections', schema: SectionsSchema },
       { name: 'greenHouses', schema: GreenHouseSchema },
       { name: 'fields', schema: FieldsSchema },
+      { name: 'devices', schema: DevicesSchema },
+      { name: 'sensors', schema: SensorsSchema },
+      { name: 'sensor_data', schema: SensorDataSchema },
     ]),
     AuthModule,
     FieldsModule,
