@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import { Box, useMediaQuery, useTheme } from "@mui/material";
 import { Sidebar } from "./Sidebar";
+import { LiveProvider } from "@/lib/live/LiveProvider";
 
 export function AppLayout() {
   const theme = useTheme();
@@ -33,7 +34,9 @@ export function AppLayout() {
             pb: isDesktop ? 3 : 10,
           }}
         >
-          <Outlet />
+          <LiveProvider>
+            <Outlet />
+          </LiveProvider>
         </Box>
       </Box>
     </Box>

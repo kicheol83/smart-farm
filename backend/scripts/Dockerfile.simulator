@@ -1,0 +1,7 @@
+FROM node:20-alpine
+WORKDIR /app
+RUN npm init -y > /dev/null && npm install --omit=dev mqtt@5.15.1 && npm cache clean --force
+COPY simulate-device.js ./
+COPY lib ./lib
+USER node
+CMD ["node", "simulate-device.js"]

@@ -23,9 +23,11 @@ import { GET_GREENHOUSE_FARM_ID } from "@/modules/map-area/graphql/queries";
 import { GET_FARM } from "@/modules/settings/graphql/queries";
 import { GET_TODAY_TEMPERATURE_RANGE } from "../graphql/queries";
 import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
+import { useLive } from "@/lib/live/LiveProvider";
 
 export function DashboardPage() {
   const { greenHouseId } = useActiveGreenhouse();
+  const { readings } = useLive();
   const hasGreenhouse = greenHouseId.length > 0;
 
   const { data: summaryData } = useQuery(GET_GREENHOUSE_SUMMARY, {
@@ -73,7 +75,18 @@ export function DashboardPage() {
     skip: !hasGreenhouse,
   });
 
-  const summary = summaryData?.greenhouseSensorSummary;
+  const baseSummary = summaryData?.greenhouseSensorSummary;
+  const summary = baseSummary
+    ? {
+        ...baseSummary,
+        temperature: readings.TEMPERATURE?.value ?? baseSummary.temperature,
+        humidity: readings.HUMIDITY?.value ?? baseSummary.humidity,
+        ph: readings.PH?.value ?? baseSummary.ph,
+        light: readings.LIGHT?.value ?? baseSummary.light,
+        co2: readings.CO2?.value ?? baseSummary.co2,
+        soilMoisture: readings.SOIL_MOISTURE?.value ?? baseSummary.soilMoisture,
+      }
+    : baseSummary;
   const detail = detailData?.greenhouse;
   const deviceOverview = deviceData?.greenhouseDeviceOverview;
   const cameras = cameraData?.camerasByGreenhouse ?? [];
