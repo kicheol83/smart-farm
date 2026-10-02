@@ -17,6 +17,7 @@ import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
 import { useLive } from "@/lib/live/LiveProvider";
 import { GET_PIPELINE_OVERVIEW } from "../graphql/queries";
 import { PipelineFlow } from "../components/PipelineFlow";
+import { ClosedLoopCard } from "../components/ClosedLoopCard";
 
 type PipelineSensor = {
   sensorId: string;
@@ -121,6 +122,8 @@ export function PipelinePage() {
         <MetricCard label="ANOMALIES · 24H" value={overview ? number.format(overview.anomaliesLast24h) : "—"} hint="Z-score ≥ 2 against rolling stats" accent={overview?.anomaliesLast24h ? "#F5A524" : undefined} />
         <MetricCard label="PIPELINE ERRORS · 24H" value={overview ? number.format(overview.errorsLast24h) : "—"} hint="auth, parse and storage failures" accent={overview?.errorsLast24h ? "#E5484D" : undefined} />
       </Box>
+
+      <ClosedLoopCard greenHouseId={greenHouseId} />
 
       <Paper sx={{ p: 2.5, borderRadius: 3 }} elevation={0}>
         <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>

@@ -1,4 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import type { Namespace } from 'socket.io';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types, Document } from 'mongoose';
 import {
@@ -54,7 +56,69 @@ export class ActuatorService {
 
     @InjectModel('automationRules')
     private readonly ruleModel: Model<IAutomationRule>,
+
+    @InjectModel('waterUsages')
+    private readonly waterUsageModel: Model<any>,
   ) {}
+
+  private wsServer?: Namespace;
+
+  setWsServer(server: Namespace): void {
+    this.wsServer = server;
+  }
+
+  @Cron(CronExpression.EVERY_30_SECONDS)
+  async autoOffExpired(): Promise<void> {
+    const expired = await this.actuatorModel
+      .find({ actuatorStatus: ActuatorStatus.ON, autoOffAt: { $lte: new Date() } })
+      .select('_id')
+      .exec();
+
+    for (const actuator of expired) {
+      await this.toggle(
+        { actuatorId: String(actuator._id), status: ActuatorStatus.OFF },
+        'Auto-off timer elapsed',
+      ).catch((err: Error) =>
+        this.logger.error(`Auto-off failed | actuator=${String(actuator._id)} | ${err.message}`),
+      );
+    }
+  }
+
+  private async recordWaterUsage(previous: IActuator, stoppedAt: Date): Promise<number | undefined> {
+    const isWaterActuator =
+      previous.actuatorType === 'WATER_PUMP' || previous.actuatorType === 'SOLENOID_VALVE';
+    if (!isWaterActuator || !previous.lastToggledAt) return undefined;
+
+    const minutes = (stoppedAt.getTime() - previous.lastToggledAt.getTime()) / 60000;
+    if (minutes <= 0) return undefined;
+
+    const flowLitersPerMinute = Number(process.env.PUMP_FLOW_LPM ?? 12);
+    const speed = (previous.speedPercent ?? 100) / 100;
+    const waterAmount = Math.round(minutes * flowLitersPerMinute * speed * 10) / 10;
+
+    await this.waterUsageModel.create({
+      waterAmount,
+      durationMinutes: Math.round(minutes * 10) / 10,
+      recordedAt: stoppedAt,
+      greenHouseId: previous.greenHouseId,
+      sectionId: previous.sectionId,
+    });
+    return waterAmount;
+  }
+
+  private emitActuatorUpdate(actuator: IActuator, reason?: string, waterAmount?: number): void {
+    if (!this.wsServer) return;
+    this.wsServer.to(`greenhouse:${String(actuator.greenHouseId)}`).emit('actuator-update', {
+      greenHouseId: String(actuator.greenHouseId),
+      actuatorId: String(actuator._id),
+      actuatorName: actuator.actuatorName,
+      actuatorType: actuator.actuatorType,
+      status: actuator.actuatorStatus,
+      reason,
+      waterAmount,
+      timestamp: new Date().toISOString(),
+    });
+  }
 
   public async create(input: CreateActuatorInput): Promise<IActuator> {
     const actuator = await this.actuatorModel.create({
@@ -101,17 +165,21 @@ export class ActuatorService {
     return Boolean(result);
   }
 
-  public async toggle(input: ToggleActuatorInput): Promise<IActuator> {
+  public async toggle(input: ToggleActuatorInput, reason?: string): Promise<IActuator> {
     const autoOffAt = input.autoOffAfterMinutes
       ? new Date(Date.now() + input.autoOffAfterMinutes * 60_000)
       : undefined;
+
+    const previous = await this.actuatorModel.findById(input.actuatorId).exec();
+    if (!previous) throw new NotFoundException('Actuator not found.');
+    const now = new Date();
 
     const actuator = await this.actuatorModel
       .findByIdAndUpdate(
         input.actuatorId,
         {
           actuatorStatus: input.status,
-          lastToggledAt: new Date(),
+          lastToggledAt: now,
           autoOffAt: input.status === ActuatorStatus.ON ? autoOffAt : undefined,
         },
         { new: true },
@@ -123,6 +191,18 @@ export class ActuatorService {
       `Actuator toggled | ${actuator.actuatorName} → ${input.status}` +
         (autoOffAt ? ` (auto-off at ${autoOffAt.toISOString()})` : ''),
     );
+
+    let waterAmount: number | undefined;
+    if (previous.actuatorStatus === ActuatorStatus.ON && input.status === ActuatorStatus.OFF) {
+      waterAmount = await this.recordWaterUsage(previous, now).catch((err: Error) => {
+        this.logger.error(`Water usage record failed | ${actuator.actuatorName} | ${err.message}`);
+        return undefined;
+      });
+    }
+
+    if (previous.actuatorStatus !== actuator.actuatorStatus) {
+      this.emitActuatorUpdate(actuator, reason, waterAmount);
+    }
     return actuator;
   }
 
@@ -163,12 +243,10 @@ export class ActuatorService {
       let status = a.actuatorStatus as ActuatorStatus;
 
       if (status === ActuatorStatus.ON && a.autoOffAt && a.autoOffAt <= now) {
-        await this.actuatorModel
-          .updateOne(
-            { _id: a._id },
-            { actuatorStatus: ActuatorStatus.OFF, autoOffAt: undefined },
-          )
-          .exec();
+        await this.toggle(
+          { actuatorId: String(a._id), status: ActuatorStatus.OFF },
+          'Auto-off timer elapsed',
+        );
         status = ActuatorStatus.OFF;
         this.logger.log(
           `Actuator auto-off (muddat tugadi) | ${a.actuatorName}`,
@@ -256,11 +334,17 @@ export class ActuatorService {
 
       if (!breached) continue;
 
-      await this.toggle({
-        actuatorId: String(rule.actuatorId),
-        status: ActuatorStatus.ON,
-        autoOffAfterMinutes: rule.actionDurationMinutes,
-      });
+      const target = await this.actuatorModel.findById(rule.actuatorId).select('actuatorStatus').exec();
+      if (!target || target.actuatorStatus === ActuatorStatus.ON) continue;
+
+      await this.toggle(
+        {
+          actuatorId: String(rule.actuatorId),
+          status: ActuatorStatus.ON,
+          autoOffAfterMinutes: rule.actionDurationMinutes,
+        },
+        `${rule.ruleName}: ${sensorType} ${currentValue} ${rule.triggerCondition === TriggerCondition.BELOW ? '<' : '>'} ${rule.triggerThreshold}`,
+      );
 
       await this.ruleModel
         .updateOne({ _id: rule._id }, { lastTriggeredAt: new Date() })

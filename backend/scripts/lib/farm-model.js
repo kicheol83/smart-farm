@@ -40,10 +40,13 @@ function clamp(value, min, max) {
 }
 
 class FarmModel {
-  constructor({ seed = Date.now(), utcOffsetHours = 9 } = {}) {
+  constructor({ seed = Date.now(), utcOffsetHours = 9, autoIrrigate = true, soilStart = 55, dryingMultiplier = 1 } = {}) {
+    this.dryingMultiplier = dryingMultiplier;
+    this.autoIrrigate = autoIrrigate;
+    this.irrigating = false;
     this.random = createRandom(seed);
     this.utcOffsetHours = utcOffsetHours;
-    this.soilMoisture = 55;
+    this.soilMoisture = soilStart;
     this.waterLevel = 85;
     this.ec = 1.9;
     this.lastTime = null;
@@ -100,13 +103,18 @@ class FarmModel {
     const ph = clamp(6.4 + 0.18 * Math.sin(day * 0.7) + this.noise(0.04), 5.2, 7.8);
 
     const dryingPerHour = 0.35 + Math.max(0, temperature - 20) * 0.05 + daylight * 0.35;
-    this.soilMoisture -= (dryingPerHour * minutes) / 60;
+    this.soilMoisture -= (dryingPerHour * this.dryingMultiplier * minutes) / 60;
     if (this.rainyDay && daylight > 0) {
       this.soilMoisture += (0.4 * minutes) / 60;
     }
 
+    if (this.irrigating) {
+      this.soilMoisture += (1.6 * minutes);
+      this.waterLevel -= (0.25 * minutes);
+    }
+
     let irrigated = null;
-    if (this.soilMoisture < 34) {
+    if (this.autoIrrigate && this.soilMoisture < 34) {
       const liters = round(140 + this.random() * 60, 1);
       this.soilMoisture += 20 + this.random() * 6;
       this.waterLevel -= 3 + this.random() * 1.5;
@@ -135,6 +143,10 @@ class FarmModel {
     };
 
     return { values, irrigated };
+  }
+
+  setIrrigating(on) {
+    this.irrigating = Boolean(on);
   }
 
   spike(type, value) {

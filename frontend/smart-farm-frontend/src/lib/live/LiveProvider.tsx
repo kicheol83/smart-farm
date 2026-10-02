@@ -32,6 +32,18 @@ type DeviceStatusEvent = {
   timestamp: string;
 };
 
+export type ActuatorEvent = {
+  actuatorId: string;
+  actuatorName: string;
+  actuatorType: string;
+  status: string;
+  reason?: string | null;
+  waterAmount?: number | null;
+  timestamp: string;
+};
+
+type Notice = { key: string; severity: "error" | "warning" | "info" | "success"; title: string; body: string };
+
 type LiveContextValue = {
   connected: boolean;
   readings: Record<string, LiveReading>;
@@ -39,6 +51,7 @@ type LiveContextValue = {
   deviceStatus: Record<string, DeviceStatusEvent>;
   messagesPerMinute: number;
   messageCount: number;
+  actuatorEvents: ActuatorEvent[];
 };
 
 const LiveContext = createContext<LiveContextValue>({
@@ -48,6 +61,7 @@ const LiveContext = createContext<LiveContextValue>({
   deviceStatus: {},
   messagesPerMinute: 0,
   messageCount: 0,
+  actuatorEvents: [],
 });
 
 const SEVERITY: Record<string, "error" | "warning" | "info"> = {
@@ -64,7 +78,8 @@ export function LiveProvider({ children }: { children: ReactNode }) {
   const [readings, setReadings] = useState<Record<string, LiveReading>>({});
   const [lastUpdate, setLastUpdate] = useState<string | null>(null);
   const [deviceStatus, setDeviceStatus] = useState<Record<string, DeviceStatusEvent>>({});
-  const [alerts, setAlerts] = useState<AlertEvent[]>([]);
+  const [notices, setNotices] = useState<Notice[]>([]);
+  const [actuatorEvents, setActuatorEvents] = useState<ActuatorEvent[]>([]);
   const [messagesPerMinute, setMessagesPerMinute] = useState(0);
   const [messageCount, setMessageCount] = useState(0);
   const messageTimes = useRef<number[]>([]);
@@ -106,7 +121,24 @@ export function LiveProvider({ children }: { children: ReactNode }) {
       setMessageCount((count) => count + 1);
     };
     const onAlert = (event: AlertEvent) => {
-      setAlerts((previous) => [...previous.slice(-4), event]);
+      const notice: Notice = {
+        key: `${event.timestamp}-${event.alertType}`,
+        severity: SEVERITY[event.severity] ?? "warning",
+        title: `${event.type === "ANOMALY" ? "Anomaly" : "Alert"} · ${event.alertType}`,
+        body: `${event.message} (${event.currentValue})`,
+      };
+      setNotices((previous) => [...previous.slice(-4), notice]);
+    };
+    const onActuatorUpdate = (event: ActuatorEvent) => {
+      setActuatorEvents((previous) => [event, ...previous].slice(0, 20));
+      const water = event.waterAmount ? ` · ${event.waterAmount} L used` : "";
+      const notice: Notice = {
+        key: `${event.timestamp}-${event.actuatorId}`,
+        severity: event.status === "ON" ? "info" : "success",
+        title: `${event.actuatorName} → ${event.status}`,
+        body: `${event.reason ?? "Manual control"}${water}`,
+      };
+      setNotices((previous) => [...previous.slice(-4), notice]);
     };
     const onDeviceStatus = (event: DeviceStatusEvent) => {
       setDeviceStatus((previous) => ({ ...previous, [event.deviceId]: event }));
@@ -117,6 +149,7 @@ export function LiveProvider({ children }: { children: ReactNode }) {
     socket.on("sensor-update", onSensorUpdate);
     socket.on("alert", onAlert);
     socket.on("device-status", onDeviceStatus);
+    socket.on("actuator-update", onActuatorUpdate);
 
     if (socket.connected) {
       onConnect();
@@ -130,6 +163,7 @@ export function LiveProvider({ children }: { children: ReactNode }) {
       socket.off("sensor-update", onSensorUpdate);
       socket.off("alert", onAlert);
       socket.off("device-status", onDeviceStatus);
+      socket.off("actuator-update", onActuatorUpdate);
       disconnectSocket();
       setConnected(false);
       setReadings({});
@@ -137,32 +171,33 @@ export function LiveProvider({ children }: { children: ReactNode }) {
   }, [greenHouseId, subscribe]);
 
   const value = useMemo(
-    () => ({ connected, readings, lastUpdate, deviceStatus, messagesPerMinute, messageCount }),
-    [connected, readings, lastUpdate, deviceStatus, messagesPerMinute, messageCount],
+    () => ({ connected, readings, lastUpdate, deviceStatus, messagesPerMinute, messageCount, actuatorEvents }),
+    [connected, readings, lastUpdate, deviceStatus, messagesPerMinute, messageCount, actuatorEvents],
   );
 
-  const current = alerts[0];
+  const current = notices[0];
+  const dismiss = () => setNotices((previous) => previous.slice(1));
 
   return (
     <LiveContext.Provider value={value}>
       {children}
       <Snackbar
-        key={current ? `${current.timestamp}-${current.alertType}` : "none"}
+        key={current?.key ?? "none"}
         open={current !== undefined}
         autoHideDuration={6000}
-        onClose={() => setAlerts((previous) => previous.slice(1))}
+        onClose={dismiss}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
         {current ? (
           <Alert
             variant="filled"
-            severity={SEVERITY[current.severity] ?? "warning"}
-            onClose={() => setAlerts((previous) => previous.slice(1))}
+            severity={current.severity}
+            onClose={dismiss}
             sx={{ minWidth: 300 }}
           >
-            <strong>{current.type === "ANOMALY" ? "Anomaly" : "Alert"} · {current.alertType}</strong>
+            <strong>{current.title}</strong>
             <br />
-            {current.message} ({current.currentValue})
+            {current.body}
           </Alert>
         ) : (
           <span />

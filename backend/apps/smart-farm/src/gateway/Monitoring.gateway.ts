@@ -14,6 +14,7 @@ import { SensorDataService } from '../io-tcontext-module/sensor-data/sensor-data
 import { AuthService } from '../account-context-module/auth/auth.service';
 import { OwnershipService } from '../ownership/ownership.service';
 import { IotPipelineService } from '../iot/iot-pipeline/iot-pipeline.service';
+import { ActuatorService } from '../actuator/actuator.service';
 import { MemberRole } from '../libs/enums/member.enum';
 
 @WebSocketGateway({
@@ -33,10 +34,12 @@ export class MonitoringGateway
     private readonly authService: AuthService,
     private readonly ownershipService: OwnershipService,
     private readonly pipelineService: IotPipelineService,
+    private readonly actuatorService: ActuatorService,
   ) {}
 
   afterInit(server: Namespace) {
     this.pipelineService.setWsServer(server as never);
+    this.actuatorService.setWsServer(server);
   }
 
   async handleConnection(client: Socket) {

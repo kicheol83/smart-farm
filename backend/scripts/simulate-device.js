@@ -28,7 +28,42 @@ const apiKey = required('API_KEY');
 const intervalMs = Number(process.env.INTERVAL_MS || 2000);
 const count = Number(process.env.COUNT || 60);
 const mode = process.env.MODE || 'realistic';
-const farm = new FarmModel({ utcOffsetHours: Number(process.env.UTC_OFFSET_HOURS || 9) });
+const closedLoop = process.env.CLOSED_LOOP === 'true';
+const apiUrl = process.env.API_URL || 'http://127.0.0.1:3010/graphql';
+const pollMs = Number(process.env.POLL_MS || 5000);
+const farm = new FarmModel({
+  utcOffsetHours: Number(process.env.UTC_OFFSET_HOURS || 9),
+  autoIrrigate: !closedLoop,
+  soilStart: Number(process.env.SOIL_START || 55),
+  dryingMultiplier: Number(process.env.DRYING_MULTIPLIER || 1),
+});
+let pumpOn = false;
+
+async function pollActuators() {
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-device-api-key': apiKey },
+      body: JSON.stringify({ query: '{ getDeviceActuatorStates { actuatorName actuatorType desiredStatus } }' }),
+    });
+    const body = await response.json();
+    if (body.errors) {
+      console.error(`Actuator poll failed: ${body.errors[0].message}`);
+      return;
+    }
+    const states = body.data.getDeviceActuatorStates;
+    const watering = states.some(
+      (state) => (state.actuatorType === 'WATER_PUMP' || state.actuatorType === 'SOLENOID_VALVE') && state.desiredStatus === 'ON',
+    );
+    if (watering !== pumpOn) {
+      pumpOn = watering;
+      farm.setIrrigating(pumpOn);
+      console.log(`>>> PUMP ${pumpOn ? 'ON' : 'OFF'} (commanded by backend)`);
+    }
+  } catch (err) {
+    console.error(`Actuator poll failed: ${err.message}`);
+  }
+}
 const spikeEvery = Number(process.env.SPIKE_EVERY || 40);
 
 const sensors = required('SENSORS')
@@ -113,6 +148,10 @@ client.on('connect', () => {
   );
   publish();
   timer = setInterval(publish, intervalMs);
+  if (closedLoop && mode === 'realistic') {
+    pollActuators();
+    setInterval(pollActuators, pollMs);
+  }
 });
 
 client.on('error', (err) => {
