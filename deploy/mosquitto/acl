@@ -1,0 +1,5 @@
+user smartfarm-backend
+topic readwrite #
+
+user smartfarm-device
+topic readwrite sf/devices/#
