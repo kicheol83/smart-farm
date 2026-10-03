@@ -26,6 +26,7 @@ import {
   LOGIN_BG_DARK,
 } from "@/theme/theme";
 import { t } from "@/i18n/core";
+import { FEATURES } from "@/lib/features";
 
 const LOGIN_MUTATION = gql`
   mutation Login($input: LoginMemberInput!) {
@@ -380,7 +381,8 @@ export function LoginPage() {
             <Button
               fullWidth
               component="a"
-              href={GOOGLE_AUTH_URL}
+              href={FEATURES.socialLogin ? GOOGLE_AUTH_URL : undefined}
+              disabled={!FEATURES.socialLogin}
               startIcon={<GoogleIcon sx={{ fontSize: 24 }} />}
               sx={{
                 py: "12px",
@@ -403,7 +405,8 @@ export function LoginPage() {
             <Button
               fullWidth
               component="a"
-              href={APPLE_AUTH_URL}
+              href={FEATURES.socialLogin ? APPLE_AUTH_URL : undefined}
+              disabled={!FEATURES.socialLogin}
               startIcon={<AppleIcon sx={{ fontSize: 24, color: "#000" }} />}
               sx={{
                 py: "12px",

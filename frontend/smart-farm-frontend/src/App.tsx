@@ -44,7 +44,7 @@ function PublicLanguageSwitcher() {
     return null;
   }
   return (
-    <Box sx={{ position: "fixed", top: 16, right: 16, zIndex: 1300, bgcolor: "background.paper", borderRadius: 2 }}>
+    <Box sx={{ position: "fixed", top: 16, right: 72, zIndex: 1300, bgcolor: "background.paper", borderRadius: 2 }}>
       <LanguageSwitcher />
     </Box>
   );
