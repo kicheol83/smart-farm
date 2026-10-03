@@ -1,0 +1,20 @@
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+ARG PUBLIC_HOST
+ARG VITE_GOOGLE_CLIENT_ID=""
+ENV VITE_GRAPHQL_HTTP_URL=https://${PUBLIC_HOST}/graphql \
+    VITE_GRAPHQL_WS_URL=wss://${PUBLIC_HOST}/graphql \
+    VITE_SOCKET_URL=https://${PUBLIC_HOST} \
+    VITE_API_BASE_URL=https://${PUBLIC_HOST} \
+    VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID} \
+    VITE_DEMO_MODE=true \
+    VITE_FEATURE_CAMERA=false \
+    VITE_FEATURE_NDVI=false
+RUN npm run build
+
+FROM caddy:2-alpine
+COPY --from=build /app/dist /srv
+COPY Caddyfile.prod /etc/caddy/Caddyfile

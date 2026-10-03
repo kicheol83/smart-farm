@@ -1,0 +1,139 @@
+name: smartfarm
+
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    mem_limit: 768m
+    command: ['mongod', '--wiredTigerCacheSizeGB', '0.25']
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: smartfarm
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:?MONGO_PASSWORD is required}
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ['CMD', 'mongosh', '--quiet', '--eval', "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - internal
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    mem_limit: 128m
+    command: ['redis-server', '--requirepass', '${REDIS_PASSWORD:?REDIS_PASSWORD is required}', '--appendonly', 'yes']
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD-SHELL', 'redis-cli -a "$$REDIS_PASSWORD" ping | grep PONG']
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    networks:
+      - internal
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: smartfarm-mosquitto
+    restart: unless-stopped
+    mem_limit: 64m
+    ports:
+      - '8883:8883'
+    volumes:
+      - ./deploy/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./deploy/mosquitto/acl:/mosquitto/config/acl:ro
+      - ./deploy/mosquitto/passwd:/mosquitto/config/passwd:ro
+      - mosquitto_data:/mosquitto/data
+      - caddy_data:/caddy-data:ro
+    networks:
+      - internal
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    restart: unless-stopped
+    mem_limit: 768m
+    env_file:
+      - ./backend/.env.production
+    environment:
+      NODE_ENV: production
+      PORT_API: '3000'
+      MONGO_PROD: mongodb://smartfarm:${MONGO_PASSWORD}@mongo:27017/SmartFarm?authSource=admin
+      REDIS_HOST: redis
+      REDIS_PORT: '6379'
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      MQTT_BROKER_URL: mqtt://mosquitto:1883
+      MQTT_USERNAME: smartfarm-backend
+      MQTT_PASSWORD: ${MQTT_BACKEND_PASSWORD:?MQTT_BACKEND_PASSWORD is required}
+      ALLOWED_ORIGINS: https://${PUBLIC_HOST}
+      NODE_OPTIONS: --max-old-space-size=512
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mosquitto:
+        condition: service_started
+    networks:
+      - internal
+
+  web:
+    build:
+      context: ./frontend/smart-farm-frontend
+      dockerfile: Dockerfile.prod
+      args:
+        PUBLIC_HOST: ${PUBLIC_HOST:?PUBLIC_HOST is required}
+        VITE_GOOGLE_CLIENT_ID: ${VITE_GOOGLE_CLIENT_ID:-}
+    container_name: smartfarm-web
+    restart: unless-stopped
+    mem_limit: 64m
+    depends_on:
+      - backend
+    networks:
+      - internal
+      - proxy
+
+  device-simulator:
+    build:
+      context: ./backend/scripts
+      dockerfile: Dockerfile.simulator
+    restart: unless-stopped
+    profiles: ['demo']
+    mem_limit: 96m
+    environment:
+      MQTT_URL: mqtt://mosquitto:1883
+      MQTT_USERNAME: smartfarm-device
+      MQTT_PASSWORD: ${MQTT_DEVICE_PASSWORD:-}
+      API_URL: http://backend:3000/graphql
+      DEVICE_ID: ${SIM_DEVICE_ID:-}
+      API_KEY: ${SIM_API_KEY:-}
+      SENSORS: ${SIM_SENSORS:-}
+      MODE: realistic
+      CLOSED_LOOP: 'true'
+      COUNT: '0'
+      INTERVAL_MS: '30000'
+      SPIKE_EVERY: '240'
+    depends_on:
+      - backend
+    networks:
+      - internal
+
+networks:
+  internal: {}
+  proxy:
+    external: true
+    name: proxy
+
+volumes:
+  mongo_data:
+  redis_data:
+  mosquitto_data:
+  caddy_data:
+    external: true
+    name: caddy_caddy_data
