@@ -14,6 +14,7 @@ import {
   LOGIN_BG_LIGHT,
   LOGIN_BG_DARK,
 } from "@/theme/theme";
+import { t } from "@/i18n/core";
 
 
 const SIGNUP_MUTATION = gql`
@@ -65,14 +66,14 @@ export function SignupPage() {
 
     let hasError = false;
     if (!EMAIL_REGEX.test(email)) {
-      setEmailError("Wrong email address. Please check again.");
+      setEmailError(t("txt.wrong_email_address_please_check_again"));
       hasError = true;
     }
     if (password.length < 8) {
-      setPasswordError("Must contain at least 8 characters.");
+      setPasswordError(t("txt.must_contain_at_least_8_characters_244f"));
       hasError = true;
     } else if (password !== confirmPassword) {
-      setPasswordError("Passwords do not match.");
+      setPasswordError(t("txt.passwords_do_not_match"));
       hasError = true;
     }
     if (hasError) return;
@@ -92,7 +93,7 @@ export function SignupPage() {
     } catch (err: any) {
       setEmailError(
         err.message?.includes("already")
-          ? "This email address has already used."
+          ? t("txt.this_email_address_is_already_in_use")
           : err.message,
       );
     }
@@ -159,7 +160,7 @@ export function SignupPage() {
                 color: "text.primary",
               }}
             >
-              Start Your Smart Farm Journey
+              {t("txt.start_your_smart_farm_journey")}
             </Typography>
             <Typography
               sx={{
@@ -171,7 +172,7 @@ export function SignupPage() {
                 color: "text.secondary",
               }}
             >
-              Create an account and bring precision to your operations.
+              {t("txt.create_an_account_and_bring_precision_to_your_op")}
             </Typography>
           </Box>
 
@@ -194,7 +195,7 @@ export function SignupPage() {
               }}
             >
               <AuthTextField
-                label="Full Name"
+                label={t("txt.full_name")}
                 required
                 autoComplete="name"
                 placeholder="e.g. Jhon Doe"
@@ -203,7 +204,7 @@ export function SignupPage() {
               />
 
               <AuthTextField
-                label="Email"
+                label={t("txt.email")}
                 type="email"
                 required
                 autoComplete="email"
@@ -217,11 +218,11 @@ export function SignupPage() {
               />
 
               <AuthTextField
-                label="Password"
+                label={t("txt.password")}
                 type={showPassword ? "text" : "password"}
                 required
                 autoComplete="new-password"
-                placeholder="Must contain at least 8 characters"
+                placeholder={t("txt.must_contain_at_least_8_characters")}
                 value={password}
                 errorText={passwordError ?? undefined}
                 onChange={(e) => {
@@ -255,11 +256,11 @@ export function SignupPage() {
               />
 
               <AuthTextField
-                label="Confirm Password"
+                label={t("txt.confirm_password")}
                 type={showConfirmPassword ? "text" : "password"}
                 required
                 autoComplete="new-password"
-                placeholder="Must contain at least 8 characters"
+                placeholder={t("txt.must_contain_at_least_8_characters")}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 endAdornment={
@@ -310,7 +311,7 @@ export function SignupPage() {
                 "&.Mui-disabled": { bgcolor: "#cecece", color: "#a4a4a4" },
               }}
             >
-              {loading ? "Yuborilmoqda..." : "Sign up"}
+              {loading ? t("txt.sending") : t("txt.sign_up")}
             </Button>
           </Box>
 
@@ -332,7 +333,7 @@ export function SignupPage() {
                 color: "text.secondary",
               }}
             >
-              Already have an account?
+              {t("txt.already_have_an_account")}
             </Typography>
             <Link
               component={RouterLink}
@@ -347,7 +348,7 @@ export function SignupPage() {
                 "&:hover": { textDecoration: "underline" },
               }}
             >
-              Log in
+              {t("txt.log_in")}
             </Link>
           </Box>
         </Box>
@@ -355,8 +356,8 @@ export function SignupPage() {
 
       <AuthOnboardingPanel
         image={ONBOARDING_IMAGE}
-        heading="Seamless Device Control"
-        subtitle="Manage sensors, irrigation, and equipment anywhere with one dashboard."
+        heading={t("txt.seamless_device_control")}
+        subtitle={t("txt.manage_sensors_irrigation_and_equipment_anywhere")}
         activeStep={1}
       />
     </Box>

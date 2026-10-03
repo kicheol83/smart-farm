@@ -19,6 +19,7 @@ import {
 } from "../graphql/queries";
 import { GET_GREENHOUSE_FARM_ID } from "@/modules/map-area/graphql/queries";
 import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
+import { t } from "@/i18n/core";
 
 export function SettingsPage() {
   const [tab, setTab] = useState("general");
@@ -95,7 +96,7 @@ export function SettingsPage() {
 
   return (
     <>
-      <Header title="Settings" />
+      <Header title={t("txt.settings")} />
 
       <Card
         elevation={0}

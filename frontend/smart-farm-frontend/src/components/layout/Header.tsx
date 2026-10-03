@@ -15,17 +15,29 @@ import { ThemeToggle } from "./ThemeToggle";
 import { GRADIENT_DARK, GRADIENT_DARK_MODE } from "@/theme/theme";
 import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
 import { LiveBadge } from "@/lib/live/LiveBadge";
+import { t } from "@/i18n/core";
+import { LanguageSwitcher } from "@/i18n/LanguageSwitcher";
+import { useState } from "react";
+import { Menu, MenuItem } from "@mui/material";
 
 interface HeaderProps {
   title?: string;
 }
 
-export function Header({ title = "Greenhouse Monitoring" }: HeaderProps) {
+export function Header({ title }: HeaderProps) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const gradient =
     theme.palette.mode === "dark" ? GRADIENT_DARK_MODE : GRADIENT_DARK;
-  const { greenHouseId } = useActiveGreenhouse();
+  const { greenHouseId, greenHouseName, greenhouses } = useActiveGreenhouse();
+  const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
+  const selectGreenhouse = (id: string) => {
+    setMenuAnchor(null);
+    if (id !== greenHouseId) {
+      localStorage.setItem("greenHouseId", id);
+      window.location.reload();
+    }
+  };
   const { data } = useQuery(GET_ACTIVE_ALERTS_COUNT, {
     variables: {
       greenHouseId,
@@ -53,10 +65,12 @@ export function Header({ title = "Greenhouse Monitoring" }: HeaderProps) {
         sx={{ flex: 1, color: "text.primary", minWidth: 0 }}
         noWrap
       >
-        {title}
+        {title ?? t("header.defaultTitle")}
       </Typography>
 
       <LiveBadge />
+
+      <LanguageSwitcher />
 
       <ThemeToggle />
 
@@ -87,7 +101,7 @@ export function Header({ title = "Greenhouse Monitoring" }: HeaderProps) {
           variant="body2"
           sx={{ display: { xs: "none", sm: "inline" }, color: "#fff" }}
         >
-          {alertCount} Alert
+          {t("header.alerts", { count: alertCount })}
         </Typography>
         <ArrowOutwardRoundedIcon
           sx={{ fontSize: 16, display: { xs: "none", sm: "block" } }}
@@ -99,12 +113,13 @@ export function Header({ title = "Greenhouse Monitoring" }: HeaderProps) {
           variant="body2"
           sx={{ display: { xs: "none", md: "inline" }, color: "text.primary" }}
         >
-          Sector:
+          {t("header.greenhouse")}
         </Typography>
         <Chip
-          label="Spinach Garden 08"
+          label={greenHouseName || t("header.noGreenhouse")}
           deleteIcon={<KeyboardArrowDownRoundedIcon />}
-          onDelete={() => {}}
+          onClick={(event) => setMenuAnchor(event.currentTarget)}
+          onDelete={(event) => setMenuAnchor((event.currentTarget as HTMLElement).parentElement)}
           sx={{
             bgcolor: "action.hover",
             borderRadius: 2,
@@ -112,6 +127,17 @@ export function Header({ title = "Greenhouse Monitoring" }: HeaderProps) {
             "& .MuiChip-label": { fontSize: 12 },
           }}
         />
+        <Menu anchorEl={menuAnchor} open={menuAnchor !== null} onClose={() => setMenuAnchor(null)}>
+          {greenhouses.map((greenhouse) => (
+            <MenuItem
+              key={greenhouse._id}
+              selected={greenhouse._id === greenHouseId}
+              onClick={() => selectGreenhouse(greenhouse._id)}
+            >
+              {greenhouse.greenHouseName}
+            </MenuItem>
+          ))}
+        </Menu>
       </Box>
     </Box>
   );

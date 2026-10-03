@@ -20,13 +20,14 @@ import { GET_GREENHOUSE_DEVICE_OVERVIEW } from "@/modules/device/graphql/queries
 import { PlantHealthOverviewCard } from "../components/lantHealthOverviewCard";
 import { ActivityTabListItem } from "../components/ActivityTabListItem";
 import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
+import { t } from "@/i18n/core";
 
 const TABS = [
-  { key: "details", label: "Details" },
-  { key: "plant", label: "Plant" },
-  { key: "task", label: "Task" },
-  { key: "device", label: "Device" },
-  { key: "activity", label: "Activity" },
+  { key: "details", label: t("txt.details") },
+  { key: "plant", label: t("txt.plant") },
+  { key: "task", label: t("txt.task") },
+  { key: "device", label: t("txt.device") },
+  { key: "activity", label: t("txt.activity") },
 ];
 
 export function PlantHealthPage() {
@@ -84,7 +85,7 @@ export function PlantHealthPage() {
   if (!hasGreenhouse) {
     return (
       <>
-        <Header title="Plant Health & Section Monitoring" />
+        <Header title={t("txt.plant_health_section_monitoring")} />
         <Box
           sx={{
             display: "flex",
@@ -94,7 +95,7 @@ export function PlantHealthPage() {
           }}
         >
           <Typography color="text.secondary">
-            Hali greenhouse tanlanmagan
+            {t("txt.no_greenhouse_selected_yet")}
           </Typography>
         </Box>
       </>
@@ -103,7 +104,7 @@ export function PlantHealthPage() {
 
   return (
     <>
-      <Header title="Greenhouse Monitoring" />
+      <Header title={t("txt.greenhouse_monitoring")} />
 
       <Box
         sx={{
@@ -175,7 +176,7 @@ export function PlantHealthPage() {
                     py: 3,
                   }}
                 >
-                  Hali section yaratilmagan
+                  {t("txt.no_sections_yet")}
                 </Typography>
               )}
             </Box>
@@ -210,7 +211,7 @@ export function PlantHealthPage() {
                     py: 3,
                   }}
                 >
-                  Hali section yaratilmagan
+                  {t("txt.no_sections_yet")}
                 </Typography>
               )}
             </Box>
@@ -227,8 +228,7 @@ export function PlantHealthPage() {
                   fontStyle: "italic",
                 }}
               >
-                Bu vazifalar greenhouse darajasida — section bo'yicha
-                filtrlanmagan.
+                {t("txt.these_tasks_belong_to_the_whole_greenhouse_not_o")}
               </Typography>
 
               {(taskListData?.taskList?.items ?? []).map((t: any) => (
@@ -251,7 +251,7 @@ export function PlantHealthPage() {
                     py: 3,
                   }}
                 >
-                  Hali vazifa yo'q
+                  {t("txt.no_tasks_yet")}
                 </Typography>
               )}
             </Box>
@@ -268,8 +268,7 @@ export function PlantHealthPage() {
                   fontStyle: "italic",
                 }}
               >
-                Bu qurilmalar greenhouse darajasida — section bo'yicha
-                filtrlanmagan.
+                {t("txt.these_devices_belong_to_the_whole_greenhouse_not")}
               </Typography>
 
               {(deviceData?.greenhouseDeviceOverview?.devices ?? []).map(
@@ -295,7 +294,7 @@ export function PlantHealthPage() {
                     py: 3,
                   }}
                 >
-                  Hali qurilma yo'q
+                  {t("txt.no_devices_yet")}
                 </Typography>
               )}
             </Box>
@@ -312,8 +311,7 @@ export function PlantHealthPage() {
                   fontStyle: "italic",
                 }}
               >
-                Bu audit-jurnal foydalanuvchi darajasida — section bo'yicha
-                filtrlanmagan.
+                {t("txt.this_activity_log_covers_your_whole_account_not_")}
               </Typography>
 
               {(activityData?.myActionLogs?.items ?? []).map((a: any) => (
@@ -337,7 +335,7 @@ export function PlantHealthPage() {
                     py: 3,
                   }}
                 >
-                  Hali faoliyat yozuvi yo'q
+                  {t("txt.no_activity_yet")}
                 </Typography>
               )}
             </Box>

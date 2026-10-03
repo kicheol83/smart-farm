@@ -1,6 +1,8 @@
 import { Box, Card, Typography, Switch, Chip, Button } from "@mui/material";
 import WaterDropRoundedIcon from "@mui/icons-material/WaterDropRounded";
 import { formatDistanceToNow } from "date-fns";
+import { t } from "@/i18n/core";
+import { dateLocale } from "@/i18n/core";
 
 interface ZoneIrrigationCardProps {
   sectionName: string;
@@ -23,10 +25,10 @@ function moistureColor(value?: number): {
   if (value === undefined)
     return { color: "#6b6b6b", bg: "rgba(156,156,156,0.14)", label: "—" };
   if (value < 30)
-    return { color: "#c62828", bg: "rgba(229,57,53,0.14)", label: "Quruq" };
+    return { color: "#c62828", bg: "rgba(229,57,53,0.14)", label: t("txt.dry") };
   if (value < 60)
-    return { color: "#a06a0a", bg: "rgba(249,173,25,0.14)", label: "O'rtacha" };
-  return { color: "#1a7a4c", bg: "rgba(53,197,110,0.14)", label: "Nam" };
+    return { color: "#a06a0a", bg: "rgba(249,173,25,0.14)", label: t("txt.moderate") };
+  return { color: "#1a7a4c", bg: "rgba(53,197,110,0.14)", label: t("txt.moist") };
 }
 
 export function ZoneIrrigationCard({
@@ -116,10 +118,7 @@ export function ZoneIrrigationCard({
                     color: "text.secondary",
                   }}
                 >
-                  Oxirgi:{" "}
-                  {formatDistanceToNow(new Date(lastToggledAt), {
-                    addSuffix: true,
-                  })}
+                  {t("irr.last", { time: formatDistanceToNow(new Date(lastToggledAt), { addSuffix: true, locale: dateLocale() }) })}
                 </Typography>
               )}
               {isOn && autoOffAt && (
@@ -130,10 +129,7 @@ export function ZoneIrrigationCard({
                     color: "#a06a0a",
                   }}
                 >
-                  Auto-off{" "}
-                  {formatDistanceToNow(new Date(autoOffAt), {
-                    addSuffix: true,
-                  })}
+                  {t("auto.autoOff", { time: formatDistanceToNow(new Date(autoOffAt), { addSuffix: true, locale: dateLocale() }) })}
                 </Typography>
               )}
             </Box>
@@ -153,7 +149,7 @@ export function ZoneIrrigationCard({
             disabled={toggling || isOn}
             sx={{ textTransform: "none", borderRadius: 2, mb: 1.5 }}
           >
-            Water Now (5 min)
+            {t("txt.water_now_5_min")}
           </Button>
         </>
       ) : (
@@ -167,7 +163,7 @@ export function ZoneIrrigationCard({
             mb: 1.5,
           }}
         >
-          Bu zonaga sug'orish actuator'i bog'lanmagan
+          {t("txt.no_irrigation_actuator_is_linked_to_this_zone")}
         </Typography>
       )}
 
@@ -187,7 +183,7 @@ export function ZoneIrrigationCard({
             color: "text.secondary",
           }}
         >
-          Bugungi sarf
+          {t("txt.used_today")}
         </Typography>
         <Typography
           sx={{

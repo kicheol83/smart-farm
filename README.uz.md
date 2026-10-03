@@ -16,6 +16,7 @@ Maqsad — sensor → pipeline → qoida → aktuator → yana sensor zanjirini,
 - **Yopiq zanjirli sug'orish**: `SOIL_MOISTURE < 35` kabi avtomatlashtirish qoidasi nasosni yoqadi, taymer uni o'chiradi, suv sarfi esa ishlagan vaqt va oqim tezligidan avtomatik hisoblanib yoziladi
 - **O'simlik salomatligi indeksi**: har soatda avtomatik hisoblanadi — so'nggi 24 soat davomida harorat, namlik, tuproq namligi, pH, CO₂ va EC optimal diapazonda bo'lgan vaqt ulushi
 - **Tashqi ob-havo**: shamol tezligi, yo'nalishi va ob-havo holati Open-Meteo'dan olinadi va 10 daqiqa keshlanadi
+- **Ko'p tilli interfeys**: koreyscha (standart) · inglizcha · o'zbekcha, sanalar va nisbiy vaqtlar ham tanlangan tilda
 - **Hisobotlar**: section'lar bo'yicha kunlik salomatlik indeksi, tuproq namligi trendi, suv sarfi tahlili, alert'lar xulosasi
 
 ## Arxitektura

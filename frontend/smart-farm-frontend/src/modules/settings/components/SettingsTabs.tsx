@@ -1,10 +1,11 @@
 import { Tabs, Tab } from "@mui/material";
+import { t } from "@/i18n/core";
 
 const TABS = [
-  { key: "general", label: "General" },
-  { key: "units", label: "Unit customization" },
-  { key: "activity", label: "User actions log" },
-  { key: "notifications", label: "Notifications and sounds" },
+  { key: "general", label: t("txt.general") },
+  { key: "units", label: t("txt.unit_customization") },
+  { key: "activity", label: t("txt.user_actions_log") },
+  { key: "notifications", label: t("txt.notifications_and_sounds") },
 ];
 
 interface SettingsTabsProps {

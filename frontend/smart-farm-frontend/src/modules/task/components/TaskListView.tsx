@@ -8,6 +8,7 @@ import {
 } from "@mui/material";
 import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded";
 import { format, isToday, isYesterday } from "date-fns";
+import { t } from "@/i18n/core";
 
 type TaskStatus = "TODO" | "IN_PROGRESS" | "DONE";
 
@@ -28,14 +29,14 @@ const STATUS_STYLE: Record<
   TaskStatus,
   { label: string; color: string; bg: string }
 > = {
-  DONE: { label: "Done", color: "#1a7a4c", bg: "rgba(53,197,110,0.16)" },
+  DONE: { label: t("txt.done"), color: "#1a7a4c", bg: "rgba(53,197,110,0.16)" },
   IN_PROGRESS: {
-    label: "In Progress",
+    label: t("txt.in_progress"),
     color: "#1565c0",
     bg: "rgba(33,150,243,0.16)",
   },
   TODO: {
-    label: "Not Started",
+    label: t("txt.not_started"),
     color: "#6b6b6b",
     bg: "rgba(156,156,156,0.16)",
   },
@@ -52,21 +53,21 @@ export function TaskListView({ tasks, onToggleDone }: TaskListViewProps) {
     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       {todayTasks.length > 0 && (
         <TaskListGroup
-          title="Today Task List"
+          title={t("txt.today")}
           tasks={todayTasks}
           onToggleDone={onToggleDone}
         />
       )}
       {yesterdayTasks.length > 0 && (
         <TaskListGroup
-          title="Yesterday Task List"
+          title={t("txt.yesterday")}
           tasks={yesterdayTasks}
           onToggleDone={onToggleDone}
         />
       )}
       {otherTasks.length > 0 && (
         <TaskListGroup
-          title="Other Tasks"
+          title={t("txt.other_tasks")}
           tasks={otherTasks}
           onToggleDone={onToggleDone}
         />
@@ -81,7 +82,7 @@ export function TaskListView({ tasks, onToggleDone }: TaskListViewProps) {
             py: 4,
           }}
         >
-          Hali vazifa yo'q
+          {t("txt.no_tasks_yet")}
         </Typography>
       )}
     </Box>
@@ -126,7 +127,7 @@ function TaskListGroup({
           borderColor: "divider",
         }}
       >
-        {["", "Task Name", "Due Date", "Status", "Description", "Time"].map(
+        {["", t("txt.task_name"), t("txt.due_date"), t("txt.status"), t("txt.description"), t("txt.time")].map(
           (h) => (
             <Typography
               key={h}

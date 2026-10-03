@@ -16,6 +16,7 @@ The goal was to build the entire **closed loop** — sensor → pipeline → rul
 - **Closed-loop irrigation**: an automation rule such as `SOIL_MOISTURE < 35` turns the pump on, a timer turns it off, and water usage is recorded automatically from run time and flow rate
 - **Plant health index**: computed every hour as the share of the last 24 hours that temperature, humidity, soil moisture, pH, CO₂ and EC spent inside their optimal ranges
 - **Outdoor weather**: wind speed, wind direction and conditions from Open-Meteo, cached for 10 minutes
+- **Multilingual UI**: Korean (default) · English · Uzbek, with dates and relative times localized too
 - **Reports**: daily health index per section, soil moisture trends, water usage analytics, alert summaries
 
 ## Architecture

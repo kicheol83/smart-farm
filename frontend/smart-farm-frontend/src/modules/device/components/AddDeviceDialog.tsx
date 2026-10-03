@@ -8,6 +8,7 @@ import {
   TextField,
   MenuItem,
 } from "@mui/material";
+import { t } from "@/i18n/core";
 
 interface AddDeviceDialogProps {
   open: boolean;
@@ -47,13 +48,13 @@ export function AddDeviceDialog({
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ fontFamily: "Satoshi, sans-serif", fontWeight: 700 }}>
-        Add Device
+        {t("txt.add_device")}
       </DialogTitle>
       <DialogContent
         sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 1 }}
       >
         <TextField
-          label="Device Name"
+          label={t("txt.device_name")}
           fullWidth
           size="small"
           value={deviceName}
@@ -61,7 +62,7 @@ export function AddDeviceDialog({
         />
         <TextField
           select
-          label="Device Type"
+          label={t("txt.device_type")}
           fullWidth
           size="small"
           value={deviceType}
@@ -74,7 +75,7 @@ export function AddDeviceDialog({
           ))}
         </TextField>
         <TextField
-          label="Installed Date"
+          label={t("txt.installed_date")}
           type="date"
           fullWidth
           size="small"
@@ -85,7 +86,7 @@ export function AddDeviceDialog({
       </DialogContent>
       <DialogActions sx={{ p: 2 }}>
         <Button onClick={onClose} sx={{ textTransform: "none" }}>
-          Cancel
+          {t("txt.cancel")}
         </Button>
         <Button
           onClick={handleSubmit}
@@ -93,7 +94,7 @@ export function AddDeviceDialog({
           disabled={!deviceName || !installedAt}
           sx={{ textTransform: "none" }}
         >
-          Add
+          {t("txt.add")}
         </Button>
       </DialogActions>
     </Dialog>

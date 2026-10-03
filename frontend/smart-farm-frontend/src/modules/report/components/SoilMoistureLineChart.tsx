@@ -2,6 +2,7 @@ import { Box, Card, Typography, Switch } from "@mui/material";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { format } from "date-fns";
 import { useState } from "react";
+import { t } from "@/i18n/core";
 
 interface SoilMoisturePoint {
   recordedAt: string;
@@ -18,7 +19,7 @@ export function SoilMoistureLineChart({ points }: SoilMoistureLineChartProps) {
   const dates = points.map((p) => format(new Date(p.recordedAt), "d MMM"));
   const values = points.map((p) => p.value);
   const lowThreshold = points.map(() => 35);
-  const highThreshold = points.map(() => 65);
+  const highThreshold = points.map(() => 70);
 
   return (
     <Card
@@ -41,7 +42,7 @@ export function SoilMoistureLineChart({ points }: SoilMoistureLineChartProps) {
             color: "text.primary",
           }}
         >
-          Soil Moisture
+          {t("txt.soil_moisture_0a4c")}
         </Typography>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
           <Typography
@@ -51,7 +52,7 @@ export function SoilMoistureLineChart({ points }: SoilMoistureLineChartProps) {
               color: "text.secondary",
             }}
           >
-            Show Threshold Line
+            {t("txt.show_threshold_line")}
           </Typography>
           <Switch
             checked={showThreshold}
@@ -67,7 +68,7 @@ export function SoilMoistureLineChart({ points }: SoilMoistureLineChartProps) {
           series={[
             {
               data: values,
-              label: "Soil Moisture %",
+              label: t("txt.soil_moisture"),
               color: "#35C56E",
               area: true,
               showMark: false,
@@ -76,14 +77,14 @@ export function SoilMoistureLineChart({ points }: SoilMoistureLineChartProps) {
               ? [
                   {
                     data: lowThreshold,
-                    label: "Low Threshold (35%)",
+                    label: t("txt.low_threshold_35"),
                     color: "#9c9c9c",
                     showMark: false,
                     curve: "linear" as const,
                   },
                   {
                     data: highThreshold,
-                    label: "High Threshold (65%)",
+                    label: t("txt.high_threshold_70"),
                     color: "#f9ad19",
                     showMark: false,
                     curve: "linear" as const,
@@ -104,7 +105,7 @@ export function SoilMoistureLineChart({ points }: SoilMoistureLineChartProps) {
             justifyContent: "center",
           }}
         >
-          <Typography color="text.secondary">Ma'lumot yo'q</Typography>
+          <Typography color="text.secondary">{t("txt.no_data")}</Typography>
         </Box>
       )}
     </Card>

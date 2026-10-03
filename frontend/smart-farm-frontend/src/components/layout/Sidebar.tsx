@@ -22,20 +22,21 @@ import { GRADIENT_DARK, GRADIENT_DARK_MODE } from "@/theme/theme";
 import { Logo } from "@/components/icons/Logo";
 import { useAuthStore } from "@/modules/auth/auth.store";
 import { FEATURES } from "@/lib/features";
+import { t } from "@/i18n/core";
 
 const NAV_ITEMS = [
-  { to: "/dashboard", icon: HomeRoundedIcon, label: "Home" },
-  { to: "/devices", icon: DesktopWindowsRoundedIcon, label: "Device" },
-  { to: "/pipeline", icon: AccountTreeRoundedIcon, label: "Pipeline" },
-  { to: "/automation", icon: BoltRoundedIcon, label: "Automation" },
-  { to: "/irrigation", icon: InvertColorsRoundedIcon, label: "Irrigation" },
-  { to: "/report", icon: PieChartRoundedIcon, label: "Report" },
-  ...(FEATURES.ndviMap ? [{ to: "/map-area", icon: MapRoundedIcon, label: "Map" }] : []),
+  { to: "/dashboard", icon: HomeRoundedIcon, label: "nav.home" },
+  { to: "/devices", icon: DesktopWindowsRoundedIcon, label: "nav.device" },
+  { to: "/pipeline", icon: AccountTreeRoundedIcon, label: "nav.pipeline" },
+  { to: "/automation", icon: BoltRoundedIcon, label: "nav.automation" },
+  { to: "/irrigation", icon: InvertColorsRoundedIcon, label: "nav.irrigation" },
+  { to: "/report", icon: PieChartRoundedIcon, label: "nav.report" },
+  ...(FEATURES.ndviMap ? [{ to: "/map-area", icon: MapRoundedIcon, label: "nav.map" }] : []),
 ];
 
 const BOTTOM_ITEMS = [
-  { to: "/settings", icon: SettingsRoundedIcon, label: "Settings" },
-  { to: "/profile", icon: PersonRoundedIcon, label: "Profile" },
+  { to: "/settings", icon: SettingsRoundedIcon, label: "nav.settings" },
+  { to: "/profile", icon: PersonRoundedIcon, label: "nav.profile" },
 ];
 
 export function Sidebar() {
@@ -50,7 +51,7 @@ export function Sidebar() {
   const bottomItems = isAdmin
     ? [
         ...BOTTOM_ITEMS,
-        { to: "/admin", icon: AdminPanelSettingsRoundedIcon, label: "Admin" },
+        { to: "/admin", icon: AdminPanelSettingsRoundedIcon, label: "nav.admin" },
       ]
     : BOTTOM_ITEMS;
 
@@ -78,7 +79,7 @@ export function Sidebar() {
         {allItems.map(({ to, icon: Icon, label }) => (
           <BottomNavigationAction
             key={to}
-            label={label}
+            label={t(label)}
             icon={<Icon fontSize="small" />}
           />
         ))}

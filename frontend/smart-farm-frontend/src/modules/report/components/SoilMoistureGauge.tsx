@@ -1,4 +1,5 @@
 import { Box, Card, Typography } from "@mui/material";
+import { t } from "@/i18n/core";
 
 interface SoilMoistureGaugeProps {
   current?: number;
@@ -34,7 +35,7 @@ export function SoilMoistureGauge({ current }: SoilMoistureGaugeProps) {
           mb: 2,
         }}
       >
-        Soil Moisture Performance
+        {t("txt.soil_moisture_performance")}
       </Typography>
 
       <Box sx={{ display: "flex", justifyContent: "center" }}>
@@ -83,7 +84,7 @@ export function SoilMoistureGauge({ current }: SoilMoistureGaugeProps) {
             fill="#a4a4a4"
             fontFamily="Inter, sans-serif"
           >
-            Current Moisture
+            {t("txt.current_moisture")}
           </text>
           <text
             x={cx}
@@ -100,9 +101,9 @@ export function SoilMoistureGauge({ current }: SoilMoistureGaugeProps) {
       </Box>
 
       <Box sx={{ display: "flex", justifyContent: "space-around", mt: 2 }}>
-        <LegendItem color="#a8c5e8" label="Low Moist" range="< 40%" />
-        <LegendItem color="#5b93d1" label="Optimal Moist" range="40 - 70%" />
-        <LegendItem color="#f2c572" label="High Moist" range="> 70%" />
+        <LegendItem color="#a8c5e8" label={t("txt.low")} range="< 40%" />
+        <LegendItem color="#5b93d1" label={t("txt.optimal")} range="40 - 70%" />
+        <LegendItem color="#f2c572" label={t("txt.high")} range="> 70%" />
       </Box>
     </Card>
   );

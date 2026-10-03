@@ -1,17 +1,18 @@
 import { Box, Typography } from "@mui/material";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import RadioButtonUncheckedRoundedIcon from "@mui/icons-material/RadioButtonUncheckedRounded";
+import { t } from "@/i18n/core";
 
 interface PasswordRequirementsListProps {
   password: string;
 }
 
 const RULES = [
-  { label: "At least 8 characters", test: (p: string) => p.length >= 8 },
-  { label: "One uppercase letter", test: (p: string) => /[A-Z]/.test(p) },
-  { label: "One number", test: (p: string) => /[0-9]/.test(p) },
+  { label: t("txt.at_least_8_characters"), test: (p: string) => p.length >= 8 },
+  { label: t("txt.one_uppercase_letter"), test: (p: string) => /[A-Z]/.test(p) },
+  { label: t("txt.one_number"), test: (p: string) => /[0-9]/.test(p) },
   {
-    label: "One special character (!@#$*)",
+    label: t("txt.one_special_character"),
     test: (p: string) => /[!@#$%^&*()_\-+=\[\]{};:'",.<>/?]/.test(p),
   },
 ];

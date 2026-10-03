@@ -9,6 +9,8 @@ import SpaRoundedIcon from "@mui/icons-material/SpaRounded";
 import MemoryRoundedIcon from "@mui/icons-material/MemoryRounded";
 import type { SvgIconComponent } from "@mui/icons-material";
 import { format } from "date-fns";
+import { t } from "@/i18n/core";
+import { dateLocale } from "@/i18n/core";
 
 type Severity = "INFO" | "WARNING" | "CRITICAL";
 type ActualValue = "LOW" | "NORMAL" | "HIGH";
@@ -25,20 +27,20 @@ const VALUE_STYLE: Record<
   ActualValue,
   { label: string; color: string; bg: string }
 > = {
-  NORMAL: { label: "Normal", color: "#1a7a4c", bg: "rgba(53,197,110,0.14)" },
-  LOW: { label: "Low", color: "#a06a0a", bg: "rgba(249,173,25,0.14)" },
-  HIGH: { label: "High", color: "#c62828", bg: "rgba(229,57,53,0.14)" },
+  NORMAL: { label: t("txt.normal"), color: "#1a7a4c", bg: "rgba(53,197,110,0.14)" },
+  LOW: { label: t("txt.low"), color: "#a06a0a", bg: "rgba(249,173,25,0.14)" },
+  HIGH: { label: t("txt.high"), color: "#c62828", bg: "rgba(229,57,53,0.14)" },
 };
 
 const ACTION_HINT: Record<string, string> = {
-  TEMPERATURE: "Check ventilation and cooling system",
-  HUMIDITY: "Check humidity control system",
-  PH: "Adjust soil pH with compost or amendments",
-  CO2: "Check ventilation system",
-  SOIL_MOISTURE: "Check irrigation schedule",
-  LIGHT: "Check lighting system",
-  PLANT_HEALTH: "Inspect section and check for pest/disease signs",
-  SYSTEM_SENSOR: "Check device power and connectivity",
+  TEMPERATURE: t("txt.check_ventilation_and_cooling_system"),
+  HUMIDITY: t("txt.check_humidity_control_system"),
+  PH: t("txt.adjust_soil_ph_with_compost_or_amendments"),
+  CO2: t("txt.check_ventilation_system"),
+  SOIL_MOISTURE: t("txt.check_irrigation_schedule"),
+  LIGHT: t("txt.check_lighting_system"),
+  PLANT_HEALTH: t("txt.inspect_section_and_check_for_pest_disease_signs"),
+  SYSTEM_SENSOR: t("txt.check_device_power_and_connectivity"),
 };
 
 const TYPE_ICON: Record<string, SvgIconComponent> = {
@@ -117,7 +119,7 @@ export function AlertCard({
         }}
       >
         Threshold: {alertsThreshold} &nbsp;•&nbsp;{" "}
-        {format(new Date(createdAt), "MMM dd, HH:mm")}
+        {format(new Date(createdAt), "PPp", { locale: dateLocale() })}
       </Typography>
 
       {ACTION_HINT[alertsType] && (

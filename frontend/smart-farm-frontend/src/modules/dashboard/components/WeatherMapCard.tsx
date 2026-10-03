@@ -3,6 +3,7 @@ import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import WbSunnyRoundedIcon from "@mui/icons-material/WbSunnyRounded";
 import CloudRoundedIcon from "@mui/icons-material/CloudRounded";
 import { format } from "date-fns";
+import { dateLocale, t } from "@/i18n/core";
 
 interface WeatherMapCardProps {
   location?: string;
@@ -117,7 +118,7 @@ export function WeatherMapCard({
             color: "text.secondary",
           }}
         >
-          {format(now, "EEE, dd MMMM yyyy")}&nbsp;&nbsp;{format(now, "hh:mm a")}
+          {format(now, "PPPP", { locale: dateLocale() })}&nbsp;&nbsp;{format(now, "p", { locale: dateLocale() })}
         </Typography>
       </Box>
 
@@ -227,7 +228,7 @@ export function WeatherMapCard({
                 color: "text.secondary",
               }}
             >
-              Area
+              {t("dash.weather.area")}
             </Typography>
             <Typography
               sx={{

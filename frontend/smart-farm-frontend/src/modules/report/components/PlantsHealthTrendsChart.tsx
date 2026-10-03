@@ -2,6 +2,7 @@ import { Box, Card, Typography, IconButton } from "@mui/material";
 import MoreHorizRoundedIcon from "@mui/icons-material/MoreHorizRounded";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { format } from "date-fns";
+import { t } from "@/i18n/core";
 
 interface TrendPoint {
   date: string;
@@ -41,7 +42,7 @@ export function PlantsHealthTrendsChart({
             color: "text.primary",
           }}
         >
-          Plants Health Trends
+          {t("txt.plants_health_trends")}
         </Typography>
         <IconButton size="small">
           <MoreHorizRoundedIcon fontSize="small" />
@@ -54,14 +55,14 @@ export function PlantsHealthTrendsChart({
           series={[
             {
               data: healthValues,
-              label: "Health Index",
+              label: t("txt.health_index"),
               color: "#35C56E",
               area: true,
               showMark: false,
             },
             {
               data: plantValues,
-              label: "Plant Value",
+              label: t("txt.plant_value"),
               color: "#f9ad19",
               area: true,
               showMark: false,
@@ -80,7 +81,7 @@ export function PlantsHealthTrendsChart({
             justifyContent: "center",
           }}
         >
-          <Typography color="text.secondary">Ma'lumot yo'q</Typography>
+          <Typography color="text.secondary">{t("txt.no_data")}</Typography>
         </Box>
       )}
     </Card>

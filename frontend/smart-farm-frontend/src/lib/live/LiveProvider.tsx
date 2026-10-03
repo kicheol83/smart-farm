@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { Alert, Snackbar } from "@mui/material";
 import { connectSocket, disconnectSocket, getSocket } from "@/lib/socket";
 import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
+import { t } from "@/i18n/core";
 
 export type LiveReading = {
   value: number;
@@ -124,19 +125,19 @@ export function LiveProvider({ children }: { children: ReactNode }) {
       const notice: Notice = {
         key: `${event.timestamp}-${event.alertType}`,
         severity: SEVERITY[event.severity] ?? "warning",
-        title: `${event.type === "ANOMALY" ? "Anomaly" : "Alert"} · ${event.alertType}`,
+        title: event.type === "ANOMALY" ? t("live.toast.anomaly", { type: event.alertType }) : t("live.toast.alert", { type: event.alertType }),
         body: `${event.message} (${event.currentValue})`,
       };
       setNotices((previous) => [...previous.slice(-4), notice]);
     };
     const onActuatorUpdate = (event: ActuatorEvent) => {
       setActuatorEvents((previous) => [event, ...previous].slice(0, 20));
-      const water = event.waterAmount ? ` · ${event.waterAmount} L used` : "";
+      const water = event.waterAmount ? t("live.toast.water", { amount: event.waterAmount }) : "";
       const notice: Notice = {
         key: `${event.timestamp}-${event.actuatorId}`,
         severity: event.status === "ON" ? "info" : "success",
         title: `${event.actuatorName} → ${event.status}`,
-        body: `${event.reason ?? "Manual control"}${water}`,
+        body: `${event.reason ?? t("live.toast.manual")}${water}`,
       };
       setNotices((previous) => [...previous.slice(-4), notice]);
     };

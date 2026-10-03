@@ -14,6 +14,8 @@ import {
   GET_WATER_ZONE_USAGE_REPORT,
 } from "../graphql/queries";
 import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
+import { t } from "@/i18n/core";
+import { dateLocale } from "@/i18n/core";
 
 export function WaterUsageAnalyticsPage() {
   const { greenHouseId } = useActiveGreenhouse();
@@ -54,12 +56,12 @@ export function WaterUsageAnalyticsPage() {
   const anomaly = anomalyData?.waterAnomalyDetection;
   const cost = costData?.waterCostEstimation;
   const zones = zoneData?.waterZoneUsageReport?.zones ?? [];
-  const lastUpdated = waterUsage ? "Today" : undefined;
+  const lastUpdated = waterUsage ? t("txt.today") : undefined;
 
   if (!hasGreenhouse) {
     return (
       <>
-        <Header title="Water Usage Analytics" />
+        <Header title={t("txt.water_usage_analytics")} />
         <Box
           sx={{
             display: "flex",
@@ -69,7 +71,7 @@ export function WaterUsageAnalyticsPage() {
           }}
         >
           <Typography color="text.secondary">
-            Hali greenhouse tanlanmagan
+            {t("txt.no_greenhouse_selected_yet")}
           </Typography>
         </Box>
       </>
@@ -78,39 +80,39 @@ export function WaterUsageAnalyticsPage() {
 
   return (
     <>
-      <Header title="Water Usage Analytics" />
+      <Header title={t("txt.water_usage_analytics")} />
 
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, mb: 2 }}>
         <WaterUsageMetricCard
-          label="Total Water Consumed"
+          label={t("txt.total_water_consumed")}
           value={waterUsage ? waterUsage.totalUsage.toFixed(0) : "--"}
-          unit="L/day"
-          description="Shows the total volume of water used across all irrigation zones within the selected time."
+          unit={t("txt.l_day")}
+          description={t("txt.total_volume_of_water_used_across_all_irrigation")}
           lastUpdated={lastUpdated}
         />
         <WaterUsageMetricCard
-          label="Water Efficiency Score"
+          label={t("txt.water_efficiency_score")}
           value={efficiency ? String(efficiency.efficiencyScore) : "--"}
           unit="/100"
-          description="Measures water usage efficiency based on liters delivered per minute of irrigation."
+          description={t("txt.efficiency_based_on_liters_delivered_per_minute_")}
           lastUpdated={lastUpdated}
         />
         <WaterUsageMetricCard
-          label="Average Water per Plant"
+          label={t("txt.average_water_per_day")}
           value={efficiency ? efficiency.averageWaterPerPlant.toFixed(2) : "--"}
-          unit="L/day"
-          description="Shows the average volume of water received by each plant daily."
+          unit={t("txt.l_day")}
+          description={t("txt.shows_the_average_volume_of_water_used_per_day")}
           lastUpdated={lastUpdated}
         />
         <WaterUsageMetricCard
-          label="Irrigation Duration"
+          label={t("txt.irrigation_duration")}
           value={
             efficiency
               ? String(Math.round(efficiency.irrigationDurationMinutes))
               : "--"
           }
-          unit="min/day"
-          description="Displays total irrigation duration over the last 24 hours for improved monitoring."
+          unit={t("txt.min_day")}
+          description={t("txt.total_irrigation_time_per_day")}
           lastUpdated={lastUpdated}
         />
       </Box>
@@ -149,7 +151,7 @@ export function WaterUsageAnalyticsPage() {
                   mb: 1,
                 }}
               >
-                Anomaly Detection
+                {t("txt.anomaly_detection")}
               </Typography>
               <Box
                 sx={{
@@ -176,7 +178,7 @@ export function WaterUsageAnalyticsPage() {
                     color: "text.secondary",
                   }}
                 >
-                  anomaly
+                  {t("txt.anomaly")}
                 </Typography>
               </Box>
 
@@ -199,7 +201,7 @@ export function WaterUsageAnalyticsPage() {
                         color: "text.secondary",
                       }}
                     >
-                      Alert Threshold
+                      {t("txt.alert_threshold")}
                     </Typography>
                     <Typography
                       sx={{
@@ -221,7 +223,7 @@ export function WaterUsageAnalyticsPage() {
                         color: "text.secondary",
                       }}
                     >
-                      Last Scan
+                      {t("txt.last_scan")}
                     </Typography>
                     <Typography
                       sx={{
@@ -230,7 +232,7 @@ export function WaterUsageAnalyticsPage() {
                         color: "text.primary",
                       }}
                     >
-                      {format(new Date(anomaly.lastScan), "MMM dd, HH:mm")}
+                      {format(new Date(anomaly.lastScan), "PPp", { locale: dateLocale() })}
                     </Typography>
                   </Box>
                 </Box>
@@ -243,8 +245,7 @@ export function WaterUsageAnalyticsPage() {
                   color: "text.secondary",
                 }}
               >
-                Detects irregular water usage patterns such as sudden spikes and
-                potential leaks
+                {t("txt.detects_irregular_water_usage_such_as_sudden_spi")}
               </Typography>
             </Card>
 
@@ -261,7 +262,7 @@ export function WaterUsageAnalyticsPage() {
                   mb: 1,
                 }}
               >
-                Cost Estimation
+                {t("txt.cost_estimation")}
               </Typography>
               <Box
                 sx={{
@@ -311,7 +312,7 @@ export function WaterUsageAnalyticsPage() {
                         color: "text.secondary",
                       }}
                     >
-                      Trend
+                      {t("txt.trend")}
                     </Typography>
                     <Typography
                       sx={{
@@ -334,7 +335,7 @@ export function WaterUsageAnalyticsPage() {
                         color: "text.secondary",
                       }}
                     >
-                      Status
+                      {t("txt.status")}
                     </Typography>
                     <Typography
                       sx={{
@@ -356,8 +357,7 @@ export function WaterUsageAnalyticsPage() {
                   color: "text.secondary",
                 }}
               >
-                Helps track operational expenses accurately, providing insights
-                for budgeting and planning.
+                {t("txt.tracks_operating_costs_to_help_with_budgeting_an")}
               </Typography>
             </Card>
           </Box>
@@ -383,7 +383,7 @@ export function WaterUsageAnalyticsPage() {
                 color: "text.primary",
               }}
             >
-              Water Usage Report
+              {t("txt.water_usage_report")}
             </Typography>
             <IconButton size="small">
               <MoreVertRoundedIcon fontSize="small" />
@@ -429,8 +429,7 @@ export function WaterUsageAnalyticsPage() {
                   py: 3,
                 }}
               >
-                Zona darajasidagi yozuv yo'q — WaterUsage yaratishda "sectionId"
-                ko'rsatilmagan.
+                {t("txt.no_per_zone_water_records_yet")}
               </Typography>
             )}
           </Box>

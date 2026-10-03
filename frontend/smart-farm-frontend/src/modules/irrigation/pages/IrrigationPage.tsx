@@ -10,6 +10,7 @@ import {
 } from "@/modules/automation/graphql/queries";
 import { GET_WATER_ZONE_USAGE_REPORT } from "@/modules/report/graphql/queries";
 import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
+import { t } from "@/i18n/core";
 
 const IRRIGATION_ACTUATOR_TYPES = ["WATER_PUMP", "SOLENOID_VALVE"];
 
@@ -85,7 +86,7 @@ export function IrrigationPage() {
   if (!hasGreenhouse) {
     return (
       <>
-        <Header title="Irrigation" />
+        <Header title={t("txt.irrigation")} />
         <Box
           sx={{
             display: "flex",
@@ -95,7 +96,7 @@ export function IrrigationPage() {
           }}
         >
           <Typography color="text.secondary">
-            Hali greenhouse tanlanmagan
+            {t("txt.no_greenhouse_selected_yet")}
           </Typography>
         </Box>
       </>
@@ -104,7 +105,7 @@ export function IrrigationPage() {
 
   return (
     <>
-      <Header title="Irrigation" />
+      <Header title={t("txt.irrigation")} />
 
       <Typography
         sx={{
@@ -122,7 +123,7 @@ export function IrrigationPage() {
           sx={{ color: "primary.main", cursor: "pointer" }}
           onClick={() => (window.location.href = "/automation")}
         >
-          Automation
+          {t("txt.automation")}
         </Box>{" "}
         sahifasiga o'ting.
       </Typography>
@@ -174,7 +175,7 @@ export function IrrigationPage() {
             py: 6,
           }}
         >
-          Hali section (zona) yaratilmagan.
+          {t("txt.no_sections_zones_yet")}
         </Typography>
       )}
 
@@ -189,7 +190,7 @@ export function IrrigationPage() {
               mb: 1,
             }}
           >
-            Umumiy sug'orish qurilmalari
+            {t("txt.shared_irrigation_devices")}
           </Typography>
           <Typography
             sx={{
@@ -199,8 +200,7 @@ export function IrrigationPage() {
               mb: 1.5,
             }}
           >
-            Bu qurilmalar hech qanday zonaga bog'lanmagan (masalan bosh nasos) —
-            boshqarish uchun Automation sahifasiga o'ting.
+            {t("txt.these_devices_are_not_linked_to_a_zone_for_examp")}
           </Typography>
           <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
             {unassignedActuators.map((a: any) => (

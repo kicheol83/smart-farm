@@ -18,6 +18,7 @@ import { ChangePasswordDialog } from "../components/ChangePasswordDialog";
 import { DeleteAccountDialog } from "../components/DeleteAccountDialog";
 import { LogoutConfirmDialog } from "../components/LogoutConfirmDialog";
 import { UPLOAD_AVATAR_MUTATION } from "../graphql/queries";
+import { t } from "@/i18n/core";
 
 export function ProfilePage() {
   const user = useAuthStore((s) => s.user);
@@ -57,9 +58,9 @@ export function ProfilePage() {
     try {
       const { data } = await uploadAvatar({ variables: { file } });
       setAvatarUrl(data.uploadAvatar.url);
-      setToast("Avatar updated!");
+      setToast(t("txt.avatar_updated"));
     } catch (err: any) {
-      setToast(err.message ?? "Avatar yuklashda xatolik");
+      setToast(err.message ?? t("txt.avatar_upload_failed"));
     }
   }
 
@@ -67,11 +68,11 @@ export function ProfilePage() {
     if (user && accessToken) {
       setAuth({ ...user, memberEmail: newEmail }, accessToken);
     }
-    setToast("Email updated!");
+    setToast(t("txt.email_updated"));
   }
 
   function handlePasswordChanged() {
-    setToast("Password changed!");
+    setToast(t("txt.password_changed"));
   }
 
   function handleAccountDeleted() {
@@ -86,7 +87,7 @@ export function ProfilePage() {
 
   return (
     <>
-      <Header title="Account Settings" />
+      <Header title={t("txt.account_settings")} />
 
       <Box
         sx={{
@@ -125,7 +126,7 @@ export function ProfilePage() {
                   onClick={() => fileInputRef.current?.click()}
                   sx={{ textTransform: "none", borderRadius: 2 }}
                 >
-                  {uploading ? "Uploading..." : "Change Image +"}
+                  {uploading ? t("txt.uploading") : t("txt.change_image")}
                 </Button>
                 <Button
                   variant="outlined"
@@ -133,7 +134,7 @@ export function ProfilePage() {
                   onClick={() => setAvatarUrl("")}
                   sx={{ textTransform: "none", borderRadius: 2 }}
                 >
-                  Remove Image
+                  {t("txt.remove_image")}
                 </Button>
               </Box>
               <Typography
@@ -144,12 +145,12 @@ export function ProfilePage() {
                   mt: 0.5,
                 }}
               >
-                We support PNGs, JPEGs and GIFs under 2MB
+                {t("txt.we_support_pngs_jpegs_and_gifs_under_2mb")}
               </Typography>
             </Box>
           </Box>
 
-          <Field label="First Name" note="Backend'da hali saqlanmaydi">
+          <Field label={t("txt.first_name")} note={t("txt.coming_soon")}>
             <TextField
               fullWidth
               size="small"
@@ -157,7 +158,7 @@ export function ProfilePage() {
               onChange={(e) => setFirstName(e.target.value)}
             />
           </Field>
-          <Field label="Last Name" note="Backend'da hali saqlanmaydi">
+          <Field label={t("txt.last_name")} note={t("txt.coming_soon")}>
             <TextField
               fullWidth
               size="small"
@@ -165,7 +166,7 @@ export function ProfilePage() {
               onChange={(e) => setLastName(e.target.value)}
             />
           </Field>
-          <Field label="Phone Number" note="Backend'da hali saqlanmaydi">
+          <Field label={t("txt.phone_number")} note={t("txt.coming_soon")}>
             <TextField
               fullWidth
               size="small"
@@ -174,7 +175,7 @@ export function ProfilePage() {
               placeholder="+998901234567"
             />
           </Field>
-          <Field label="Location" note="Backend'da hali saqlanmaydi">
+          <Field label={t("txt.location")} note={t("txt.coming_soon")}>
             <TextField
               fullWidth
               multiline
@@ -190,7 +191,7 @@ export function ProfilePage() {
               variant="contained"
               sx={{ textTransform: "none", borderRadius: 2 }}
             >
-              Save
+              {t("txt.save")}
             </Button>
           </Box>
         </Card>
@@ -216,42 +217,42 @@ export function ProfilePage() {
                 color: "text.primary",
               }}
             >
-              Account Security
+              {t("txt.account_security")}
             </Typography>
 
             <SecurityRow
-              label="Email"
+              label={t("txt.email")}
               value={user?.memberEmail}
-              actionLabel="Change Email"
+              actionLabel={t("txt.change_email")}
               onAction={() => setEmailDialogOpen(true)}
             />
             <SecurityRow
-              label="Password"
-              description="Set a unique password to protect your account."
-              actionLabel="Change Password"
+              label={t("txt.password")}
+              description={t("txt.set_a_unique_password_to_protect_your_account")}
+              actionLabel={t("txt.change_password")}
               onAction={() => setPasswordDialogOpen(true)}
             />
 
             <ToggleRow
-              label="2-Step Verifications"
-              description="Add an additional layer of security to your account during login for enhanced protection."
+              label={t("txt.2_step_verification")}
+              description={t("txt.add_an_extra_layer_of_security_when_you_log_in")}
               checked={twoStep}
               onChange={() => setTwoStep((v) => !v)}
-              note="Backend'da hali mavjud emas"
+              note={t("txt.coming_soon")}
             />
             <ToggleRow
-              label="Login Alert Notification"
-              description="Get notified when a new device or browser is used to log in to your account."
+              label={t("txt.login_alert_notification")}
+              description={t("txt.get_notified_when_a_new_device_or_browser_logs_i")}
               checked={loginAlert}
               onChange={() => setLoginAlert((v) => !v)}
-              note="Backend'da hali mavjud emas"
+              note={t("txt.coming_soon")}
             />
             <ToggleRow
-              label="Email Notification"
-              description="Stay informed via email whenever your account is accessed from a new device or browser."
+              label={t("txt.email_notification")}
+              description={t("txt.get_an_email_whenever_your_account_is_accessed_f")}
               checked={emailNotif}
               onChange={() => setEmailNotif((v) => !v)}
-              note="Settings > Notifications'dagi bilan bir xil maydon emas — bu joyi placeholder"
+              note={t("txt.coming_soon")}
             />
           </Card>
 
@@ -274,20 +275,20 @@ export function ProfilePage() {
                 color: "text.primary",
               }}
             >
-              Support Access
+              {t("txt.support_access")}
             </Typography>
 
             <SecurityRow
-              label="Log out account"
-              description="Sign out from your account."
-              actionLabel="Log out"
+              label={t("txt.log_out")}
+              description={t("txt.sign_out_from_your_account")}
+              actionLabel={t("txt.log_out")}
               onAction={() => setLogoutDialogOpen(true)}
             />
             <SecurityRow
-              label="Delete my account"
+              label={t("txt.delete_my_account")}
               labelColor="error.main"
-              description="Permanently delete your account and all data."
-              actionLabel="Delete"
+              description={t("txt.permanently_delete_your_account_and_all_data")}
+              actionLabel={t("txt.delete")}
               onAction={() => setDeleteDialogOpen(true)}
             />
           </Card>

@@ -2,6 +2,7 @@ import { useQuery } from "@apollo/client";
 import { Box, Chip, Paper, Typography } from "@mui/material";
 import { GET_ACTUATORS_BY_GREENHOUSE } from "@/modules/automation/graphql/queries";
 import { useLive } from "@/lib/live/LiveProvider";
+import { locale, t } from "@/i18n/core";
 
 type Actuator = {
   _id: string;
@@ -30,16 +31,16 @@ export function ClosedLoopCard({ greenHouseId }: { greenHouseId: string }) {
     <Paper sx={{ p: 2.5, borderRadius: 3 }} elevation={0}>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 1, mb: 1.5 }}>
         <Typography variant="h6" sx={{ fontWeight: 700 }}>
-          Closed loop · sensor → rule → actuator
+          {t("pipe.loop.title")}
         </Typography>
         <Typography variant="caption" color="text.secondary">
-          Soil moisture now: {soil !== undefined ? `${soil}%` : "—"}
+          {t("pipe.loop.soilNow", { value: soil !== undefined ? `${soil}%` : "—" })}
         </Typography>
       </Box>
 
       <Box sx={{ display: "flex", gap: 1.5, flexWrap: "wrap", mb: 2 }}>
         {actuators.length === 0 && (
-          <Typography color="text.secondary">No actuators configured for this greenhouse.</Typography>
+          <Typography color="text.secondary">{t("pipe.loop.noActuators")}</Typography>
         )}
         {actuators.map((actuator) => {
           const status = latestStatus.get(actuator._id) ?? actuator.actuatorStatus;
@@ -61,11 +62,11 @@ export function ClosedLoopCard({ greenHouseId }: { greenHouseId: string }) {
       </Box>
 
       <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5 }}>
-        Automation events (this session)
+        {t("pipe.loop.events")}
       </Typography>
       {actuatorEvents.length === 0 && (
         <Typography variant="body2" color="text.secondary">
-          Waiting for an automation rule to fire…
+          {t("pipe.loop.waiting")}
         </Typography>
       )}
       {actuatorEvents.map((event) => (
@@ -78,11 +79,11 @@ export function ClosedLoopCard({ greenHouseId }: { greenHouseId: string }) {
             {event.actuatorName}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ flex: 1 }}>
-            {event.reason ?? "Manual control"}
-            {event.waterAmount ? ` · ${event.waterAmount} L recorded` : ""}
+            {event.reason ?? t("live.toast.manual")}
+            {event.waterAmount ? t("pipe.loop.recorded", { amount: event.waterAmount }) : ""}
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            {new Date(event.timestamp).toLocaleTimeString()}
+            {new Date(event.timestamp).toLocaleTimeString(locale())}
           </Typography>
         </Box>
       ))}

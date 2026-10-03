@@ -1,5 +1,7 @@
 import { Box, Typography, Chip } from "@mui/material";
 import { format } from "date-fns";
+import { t } from "@/i18n/core";
+import { dateLocale } from "@/i18n/core";
 
 type TaskStatus = "TODO" | "IN_PROGRESS" | "DONE";
 
@@ -15,19 +17,19 @@ const STATUS_STYLE: Record<
   { label: string; color: string; bg: string; progress: number }
 > = {
   DONE: {
-    label: "Done",
+    label: t("txt.done"),
     color: "#1a7a4c",
     bg: "rgba(53,197,110,0.16)",
     progress: 100,
   },
   IN_PROGRESS: {
-    label: "In Progress",
+    label: t("txt.in_progress"),
     color: "#1565c0",
     bg: "rgba(33,150,243,0.16)",
     progress: 50,
   },
   TODO: {
-    label: "Not Started",
+    label: t("txt.not_started"),
     color: "#6b6b6b",
     bg: "rgba(156,156,156,0.16)",
     progress: 0,
@@ -76,11 +78,11 @@ export function TaskTabListItem({
       </Box>
 
       <FieldRow
-        label="Last Updated"
-        value={format(new Date(updatedAt), "MMM dd, hh:mm a")}
+        label={t("txt.last_updated")}
+        value={format(new Date(updatedAt), "PPp", { locale: dateLocale() })}
       />
-      <FieldRow label="Progress" value={`${style.progress}%`} />
-      <FieldRow label="Summary" value={taskDescription} />
+      <FieldRow label={t("txt.progress")} value={`${style.progress}%`} />
+      <FieldRow label={t("txt.summary")} value={taskDescription} />
     </Box>
   );
 }

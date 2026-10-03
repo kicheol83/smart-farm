@@ -1,5 +1,7 @@
 import { Box, Typography, Chip } from "@mui/material";
 import { format } from "date-fns";
+import { t } from "@/i18n/core";
+import { dateLocale } from "@/i18n/core";
 
 interface SystemAlert {
   alertId: string;
@@ -61,7 +63,7 @@ export function SystemAlertsList({ alerts }: SystemAlertsListProps) {
                 }}
               >
                 {a.ownerEmail} &nbsp;•&nbsp; {a.greenHouseName} &nbsp;•&nbsp;{" "}
-                {format(new Date(a.createdAt), "MMM dd, hh:mm a")}
+                {format(new Date(a.createdAt), "PPp", { locale: dateLocale() })}
               </Typography>
             </Box>
             <Chip
@@ -88,7 +90,7 @@ export function SystemAlertsList({ alerts }: SystemAlertsListProps) {
             py: 4,
           }}
         >
-          Faol alertlar yo'q
+          {t("txt.no_active_alerts")}
         </Typography>
       )}
     </Box>

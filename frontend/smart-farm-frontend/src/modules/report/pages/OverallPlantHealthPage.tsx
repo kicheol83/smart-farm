@@ -5,19 +5,11 @@ import { Header } from "@/components/layout/Header";
 import { PlantHealthHeroCard } from "../components/PlantHealthHeroCard";
 import { PlantsHealthTrendsChart } from "../components/PlantsHealthTrendsChart";
 import { PlantHealthSectionCard } from "../components/PlantHealthSectionCard";
-import { GET_FULL_GREENHOUSE_REPORT } from "../graphql/queries";
+import { GET_FULL_GREENHOUSE_REPORT, GET_SECTION_HEALTH_TRENDS } from "../graphql/queries";
+import { lastDaysLabel } from "@/lib/dateRange";
 import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
+import { t } from "@/i18n/core";
 
-const SECTION_NAMES = [
-  "Section 01",
-  "Section 02",
-  "Section 03",
-  "Section 04",
-  "Section 05",
-  "Section 06",
-  "Section 07",
-  "Section 08",
-];
 
 export function OverallPlantHealthPage() {
   const { greenHouseId } = useActiveGreenhouse();
@@ -30,10 +22,23 @@ export function OverallPlantHealthPage() {
 
   const plantHealth = data?.greenhouseFullReport?.plantHealth;
 
+  const { data: sectionData } = useQuery(GET_SECTION_HEALTH_TRENDS, {
+    variables: { greenHouseId },
+    skip: !hasGreenhouse,
+  });
+  const sections: {
+    sectionId: string;
+    sectionName: string;
+    currentIndex: number;
+    changePercent: number;
+    status: string;
+    trend: { healthIndex: number }[];
+  }[] = sectionData?.greenhousePlantHealthOverview?.sectionTrends ?? [];
+
   if (!hasGreenhouse) {
     return (
       <>
-        <Header title="Overall Plant Health" />
+        <Header title={t("txt.overall_plant_health")} />
         <Box
           sx={{
             display: "flex",
@@ -43,7 +48,7 @@ export function OverallPlantHealthPage() {
           }}
         >
           <Typography color="text.secondary">
-            Hali greenhouse tanlanmagan
+            {t("txt.no_greenhouse_selected_yet")}
           </Typography>
         </Box>
       </>
@@ -52,7 +57,7 @@ export function OverallPlantHealthPage() {
 
   return (
     <>
-      <Header title="Overall Plant Health" />
+      <Header title={t("txt.overall_plant_health")} />
 
       <Box
         sx={{
@@ -91,7 +96,7 @@ export function OverallPlantHealthPage() {
             },
           }}
         >
-          <Tab label="All Garden" value="all" />
+          <Tab label={t("txt.all_sections")} value="all" />
         </Tabs>
 
         <Box sx={{ display: "flex", gap: 1 }}>
@@ -99,14 +104,14 @@ export function OverallPlantHealthPage() {
             variant="outlined"
             sx={{ textTransform: "none", borderRadius: 2 }}
           >
-            Sort By
+            {t("txt.sort_by")}
           </Button>
           <Button
             variant="outlined"
             startIcon={<CalendarTodayRoundedIcon fontSize="small" />}
             sx={{ textTransform: "none", borderRadius: 2 }}
           >
-            10 - 24 September 2024
+            {lastDaysLabel(7)}
           </Button>
         </Box>
       </Box>
@@ -122,8 +127,15 @@ export function OverallPlantHealthPage() {
           gap: 2,
         }}
       >
-        {SECTION_NAMES.map((name) => (
-          <PlantHealthSectionCard key={name} sectionName={name} />
+        {sections.map((section) => (
+          <PlantHealthSectionCard
+            key={section.sectionId}
+            sectionName={section.sectionName}
+            healthIndex={section.currentIndex}
+            status={section.status}
+            changePercent={section.changePercent}
+            trend={section.trend.map((point) => point.healthIndex)}
+          />
         ))}
       </Box>
     </>

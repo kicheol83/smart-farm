@@ -12,6 +12,8 @@ import {
   Pagination,
 } from "@mui/material";
 import { format } from "date-fns";
+import { t } from "@/i18n/core";
+import { dateLocale } from "@/i18n/core";
 
 interface DeviceHealthItem {
   deviceId: string;
@@ -57,16 +59,16 @@ export function DeviceHealthTable({
         <TextField
           select
           size="small"
-          label="Status"
+          label={t("txt.status")}
           value={statusFilter}
           onChange={(e) => onStatusFilterChange(e.target.value)}
           sx={{ minWidth: 160 }}
         >
-          <MenuItem value="">All Status</MenuItem>
-          <MenuItem value="ONLINE">Online</MenuItem>
-          <MenuItem value="OFFLINE">Offline</MenuItem>
-          <MenuItem value="MAINTENANCE">Maintenance</MenuItem>
-          <MenuItem value="ERROR">Error</MenuItem>
+          <MenuItem value="">{t("txt.all_status")}</MenuItem>
+          <MenuItem value="ONLINE">{t("txt.online")}</MenuItem>
+          <MenuItem value="OFFLINE">{t("txt.offline")}</MenuItem>
+          <MenuItem value="MAINTENANCE">{t("txt.maintenance")}</MenuItem>
+          <MenuItem value="ERROR">{t("txt.error")}</MenuItem>
         </TextField>
       </Box>
 
@@ -75,13 +77,13 @@ export function DeviceHealthTable({
           <TableHead>
             <TableRow>
               {[
-                "Device",
-                "Type",
-                "Status",
-                "Greenhouse",
-                "Farm",
-                "Owner",
-                "Last Updated",
+                t("txt.device"),
+                t("txt.type"),
+                t("txt.status"),
+                t("txt.greenhouse"),
+                t("txt.farm"),
+                t("txt.owner"),
+                t("txt.last_updated"),
               ].map((c) => (
                 <TableCell
                   key={c}
@@ -175,7 +177,7 @@ export function DeviceHealthTable({
                       borderColor: "divider",
                     }}
                   >
-                    {format(new Date(d.updatedAt), "MMM dd, HH:mm")}
+                    {format(new Date(d.updatedAt), "PPp", { locale: dateLocale() })}
                   </TableCell>
                 </TableRow>
               );
@@ -194,7 +196,7 @@ export function DeviceHealthTable({
                       color: "text.secondary",
                     }}
                   >
-                    Qurilma topilmadi
+                    {t("txt.no_devices_found")}
                   </Typography>
                 </TableCell>
               </TableRow>

@@ -9,6 +9,7 @@ import {
   MenuItem,
   Box,
 } from "@mui/material";
+import { t } from "@/i18n/core";
 
 interface NewTaskDialogProps {
   open: boolean;
@@ -52,20 +53,20 @@ export function NewTaskDialog({ open, onClose, onSubmit }: NewTaskDialogProps) {
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ fontFamily: "Satoshi, sans-serif", fontWeight: 700 }}>
-        New Task
+        {t("txt.new_task")}
       </DialogTitle>
       <DialogContent
         sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 1 }}
       >
         <TextField
-          label="Task Name"
+          label={t("txt.task_name")}
           fullWidth
           size="small"
           value={taskTitle}
           onChange={(e) => setTaskTitle(e.target.value)}
         />
         <TextField
-          label="Description"
+          label={t("txt.description")}
           fullWidth
           multiline
           rows={3}
@@ -75,18 +76,18 @@ export function NewTaskDialog({ open, onClose, onSubmit }: NewTaskDialogProps) {
         />
         <TextField
           select
-          label="Priority"
+          label={t("txt.priority")}
           fullWidth
           size="small"
           value={taskPriority}
           onChange={(e) => setTaskPriority(e.target.value)}
         >
-          <MenuItem value="LOW">Low</MenuItem>
-          <MenuItem value="MEDIUM">Medium</MenuItem>
-          <MenuItem value="HIGH">High</MenuItem>
+          <MenuItem value="LOW">{t("txt.low")}</MenuItem>
+          <MenuItem value="MEDIUM">{t("txt.medium")}</MenuItem>
+          <MenuItem value="HIGH">{t("txt.high")}</MenuItem>
         </TextField>
         <TextField
-          label="Due Date"
+          label={t("txt.due_date")}
           type="date"
           fullWidth
           size="small"
@@ -96,7 +97,7 @@ export function NewTaskDialog({ open, onClose, onSubmit }: NewTaskDialogProps) {
         />
         <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
           <TextField
-            label="Start Time"
+            label={t("txt.start_time")}
             type="time"
             fullWidth
             size="small"
@@ -105,7 +106,7 @@ export function NewTaskDialog({ open, onClose, onSubmit }: NewTaskDialogProps) {
             onChange={(e) => setStartTime(e.target.value)}
           />
           <TextField
-            label="End Time"
+            label={t("txt.end_time")}
             type="time"
             fullWidth
             size="small"
@@ -117,7 +118,7 @@ export function NewTaskDialog({ open, onClose, onSubmit }: NewTaskDialogProps) {
       </DialogContent>
       <DialogActions sx={{ p: 2 }}>
         <Button onClick={onClose} sx={{ textTransform: "none" }}>
-          Cancel
+          {t("txt.cancel")}
         </Button>
         <Button
           onClick={handleSubmit}
@@ -125,7 +126,7 @@ export function NewTaskDialog({ open, onClose, onSubmit }: NewTaskDialogProps) {
           disabled={!taskTitle || !dueDate}
           sx={{ textTransform: "none" }}
         >
-          Create
+          {t("txt.create")}
         </Button>
       </DialogActions>
     </Dialog>

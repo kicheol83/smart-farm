@@ -7,6 +7,7 @@ import { AlertCategoryCard } from "../components/AlertCategoryCard";
 import { AlertCard } from "../components/AlertCard";
 import { GET_ACTIVE_ALERTS_SUMMARY } from "../graphql/queries";
 import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
+import { t } from "@/i18n/core";
 
 type Severity = "INFO" | "WARNING" | "CRITICAL";
 
@@ -25,9 +26,9 @@ const PLANT_HEALTH_TYPES = ["PLANT_HEALTH"];
 const SYSTEM_SENSOR_TYPES = ["SYSTEM_SENSOR"];
 
 const COLUMN_MAP: { key: Severity; label: string; dotColor: string }[] = [
-  { key: "INFO", label: "Optimal", dotColor: "#35C56E" },
-  { key: "WARNING", label: "Fair", dotColor: "#f9ad19" },
-  { key: "CRITICAL", label: "Error", dotColor: "#e53935" },
+  { key: "INFO", label: t("txt.optimal"), dotColor: "#35C56E" },
+  { key: "WARNING", label: t("txt.fair"), dotColor: "#f9ad19" },
+  { key: "CRITICAL", label: t("txt.error"), dotColor: "#e53935" },
 ];
 
 export function AlertsSummaryPage() {
@@ -56,7 +57,7 @@ export function AlertsSummaryPage() {
   if (!hasGreenhouse) {
     return (
       <>
-        <Header title="Alerts Summary" />
+        <Header title={t("txt.alerts_summary")} />
         <Box
           sx={{
             display: "flex",
@@ -66,7 +67,7 @@ export function AlertsSummaryPage() {
           }}
         >
           <Typography color="text.secondary">
-            Hali greenhouse tanlanmagan
+            {t("txt.no_greenhouse_selected_yet")}
           </Typography>
         </Box>
       </>
@@ -75,32 +76,32 @@ export function AlertsSummaryPage() {
 
   return (
     <>
-      <Header title="Alerts Summary" />
+      <Header title={t("txt.alerts_summary")} />
 
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, mb: 3 }}>
         <AlertCategoryCard
           dotColor="#f9ad19"
-          label="Plant Health Alerts"
+          label={t("txt.plant_health_alerts")}
           value={`${plantHealthAlerts.length} Alert${plantHealthAlerts.length !== 1 ? "s" : ""}`}
-          description="Section sog'lik indeksi kritik darajaga tushganda avtomatik yaratiladi."
+          description={t("txt.created_automatically_when_a_section_s_health_in")}
         />
         <AlertCategoryCard
           dotColor="#f9ad19"
-          label="Environmental Alerts"
+          label={t("txt.environmental_alerts")}
           value={`${environmentalAlerts.length} Alert${environmentalAlerts.length !== 1 ? "s" : ""}`}
-          description="Temperature, Humidity, CO2, Light bo'yicha aniqlangan holatlar."
+          description={t("txt.detected_from_temperature_humidity_co_and_light_")}
         />
         <AlertCategoryCard
           dotColor="#f9ad19"
-          label="Soil Quality Alerts"
+          label={t("txt.soil_quality_alerts")}
           value={`${soilAlerts.length} Alert${soilAlerts.length !== 1 ? "s" : ""}`}
-          description="pH va tuproq namligi bo'yicha aniqlangan holatlar."
+          description={t("txt.detected_from_ph_and_soil_moisture_readings")}
         />
         <AlertCategoryCard
           dotColor="#e53935"
-          label="System & Sensor Alerts"
+          label={t("txt.system_sensor_alerts")}
           value={`${systemAlerts.length} Alert${systemAlerts.length !== 1 ? "s" : ""}`}
-          description="Qurilma offline yoki xato holatiga o'tganda avtomatik yaratiladi."
+          description={t("txt.created_automatically_when_a_device_goes_offline")}
         />
       </Box>
 
@@ -120,21 +121,21 @@ export function AlertsSummaryPage() {
             color: "text.primary",
           }}
         >
-          Alerts
+          {t("txt.alerts")}
         </Typography>
         <Box sx={{ display: "flex", gap: 1 }}>
           <Button
             variant="outlined"
             sx={{ textTransform: "none", borderRadius: 2 }}
           >
-            Sort By
+            {t("txt.sort_by")}
           </Button>
           <Button
             variant="outlined"
             startIcon={<TuneRoundedIcon fontSize="small" />}
             sx={{ textTransform: "none", borderRadius: 2 }}
           >
-            Filter
+            {t("txt.filter")}
           </Button>
         </Box>
       </Box>
@@ -233,7 +234,7 @@ export function AlertsSummaryPage() {
                     py: 2,
                   }}
                 >
-                  Alert yo'q
+                  {t("txt.no_alerts")}
                 </Typography>
               )}
             </Box>

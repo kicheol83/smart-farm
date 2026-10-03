@@ -8,6 +8,7 @@ import {
   TextField,
   MenuItem,
 } from "@mui/material";
+import { t } from "@/i18n/core";
 
 interface Device {
   _id: string;
@@ -26,12 +27,12 @@ interface CreateActuatorDialogProps {
 }
 
 const ACTUATOR_TYPES = [
-  { value: "RELAY", label: "Relay" },
-  { value: "WATER_PUMP", label: "Water Pump" },
-  { value: "SOLENOID_VALVE", label: "Solenoid Valve" },
-  { value: "GROW_LIGHT", label: "Grow Light" },
-  { value: "COOLING_FAN", label: "Cooling Fan" },
-  { value: "SERVO", label: "Servo" },
+  { value: "RELAY", label: t("txt.relay") },
+  { value: "WATER_PUMP", label: t("txt.water_pump") },
+  { value: "SOLENOID_VALVE", label: t("txt.solenoid_valve") },
+  { value: "GROW_LIGHT", label: t("txt.grow_light") },
+  { value: "COOLING_FAN", label: t("txt.cooling_fan") },
+  { value: "SERVO", label: t("txt.servo") },
 ];
 
 export function CreateActuatorDialog({
@@ -55,22 +56,22 @@ export function CreateActuatorDialog({
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ fontFamily: "Satoshi, sans-serif", fontWeight: 700 }}>
-        Add Actuator
+        {t("txt.add_actuator")}
       </DialogTitle>
       <DialogContent
         sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 1 }}
       >
         <TextField
-          label="Name"
+          label={t("txt.name")}
           fullWidth
           size="small"
-          placeholder="Irrigation Valve — Section 1"
+          placeholder={t("txt.irrigation_valve_section_1")}
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
         <TextField
           select
-          label="Type"
+          label={t("txt.type")}
           fullWidth
           size="small"
           value={type}
@@ -84,7 +85,7 @@ export function CreateActuatorDialog({
         </TextField>
         <TextField
           select
-          label="Connected Device (ESP32 hub)"
+          label={t("txt.connected_device_esp32_hub")}
           fullWidth
           size="small"
           value={deviceId}
@@ -99,7 +100,7 @@ export function CreateActuatorDialog({
       </DialogContent>
       <DialogActions sx={{ p: 2 }}>
         <Button onClick={onClose} sx={{ textTransform: "none" }}>
-          Cancel
+          {t("txt.cancel")}
         </Button>
         <Button
           onClick={handleSubmit}
@@ -107,7 +108,7 @@ export function CreateActuatorDialog({
           disabled={!name || !deviceId}
           sx={{ textTransform: "none" }}
         >
-          Create
+          {t("txt.create")}
         </Button>
       </DialogActions>
     </Dialog>

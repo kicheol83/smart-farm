@@ -17,6 +17,7 @@ import {
   REQUEST_SENSITIVE_UPDATE,
   CONFIRM_SENSITIVE_UPDATE,
 } from "../graphql/queries";
+import { t } from "@/i18n/core";
 
 interface ChangeEmailDialogProps {
   open: boolean;
@@ -65,11 +66,11 @@ export function ChangeEmailDialog({
   async function handleRequestChange() {
     setError(null);
     if (!EMAIL_REGEX.test(newEmail)) {
-      setError("Entered email address is invalid");
+      setError(t("txt.entered_email_address_is_invalid"));
       return;
     }
     if (newEmail.toLowerCase() === currentEmail.toLowerCase()) {
-      setError("Entered email is exists in this workspace");
+      setError(t("txt.this_email_is_already_in_use"));
       return;
     }
 
@@ -78,7 +79,7 @@ export function ChangeEmailDialog({
       setStep("otp");
       setSecondsLeft(60);
     } catch (err: any) {
-      setError(err.message ?? "Xatolik yuz berdi");
+      setError(err.message ?? t("txt.something_went_wrong_6609"));
     }
   }
 
@@ -91,7 +92,7 @@ export function ChangeEmailDialog({
       onSuccess(newEmail);
       resetAndClose();
     } catch (err: any) {
-      setError(err.message ?? "Incorrect OTP. Please try again");
+      setError(err.message ?? t("txt.incorrect_otp_please_try_again"));
     }
   }
 
@@ -106,7 +107,7 @@ export function ChangeEmailDialog({
           textAlign: "center",
         }}
       >
-        Change Email
+        {t("txt.change_email")}
       </DialogTitle>
 
       {step === "form" ? (
@@ -123,7 +124,7 @@ export function ChangeEmailDialog({
                   mb: 0.5,
                 }}
               >
-                Your current email
+                {t("txt.your_current_email")}
               </Typography>
               <TextField fullWidth size="small" value={currentEmail} disabled />
             </Box>
@@ -136,12 +137,12 @@ export function ChangeEmailDialog({
                   mb: 0.5,
                 }}
               >
-                New email
+                {t("txt.new_email")}
               </Typography>
               <TextField
                 fullWidth
                 size="small"
-                placeholder="Enter new email"
+                placeholder={t("txt.enter_new_email")}
                 value={newEmail}
                 error={Boolean(error)}
                 onChange={(e) => {
@@ -163,7 +164,7 @@ export function ChangeEmailDialog({
               onClick={resetAndClose}
               sx={{ textTransform: "none", borderRadius: 2 }}
             >
-              Cancel
+              {t("txt.cancel")}
             </Button>
             <Button
               fullWidth
@@ -172,7 +173,7 @@ export function ChangeEmailDialog({
               onClick={handleRequestChange}
               sx={{ textTransform: "none", borderRadius: 2 }}
             >
-              Change
+              {t("txt.change")}
             </Button>
           </DialogActions>
         </>
@@ -220,7 +221,7 @@ export function ChangeEmailDialog({
                       color: "text.secondary",
                     }}
                   >
-                    Didn't receive code?
+                    {t("txt.didn_t_receive_code")}
                   </Typography>
                   {secondsLeft > 0 ? (
                     <Typography
@@ -241,7 +242,7 @@ export function ChangeEmailDialog({
                       onClick={handleRequestChange}
                       sx={{ fontSize: 13, color: "#17b26a" }}
                     >
-                      Resend
+                      {t("txt.resend")}
                     </Link>
                   )}
                 </>
@@ -256,7 +257,7 @@ export function ChangeEmailDialog({
               onClick={handleVerify}
               sx={{ textTransform: "none", borderRadius: 2 }}
             >
-              Verify
+              {t("txt.verify")}
             </Button>
           </DialogActions>
         </>

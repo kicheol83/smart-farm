@@ -195,3 +195,21 @@ export const SAVE_REPORT_MUTATION = gql`
     }
   }
 `;
+
+export const GET_SECTION_HEALTH_TRENDS = gql`
+  query ReportSectionHealthTrends($greenHouseId: ID!) {
+    greenhousePlantHealthOverview(greenHouseId: $greenHouseId) {
+      greenHouseId
+      sectionTrends {
+        sectionId
+        sectionName
+        currentIndex
+        changePercent
+        status
+        trend {
+          healthIndex
+        }
+      }
+    }
+  }
+`;

@@ -28,6 +28,7 @@ import {
   DELETE_DEVICE_MUTATION,
 } from "../graphql/queries";
 import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
+import { t } from "@/i18n/core";
 
 type DeviceStatus = "ONLINE" | "OFFLINE" | "MAINTENANCE" | "ERROR";
 
@@ -107,7 +108,7 @@ export function DeviceListPage() {
   if (!hasGreenhouse) {
     return (
       <>
-        <Header title="Device Status" />
+        <Header title={t("txt.device_status")} />
         <Box
           sx={{
             display: "flex",
@@ -117,7 +118,7 @@ export function DeviceListPage() {
           }}
         >
           <Typography color="text.secondary">
-            Hali greenhouse tanlanmagan
+            {t("txt.no_greenhouse_selected_yet")}
           </Typography>
         </Box>
       </>
@@ -126,27 +127,27 @@ export function DeviceListPage() {
 
   return (
     <>
-      <Header title="Device Status" />
+      <Header title={t("txt.device_status")} />
 
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, mb: 3 }}>
         <DeviceSummaryCard
           dotColor="#35C56E"
-          label="Sensor Connected"
+          label={t("txt.sensor_connected")}
           value={sensorCount}
         />
         <DeviceSummaryCard
           dotColor="#2196f3"
-          label="Camera Connected"
+          label={t("txt.camera_connected")}
           value={cameraCount}
         />
         <DeviceSummaryCard
           dotColor="#9c9c9c"
-          label="Offline Device"
+          label={t("txt.offline_device")}
           value={offlineCount}
         />
         <DeviceSummaryCard
           dotColor="#f9ad19"
-          label="Device Issue"
+          label={t("txt.device_issue")}
           value={issueCount}
         />
       </Box>
@@ -163,7 +164,7 @@ export function DeviceListPage() {
       >
         <TextField
           size="small"
-          placeholder="Search device"
+          placeholder={t("txt.search_device")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           InputProps={{
@@ -179,7 +180,7 @@ export function DeviceListPage() {
         />
 
         <Box sx={{ display: "flex", gap: 1 }}>
-          <Tooltip title="Refresh">
+          <Tooltip title={t("txt.refresh")}>
             <IconButton
               onClick={() => refetchOverview()}
               sx={{ bgcolor: "background.paper", borderRadius: 2 }}
@@ -199,14 +200,14 @@ export function DeviceListPage() {
             variant="outlined"
             sx={{ textTransform: "none", borderRadius: 2 }}
           >
-            All Device
+            {t("txt.all_devices")}
           </Button>
           <Button
             variant="outlined"
             startIcon={<TuneRoundedIcon fontSize="small" />}
             sx={{ textTransform: "none", borderRadius: 2 }}
           >
-            Filter
+            {t("txt.filter")}
           </Button>
           <Button
             variant="contained"
@@ -214,7 +215,7 @@ export function DeviceListPage() {
             onClick={() => setDialogOpen(true)}
             sx={{ textTransform: "none", borderRadius: 2 }}
           >
-            Add Device
+            {t("txt.add_device")}
           </Button>
         </Box>
       </Box>
@@ -249,7 +250,7 @@ export function DeviceListPage() {
               pb: 1,
             }}
           >
-            Device List
+            {t("txt.device_list")}
           </Typography>
 
           {filteredDevices.map((d: any) => (
@@ -274,7 +275,7 @@ export function DeviceListPage() {
                 py: 3,
               }}
             >
-              Qurilma topilmadi
+              {t("txt.no_devices_found")}
             </Typography>
           )}
         </Box>

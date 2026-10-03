@@ -2,6 +2,7 @@ import { Box, Typography } from "@mui/material";
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { t } from "@/i18n/core";
 
 interface DeviceMapPlaceholderProps {
   deviceName: string;
@@ -127,7 +128,7 @@ export function DeviceMapPlaceholder({
         <Typography
           sx={{ fontFamily: "Inter, sans-serif", fontSize: 10, color: "#fff" }}
         >
-          Koordinata kiritilmagan — GPS ulanmagan
+          {t("device.map.noCoordinates")}
         </Typography>
       </Box>
     </Box>

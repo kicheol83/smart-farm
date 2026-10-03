@@ -2,6 +2,7 @@ import { Box, Typography, IconButton } from "@mui/material";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import MoreHorizRoundedIcon from "@mui/icons-material/MoreHorizRounded";
 import { TaskBoardCard } from "./TaskBoardCard";
+import { t } from "@/i18n/core";
 
 type TaskStatus = "TODO" | "IN_PROGRESS" | "DONE";
 
@@ -29,9 +30,9 @@ interface TaskBoardViewProps {
 }
 
 const COLUMN_META: Record<TaskStatus, { label: string; dotColor: string }> = {
-  TODO: { label: "Not Started", dotColor: "#9c9c9c" },
-  IN_PROGRESS: { label: "In Progress", dotColor: "#2196f3" },
-  DONE: { label: "Done", dotColor: "#35C56E" },
+  TODO: { label: t("txt.not_started"), dotColor: "#9c9c9c" },
+  IN_PROGRESS: { label: t("txt.in_progress"), dotColor: "#2196f3" },
+  DONE: { label: t("txt.done"), dotColor: "#35C56E" },
 };
 
 const COLUMN_ORDER: TaskStatus[] = ["TODO", "IN_PROGRESS", "DONE"];
@@ -143,7 +144,7 @@ export function TaskBoardView({
                     py: 3,
                   }}
                 >
-                  Vazifa yo'q
+                  {t("txt.no_tasks")}
                 </Typography>
               )}
             </Box>

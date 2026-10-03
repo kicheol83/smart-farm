@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Box, TextField, MenuItem, Button, Typography } from "@mui/material";
+import { t } from "@/i18n/core";
 
 interface Units {
   temperatureUnit: string;
@@ -50,7 +51,7 @@ export function UnitSettingsTab({
           gap: 3,
         }}
       >
-        <Field label="Temperature Unit">
+        <Field label={t("txt.temperature_unit")}>
           <TextField
             select
             fullWidth
@@ -58,12 +59,12 @@ export function UnitSettingsTab({
             value={temperatureUnit}
             onChange={(e) => setTemperatureUnit(e.target.value)}
           >
-            <MenuItem value="CELSIUS">Celsius (°C)</MenuItem>
-            <MenuItem value="FAHRENHEIT">Fahrenheit (°F)</MenuItem>
+            <MenuItem value="CELSIUS">{t("txt.celsius_c")}</MenuItem>
+            <MenuItem value="FAHRENHEIT">{t("txt.fahrenheit_f")}</MenuItem>
           </TextField>
         </Field>
 
-        <Field label="Speed Unit" note="Backend'da hali mavjud emas">
+        <Field label={t("txt.speed_unit")} note={t("txt.coming_soon")}>
           <TextField
             select
             fullWidth
@@ -76,7 +77,7 @@ export function UnitSettingsTab({
           </TextField>
         </Field>
 
-        <Field label="Land Area Unit">
+        <Field label={t("txt.land_area_unit")}>
           <TextField
             select
             fullWidth
@@ -84,14 +85,14 @@ export function UnitSettingsTab({
             value={areaUnit}
             onChange={(e) => setAreaUnit(e.target.value)}
           >
-            <MenuItem value="SQUARE_METER">Square Meter (m²)</MenuItem>
-            <MenuItem value="SQUARE_FEET">Square Feet (ft²)</MenuItem>
-            <MenuItem value="HECTARE">Hectare (ha)</MenuItem>
-            <MenuItem value="ACRE">Acre (ac)</MenuItem>
+            <MenuItem value="SQUARE_METER">{t("txt.square_meter_m")}</MenuItem>
+            <MenuItem value="SQUARE_FEET">{t("txt.square_feet_ft")}</MenuItem>
+            <MenuItem value="HECTARE">{t("txt.hectare_ha")}</MenuItem>
+            <MenuItem value="ACRE">{t("txt.acre_ac")}</MenuItem>
           </TextField>
         </Field>
 
-        <Field label="Water Volume Unit">
+        <Field label={t("txt.water_volume_unit")}>
           <TextField
             select
             fullWidth
@@ -99,12 +100,12 @@ export function UnitSettingsTab({
             value={waterUnit}
             onChange={(e) => setWaterUnit(e.target.value)}
           >
-            <MenuItem value="LITER">Liter (L)</MenuItem>
-            <MenuItem value="GALLON">Gallon (gal)</MenuItem>
+            <MenuItem value="LITER">{t("txt.liter_l")}</MenuItem>
+            <MenuItem value="GALLON">{t("txt.gallon_gal")}</MenuItem>
           </TextField>
         </Field>
 
-        <Field label="Date Format" note="Backend'da hali mavjud emas">
+        <Field label={t("txt.date_format")} note={t("txt.coming_soon")}>
           <TextField
             select
             fullWidth
@@ -117,7 +118,7 @@ export function UnitSettingsTab({
           </TextField>
         </Field>
 
-        <Field label="Time Format">
+        <Field label={t("txt.time_format")}>
           <TextField
             select
             fullWidth
@@ -125,8 +126,8 @@ export function UnitSettingsTab({
             value={timeFormat}
             onChange={(e) => setTimeFormat(e.target.value)}
           >
-            <MenuItem value="FORMAT_24H">24-hour</MenuItem>
-            <MenuItem value="FORMAT_12H">12-hour (AM/PM)</MenuItem>
+            <MenuItem value="FORMAT_24H">{t("txt.24_hour")}</MenuItem>
+            <MenuItem value="FORMAT_12H">{t("txt.12_hour_am_pm")}</MenuItem>
           </TextField>
         </Field>
       </Box>
@@ -136,7 +137,7 @@ export function UnitSettingsTab({
           variant="outlined"
           sx={{ textTransform: "none", borderRadius: 2 }}
         >
-          Cancel
+          {t("txt.cancel")}
         </Button>
         <Button
           variant="contained"
@@ -146,7 +147,7 @@ export function UnitSettingsTab({
           }
           sx={{ textTransform: "none", borderRadius: 2 }}
         >
-          Save
+          {t("txt.save")}
         </Button>
       </Box>
     </Box>

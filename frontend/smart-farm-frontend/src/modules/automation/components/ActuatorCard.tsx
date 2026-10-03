@@ -15,6 +15,8 @@ import AirRoundedIcon from "@mui/icons-material/AirRounded";
 import SettingsInputComponentRoundedIcon from "@mui/icons-material/SettingsInputComponentRounded";
 import type { SvgIconComponent } from "@mui/icons-material";
 import { format, formatDistanceToNow } from "date-fns";
+import { t } from "@/i18n/core";
+import { dateLocale } from "@/i18n/core";
 
 type ActuatorType =
   | "RELAY"
@@ -48,12 +50,12 @@ const TYPE_ICON: Record<ActuatorType, SvgIconComponent> = {
 };
 
 const TYPE_LABEL: Record<ActuatorType, string> = {
-  RELAY: "Relay",
-  WATER_PUMP: "Water Pump",
-  SOLENOID_VALVE: "Solenoid Valve",
-  GROW_LIGHT: "Grow Light",
-  COOLING_FAN: "Cooling Fan",
-  SERVO: "Servo",
+  RELAY: t("txt.relay"),
+  WATER_PUMP: t("txt.water_pump"),
+  SOLENOID_VALVE: t("txt.solenoid_valve"),
+  GROW_LIGHT: t("txt.grow_light"),
+  COOLING_FAN: t("txt.cooling_fan"),
+  SERVO: t("txt.servo"),
 };
 
 const PWM_CAPABLE_TYPES: ActuatorType[] = ["COOLING_FAN"];
@@ -151,7 +153,7 @@ export function ActuatorCard({
                 color: "text.secondary",
               }}
             >
-              Speed (PWM)
+              {t("txt.speed_pwm")}
             </Typography>
             <Typography
               sx={{
@@ -188,7 +190,7 @@ export function ActuatorCard({
               color: "text.secondary",
             }}
           >
-            Last toggled: {format(new Date(lastToggledAt), "MMM dd, HH:mm")}
+            {t("auto.lastToggled", { time: format(new Date(lastToggledAt), "PPp", { locale: dateLocale() }) })}
           </Typography>
         )}
         {isOn && autoOffAt && (
@@ -199,8 +201,7 @@ export function ActuatorCard({
               color: "#a06a0a",
             }}
           >
-            Auto-off{" "}
-            {formatDistanceToNow(new Date(autoOffAt), { addSuffix: true })}
+            {t("auto.autoOff", { time: formatDistanceToNow(new Date(autoOffAt), { addSuffix: true, locale: dateLocale() }) })}
           </Typography>
         )}
       </Box>

@@ -1,5 +1,7 @@
 import { Box, Typography, Chip } from "@mui/material";
 import { format } from "date-fns";
+import { t } from "@/i18n/core";
+import { dateLocale } from "@/i18n/core";
 
 type DeviceStatus = "ONLINE" | "OFFLINE" | "MAINTENANCE" | "ERROR";
 
@@ -15,28 +17,28 @@ const STATUS_STYLE: Record<
   { label: string; color: string; bg: string; summary: string }
 > = {
   ONLINE: {
-    label: "Active",
+    label: t("txt.active"),
     color: "#1a7a4c",
     bg: "rgba(53,197,110,0.16)",
-    summary: "Device running normally.",
+    summary: t("txt.device_running_normally"),
   },
   OFFLINE: {
-    label: "Offline",
+    label: t("txt.offline"),
     color: "#6b6b6b",
     bg: "rgba(156,156,156,0.16)",
-    summary: "Device is currently offline.",
+    summary: t("txt.device_is_currently_offline"),
   },
   MAINTENANCE: {
-    label: "Maintenance",
+    label: t("txt.maintenance"),
     color: "#a06a0a",
     bg: "rgba(249,173,25,0.16)",
-    summary: "Device under maintenance.",
+    summary: t("txt.device_under_maintenance"),
   },
   ERROR: {
-    label: "Error",
+    label: t("txt.error"),
     color: "#c62828",
     bg: "rgba(229,57,53,0.16)",
-    summary: "Sensor malfunction detected.",
+    summary: t("txt.sensor_malfunction_detected"),
   },
 };
 
@@ -82,11 +84,11 @@ export function DeviceTabListItem({
       </Box>
 
       <FieldRow
-        label="Last Updated"
-        value={format(new Date(updatedAt), "MMM dd, hh:mm a")}
+        label={t("txt.last_updated")}
+        value={format(new Date(updatedAt), "PPp", { locale: dateLocale() })}
       />
-      <FieldRow label="Device Type" value={deviceType} />
-      <FieldRow label="Summary" value={style.summary} />
+      <FieldRow label={t("txt.device_type")} value={deviceType} />
+      <FieldRow label={t("txt.summary")} value={style.summary} />
     </Box>
   );
 }

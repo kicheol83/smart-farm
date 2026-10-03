@@ -16,6 +16,7 @@ import {
   LOGIN_BG_LIGHT,
   LOGIN_BG_DARK,
 } from "@/theme/theme";
+import { t } from "@/i18n/core";
 
 const RESET_PASSWORD_MUTATION = gql`
   mutation ResetPassword($input: ResetPasswordInput!) {
@@ -58,11 +59,11 @@ export function CreateNewPasswordPage() {
     setError(null);
 
     if (!isValid) {
-      setError("Password does not meet the requirements.");
+      setError(t("txt.password_does_not_meet_the_requirements"));
       return;
     }
     if (password !== confirmPassword) {
-      setError("Passwords do not match.");
+      setError(t("txt.passwords_do_not_match"));
       return;
     }
 
@@ -78,7 +79,7 @@ export function CreateNewPasswordPage() {
       });
       navigate("/forgot-password/success");
     } catch (err: any) {
-      setError(err.message ?? "Xatolik yuz berdi.");
+      setError(err.message ?? t("txt.something_went_wrong"));
     }
   }
 
@@ -157,7 +158,7 @@ export function CreateNewPasswordPage() {
                 color: "text.primary",
               }}
             >
-              Create New Password
+              {t("txt.create_new_password")}
             </Typography>
             <Typography
               sx={{
@@ -169,18 +170,18 @@ export function CreateNewPasswordPage() {
                 color: "text.secondary",
               }}
             >
-              Enter a new password and confirm it to continue.
+              {t("txt.enter_a_new_password_and_confirm_it_to_continue")}
             </Typography>
           </Box>
 
           <Box sx={{ display: "flex", flexDirection: "column", gap: "12px" }}>
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
               <AuthTextField
-                label="Password"
+                label={t("txt.password")}
                 type={showPassword ? "text" : "password"}
                 required
                 autoComplete="new-password"
-                placeholder="Must contain at least 8 characters"
+                placeholder={t("txt.must_contain_at_least_8_characters")}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 endAdornment={
@@ -212,11 +213,11 @@ export function CreateNewPasswordPage() {
             </Box>
 
             <AuthTextField
-              label="Confirm Password"
+              label={t("txt.confirm_password")}
               type={showConfirmPassword ? "text" : "password"}
               required
               autoComplete="new-password"
-              placeholder="Must contain at least 8 characters"
+              placeholder={t("txt.must_contain_at_least_8_characters")}
               value={confirmPassword}
               errorText={error ?? undefined}
               onChange={(e) => {
@@ -272,15 +273,15 @@ export function CreateNewPasswordPage() {
               "&.Mui-disabled": { bgcolor: "#cecece", color: "#a4a4a4" },
             }}
           >
-            {loading ? "Saqlanmoqda..." : "Reset"}
+            {loading ? t("txt.saving") : t("txt.reset")}
           </Button>
         </Box>
       </Box>
 
       <AuthOnboardingPanel
         image="https://picsum.photos/seed/smartfarm-forgot/800/1200"
-        heading="Real-Time Insights Access"
-        subtitle="Analyze field metrics quickly with intuitive charts and visual reports."
+        heading={t("txt.real_time_insights_access")}
+        subtitle={t("txt.analyze_field_metrics_quickly_with_intuitive_cha")}
         activeStep={2}
       />
     </Box>

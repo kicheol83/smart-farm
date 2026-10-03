@@ -13,6 +13,7 @@ import {
   LOGIN_BG_LIGHT,
   LOGIN_BG_DARK,
 } from "@/theme/theme";
+import { t } from "@/i18n/core";
 
 const VERIFY_OTP_MUTATION = gql`
   mutation VerifyEmail($input: VerifyEmailInput!) {
@@ -84,8 +85,8 @@ export function EmailVerificationPage() {
       setAuth(data.verifyEmail.member, data.verifyEmail.accessToken);
       navigate("/dashboard");
     } catch (err: any) {
-      // Figma "Incorrect OTP. Please try again"
-      setError("Incorrect OTP. Please try again");
+      // Figma t("txt.incorrect_otp_please_try_again")
+      setError(t("txt.incorrect_otp_please_try_again"));
     }
   }
 
@@ -96,7 +97,7 @@ export function EmailVerificationPage() {
       setOtp(Array(OTP_LENGTH).fill(""));
       setError(null);
     } catch (err: any) {
-      setError(err.message ?? "Resend failed");
+      setError(err.message ?? t("txt.resend_failed"));
     }
   }
 
@@ -171,7 +172,7 @@ export function EmailVerificationPage() {
                 color: "text.primary",
               }}
             >
-              Email Verification
+              {t("txt.email_verification")}
             </Typography>
             <Typography
               sx={{
@@ -218,7 +219,7 @@ export function EmailVerificationPage() {
                   "&:hover": { textDecoration: "underline" },
                 }}
               >
-                Resend
+                {t("txt.resend")}
               </Link>
             </Box>
           ) : (
@@ -231,7 +232,7 @@ export function EmailVerificationPage() {
                   color: "text.secondary",
                 }}
               >
-                Didn't receive code?
+                {t("txt.didn_t_receive_code")}
               </Typography>
               {secondsLeft > 0 ? (
                 <Typography
@@ -261,7 +262,7 @@ export function EmailVerificationPage() {
                     "&:hover": { textDecoration: "underline" },
                   }}
                 >
-                  Resend
+                  {t("txt.resend")}
                 </Link>
               )}
             </Box>
@@ -289,15 +290,15 @@ export function EmailVerificationPage() {
               "&.Mui-disabled": { bgcolor: "#cecece", color: "#a4a4a4" },
             }}
           >
-            {verifying ? "Tekshirilmoqda..." : "Verify"}
+            {verifying ? t("txt.verifying") : t("txt.verify")}
           </Button>
         </Box>
       </Box>
 
       <AuthOnboardingPanel
         image={ONBOARDING_IMAGE}
-        heading="Seamless Device Control"
-        subtitle="Manage sensors, irrigation, and equipment anywhere with one dashboard."
+        heading={t("txt.seamless_device_control")}
+        subtitle={t("txt.manage_sensors_irrigation_and_equipment_anywhere")}
         activeStep={1}
       />
     </Box>

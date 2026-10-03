@@ -1,14 +1,15 @@
 import { Box, Typography } from "@mui/material";
 import { keyframes } from "@mui/system";
+import { t } from "@/i18n/core";
 
 const STAGES = [
-  { title: "ESP32", detail: "sensors" },
-  { title: "MQTT", detail: "QoS 1" },
-  { title: "Redis buffer", detail: "queue + DLQ" },
-  { title: "Calibration", detail: "offset / scale" },
-  { title: "MongoDB", detail: "raw + time-series" },
-  { title: "Z-score", detail: "anomaly detection" },
-  { title: "WebSocket", detail: "live push" },
+  { title: "ESP32", detail: "pipe.stage.0" },
+  { title: "MQTT", detail: "pipe.stage.1" },
+  { title: "Redis", detail: "pipe.stage.2" },
+  { title: "pipe.stage.3", detail: "pipe.stage.4" },
+  { title: "MongoDB", detail: "pipe.stage.5" },
+  { title: "Z-score", detail: "pipe.stage.6" },
+  { title: "WebSocket", detail: "pipe.stage.7" },
 ];
 
 const travel = keyframes`
@@ -69,10 +70,10 @@ export function PipelineFlow({ pulseKey, active }: PipelineFlowProps) {
               }}
             >
               <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                {stage.title}
+                {t(stage.title)}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {stage.detail}
+                {t(stage.detail)}
               </Typography>
             </Box>
           ))}

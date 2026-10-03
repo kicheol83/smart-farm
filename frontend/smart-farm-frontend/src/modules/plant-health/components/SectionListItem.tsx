@@ -1,4 +1,5 @@
 import { Box, Typography, Chip } from "@mui/material";
+import { t } from "@/i18n/core";
 
 type SectionStatus = "HEALTHY" | "WARNING" | "CRITICAL" | "INACTIVE";
 
@@ -17,10 +18,10 @@ const STATUS_BADGE: Record<
   { label: string; color: string; bg: string } | null
 > = {
   HEALTHY: null,
-  WARNING: { label: "Low", color: "#a06a0a", bg: "rgba(249,173,25,0.16)" },
-  CRITICAL: { label: "Critical", color: "#c62828", bg: "rgba(229,57,53,0.16)" },
+  WARNING: { label: t("txt.low"), color: "#a06a0a", bg: "rgba(249,173,25,0.16)" },
+  CRITICAL: { label: t("txt.critical"), color: "#c62828", bg: "rgba(229,57,53,0.16)" },
   INACTIVE: {
-    label: "Inactive",
+    label: t("txt.inactive"),
     color: "#6b6b6b",
     bg: "rgba(156,156,156,0.16)",
   },
@@ -101,19 +102,19 @@ export function SectionListItem({
       </Box>
 
       <Box sx={{ display: "flex", flexDirection: "column", gap: 0.25 }}>
-        <FieldRow label="Plant" value={plantName ?? "—"} />
-        <FieldRow label="Area" value={`${sectionArea} m²`} />
-        <FieldRow label="Status Notes" value={statusNote} />
+        <FieldRow label={t("txt.plant")} value={plantName ?? "—"} />
+        <FieldRow label={t("txt.area")} value={`${sectionArea} m²`} />
+        <FieldRow label={t("txt.status_notes")} value={statusNote} />
       </Box>
     </Box>
   );
 }
 
 const STATUS_NOTE: Record<SectionStatus, string> = {
-  HEALTHY: "Healthy and stable growth.",
-  WARNING: "Minor issues detected; needs light attention.",
-  CRITICAL: "Critical condition — immediate action required.",
-  INACTIVE: "Section is currently inactive.",
+  HEALTHY: t("txt.healthy_and_stable_growth"),
+  WARNING: t("txt.minor_issues_detected_needs_light_attention"),
+  CRITICAL: t("txt.critical_condition_immediate_action_required"),
+  INACTIVE: t("txt.section_is_currently_inactive"),
 };
 
 function FieldRow({ label, value }: { label: string; value: string }) {

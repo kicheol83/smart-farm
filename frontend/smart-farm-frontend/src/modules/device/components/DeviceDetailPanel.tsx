@@ -12,6 +12,7 @@ import AccessTimeRoundedIcon from "@mui/icons-material/AccessTimeRounded";
 import { useState } from "react";
 import { format } from "date-fns";
 import { DeviceMapPlaceholder } from "./DeviceMapPlaceholder";
+import { t } from "@/i18n/core";
 
 type DeviceStatus = "ONLINE" | "OFFLINE" | "MAINTENANCE" | "ERROR";
 
@@ -39,12 +40,12 @@ interface DeviceDetail {
 
 function formatRadioQuality(rssi?: number, snr?: number): string {
   if (rssi === undefined && snr === undefined) return "—";
-  let grade = "Fair";
+  let grade = t("txt.fair");
   if (rssi !== undefined) {
-    if (rssi >= -70) grade = "Excellent";
-    else if (rssi >= -85) grade = "Good";
-    else if (rssi >= -100) grade = "Fair";
-    else grade = "Poor";
+    if (rssi >= -70) grade = t("txt.excellent");
+    else if (rssi >= -85) grade = t("txt.good");
+    else if (rssi >= -100) grade = t("txt.fair");
+    else grade = t("txt.poor");
   }
   const parts = [];
   if (rssi !== undefined) parts.push(`RSSI ${rssi} dBm`);
@@ -180,7 +181,7 @@ export function DeviceDetailPanel({
             }}
             sx={{ color: "error.main" }}
           >
-            Delete Device
+            {t("txt.delete_device")}
           </MenuItem>
         </Menu>
       </Box>
@@ -200,26 +201,26 @@ export function DeviceDetailPanel({
         }}
       >
         <InfoField
-          label="Sensor Status"
+          label={t("txt.sensor_status")}
           value={statusMeta.label}
           valueColor={statusMeta.color}
         />
         <InfoField
-          label="Network Connectivity"
+          label={t("txt.network_connectivity")}
           value={device.networkType ?? "—"}
         />
-        <InfoField label="Device Type" value={device.deviceType} />
+        <InfoField label={t("txt.device_type")} value={device.deviceType} />
         <InfoField
-          label="Last Data Received"
+          label={t("txt.last_data_received")}
           value={
             device.lastDataReceived
               ? format(new Date(device.lastDataReceived), "hh:mm a, MMM dd")
               : "—"
           }
         />
-        <InfoField label="Power Source" value={device.powerSource ?? "—"} />
+        <InfoField label={t("txt.power_source")} value={device.powerSource ?? "—"} />
         <InfoField
-          label="Radio Quality"
+          label={t("txt.radio_quality")}
           value={formatRadioQuality(device.rssi, device.snr)}
         />
       </Box>
@@ -246,7 +247,7 @@ export function DeviceDetailPanel({
               fontSize: 14,
             }}
           >
-            Soil Moisture
+            {t("txt.soil_moisture_0a4c")}
           </Typography>
           <Box sx={{ display: "flex", alignItems: "baseline", gap: 1 }}>
             <Typography
@@ -258,7 +259,7 @@ export function DeviceDetailPanel({
             >
               {soilMoistureValue !== undefined ? `${soilMoistureValue}%` : "—"}
             </Typography>
-            {soilMoistureValue !== undefined && soilMoistureValue >= 70 && (
+            {soilMoistureValue !== undefined && soilMoistureValue >= 35 && soilMoistureValue <= 70 && (
               <Box
                 sx={{
                   bgcolor: "#fff",
@@ -270,14 +271,20 @@ export function DeviceDetailPanel({
                   fontWeight: 700,
                 }}
               >
-                Good
+                {t("device.soil.badge")}
               </Box>
             )}
           </Box>
           <Typography
             sx={{ fontFamily: "Inter, sans-serif", fontSize: 12, opacity: 0.9 }}
           >
-            Optimal moisture level detected.
+            {soilMoistureValue === undefined
+              ? ""
+              : soilMoistureValue < 35
+                ? t("device.soil.dry")
+                : soilMoistureValue > 70
+                  ? t("device.soil.wet")
+                  : t("device.soil.optimal")}
           </Typography>
         </Box>
       )}
@@ -292,7 +299,7 @@ export function DeviceDetailPanel({
             color: "text.primary",
           }}
         >
-          Recent Activity
+          {t("txt.recent_activity")}
         </Typography>
 
         {recentActivity.length > 0 ? (
@@ -342,8 +349,7 @@ export function DeviceDetailPanel({
               color: "text.secondary",
             }}
           >
-            Hali faoliyat jurnali mavjud emas — backend'ga activity-log
-            qo'shilgach shu yerda ko'rinadi.
+            {t("device.activity.empty")}
           </Typography>
         )}
       </Box>

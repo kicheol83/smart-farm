@@ -18,6 +18,7 @@ import { ReportDetailsTable } from "../components/ReportDetailsTable";
 import { GET_REPORT_ENTRIES, GENERATE_REPORT_ENTRY } from "../graphql/queries";
 import { GET_SECTIONS_BY_GREENHOUSE } from "@/modules/plant-health/graphql/queries";
 import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
+import { t } from "@/i18n/core";
 
 export function ReportDetailsPage() {
   const { greenHouseId } = useActiveGreenhouse();
@@ -69,16 +70,16 @@ export function ReportDetailsPage() {
   function handleExport() {
     const rows = [
       [
-        "Date",
-        "Plant",
-        "Area",
-        "Health",
-        "Status",
-        "Harvest Prediction",
-        "Moisture",
-        "Humidity",
-        "Pest Disease",
-        "Description",
+        t("txt.date"),
+        t("txt.plant"),
+        t("txt.area"),
+        t("txt.health"),
+        t("txt.status"),
+        t("txt.harvest_prediction"),
+        t("txt.moisture"),
+        t("txt.humidity"),
+        t("txt.pest_disease"),
+        t("txt.description"),
       ],
       ...entries.map((e: any) => [
         new Date(e.entryDate).toISOString().slice(0, 10),
@@ -108,7 +109,7 @@ export function ReportDetailsPage() {
   if (!hasGreenhouse) {
     return (
       <>
-        <Header title="Report Details" />
+        <Header title={t("txt.report_details")} />
         <Box
           sx={{
             display: "flex",
@@ -118,7 +119,7 @@ export function ReportDetailsPage() {
           }}
         >
           <Typography color="text.secondary">
-            Hali greenhouse tanlanmagan
+            {t("txt.no_greenhouse_selected_yet")}
           </Typography>
         </Box>
       </>
@@ -127,7 +128,7 @@ export function ReportDetailsPage() {
 
   return (
     <>
-      <Header title="Report Details" />
+      <Header title={t("txt.report_details")} />
 
       <Box
         sx={{
@@ -144,7 +145,7 @@ export function ReportDetailsPage() {
           onClick={handleExport}
           sx={{ textTransform: "none", borderRadius: 2 }}
         >
-          Export
+          {t("txt.export")}
         </Button>
         <Button
           variant="contained"
@@ -152,7 +153,7 @@ export function ReportDetailsPage() {
           onClick={() => setDialogOpen(true)}
           sx={{ textTransform: "none", borderRadius: 2 }}
         >
-          Generate Entry
+          {t("txt.generate_entry")}
         </Button>
       </Box>
 
@@ -165,7 +166,7 @@ export function ReportDetailsPage() {
           mb: 2,
         }}
       >
-        Report Details
+        {t("txt.report_details")}
       </Typography>
 
       <ReportDetailsTable
@@ -189,14 +190,14 @@ export function ReportDetailsPage() {
         <DialogTitle
           sx={{ fontFamily: "Satoshi, sans-serif", fontWeight: 700 }}
         >
-          Generate Report Entry
+          {t("txt.generate_report_entry")}
         </DialogTitle>
         <DialogContent
           sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 1 }}
         >
           <TextField
             select
-            label="Section"
+            label={t("txt.section")}
             fullWidth
             size="small"
             value={selectedSectionId}
@@ -209,15 +210,15 @@ export function ReportDetailsPage() {
             ))}
           </TextField>
           <TextField
-            label="Pest / Disease (ixtiyoriy)"
+            label={t("txt.pest_disease_optional")}
             fullWidth
             size="small"
-            placeholder="No pest"
+            placeholder={t("txt.no_pest")}
             value={pestDisease}
             onChange={(e) => setPestDisease(e.target.value)}
           />
           <TextField
-            label="Description (ixtiyoriy)"
+            label={t("txt.description_optional")}
             fullWidth
             multiline
             rows={2}
@@ -231,7 +232,7 @@ export function ReportDetailsPage() {
             onClick={() => setDialogOpen(false)}
             sx={{ textTransform: "none" }}
           >
-            Cancel
+            {t("txt.cancel")}
           </Button>
           <Button
             onClick={handleGenerate}
@@ -239,7 +240,7 @@ export function ReportDetailsPage() {
             disabled={!selectedSectionId || generating}
             sx={{ textTransform: "none" }}
           >
-            Generate
+            {t("txt.generate")}
           </Button>
         </DialogActions>
       </Dialog>

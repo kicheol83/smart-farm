@@ -1,6 +1,8 @@
 import { Box, Card, Typography, IconButton } from "@mui/material";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import { format } from "date-fns";
+import { t } from "@/i18n/core";
+import { dateLocale } from "@/i18n/core";
 
 interface SectionDetail {
   sectionId: string;
@@ -67,13 +69,13 @@ export function SectionDetailPopup({
         </IconButton>
       </Box>
 
-      <Field label="Plant" value={plantName ?? "—"} />
+      <Field label={t("txt.plant")} value={plantName ?? "—"} />
 
       {variant === "details" ? (
         <>
-          <Field label="Next Harvest Estimate" value="—" />
-          <Field label="Last Watering" value="—" />
-          <Field label="Pest Status" value="—" />
+          <Field label={t("txt.next_harvest_estimate")} value="—" />
+          <Field label={t("txt.last_watering")} value="—" />
+          <Field label={t("txt.pest_status")} value="—" />
 
           <Box sx={{ borderTop: 1, borderColor: "divider", my: 1.5 }} />
 
@@ -81,13 +83,13 @@ export function SectionDetailPopup({
             sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1.5 }}
           >
             <Field
-              label="Health"
+              label={t("txt.health")}
               value={`${Math.round(section.healthIndex)}% • Good`}
               valueColor="#1a7a4c"
             />
-            <Field label="7-day trend" value="—" />
+            <Field label={t("txt.7_day_trend")} value="—" />
             <Field
-              label="Soil Moisture"
+              label={t("txt.soil_moisture_0a4c")}
               value={
                 section.soilMoisture !== undefined
                   ? `${Math.round(section.soilMoisture)}%`
@@ -95,12 +97,12 @@ export function SectionDetailPopup({
               }
             />
             <Field
-              label="Soil pH"
+              label={t("txt.soil_ph")}
               value={section.ph !== undefined ? section.ph.toFixed(1) : "—"}
             />
-            <Field label="Nutrition Index" value="—" />
+            <Field label={t("txt.nutrition_index")} value="—" />
             <Field
-              label="Temperature"
+              label={t("txt.temperature")}
               value={
                 section.temperature !== undefined
                   ? `${section.temperature.toFixed(1)}°C`
@@ -108,29 +110,29 @@ export function SectionDetailPopup({
               }
             />
             <Field
-              label="Humidity"
+              label={t("txt.humidity")}
               value={
                 section.humidity !== undefined
                   ? `${Math.round(section.humidity)}%`
                   : "—"
               }
             />
-            <Field label="Light Intensity" value="—" />
+            <Field label={t("txt.light_intensity")} value="—" />
           </Box>
         </>
       ) : variant === "plant" ? (
         <>
           <Field
-            label="Health"
+            label={t("txt.health")}
             value={`${Math.round(section.healthIndex)}% • Good`}
             valueColor="#1a7a4c"
           />
           <Field
-            label="Area"
+            label={t("txt.area")}
             value={sectionArea !== undefined ? `${sectionArea} m2` : "—"}
           />
-          <Field label="Last Harvest" value="—" />
-          <Field label="Next Harvest Prediction" value="—" />
+          <Field label={t("txt.last_harvest")} value="—" />
+          <Field label={t("txt.next_harvest_prediction")} value="—" />
 
           <Box sx={{ borderTop: 1, borderColor: "divider", my: 1.5 }} />
 
@@ -138,7 +140,7 @@ export function SectionDetailPopup({
             sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1.5 }}
           >
             <Field
-              label="Humidity"
+              label={t("txt.humidity")}
               value={
                 section.humidity !== undefined
                   ? `${Math.round(section.humidity)}%`
@@ -146,12 +148,12 @@ export function SectionDetailPopup({
               }
             />
             <Field
-              label="pH Level"
+              label={t("txt.ph_level")}
               value={section.ph !== undefined ? section.ph.toFixed(1) : "—"}
             />
           </Box>
           <Field
-            label="Soil Moisture"
+            label={t("txt.soil_moisture_0a4c")}
             value={
               section.soilMoisture !== undefined
                 ? `${Math.round(section.soilMoisture)}%`
@@ -161,20 +163,20 @@ export function SectionDetailPopup({
         </>
       ) : variant === "task" ? (
         <>
-          <Field label="Scan Timestamp" value="—" />
-          <Field label="Pest Scan" value="—" />
-          <Field label="Leaf Check" value="—" />
-          <Field label="Status Update" value="—" />
+          <Field label={t("txt.scan_timestamp")} value="—" />
+          <Field label={t("txt.pest_scan")} value="—" />
+          <Field label={t("txt.leaf_check")} value="—" />
+          <Field label={t("txt.status_update")} value="—" />
 
           <Box sx={{ borderTop: 1, borderColor: "divider", my: 1.5 }} />
 
           <Box
             sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1.5 }}
           >
-            <Field label="Status" value="—" />
-            <Field label="Date" value="—" />
-            <Field label="Pest Threat Level" value="—" />
-            <Field label="Detected Species" value="—" />
+            <Field label={t("txt.status")} value="—" />
+            <Field label={t("txt.date")} value="—" />
+            <Field label={t("txt.pest_threat_level")} value="—" />
+            <Field label={t("txt.detected_species")} value="—" />
           </Box>
         </>
       ) : variant === "device" ? (
@@ -187,13 +189,10 @@ export function SectionDetailPopup({
               textAlign: "center",
             }}
           >
-            Backend Device modelida section bilan bog'lanish (sectionId) hali
-            mavjud emas — shuning uchun aynan shu section'ga tegishli
-            qurilmalarni bu yerda ko'rsata olmaymiz.
+            {t("txt.devices_are_listed_per_greenhouse_rather_than_pe")}
             <br />
             <br />
-            Barcha qurilmalar ro'yxatini chap paneldagi "Device" tab'da
-            ko'rishingiz mumkin.
+            {t("txt.see_every_device_in_the_device_tab_on_the_left")}
           </Typography>
         </Box>
       ) : (
@@ -206,9 +205,7 @@ export function SectionDetailPopup({
               textAlign: "center",
             }}
           >
-            Audit-log (ActionLog) foydalanuvchi darajasida — section bilan
-            bog'lanmagan. To'liq faoliyat tarixini chap paneldagi "Activity"
-            tab'da ko'rishingiz mumkin.
+            {t("txt.the_activity_log_is_kept_per_account_see_the_ful")}
           </Typography>
         </Box>
       )}
@@ -222,7 +219,7 @@ export function SectionDetailPopup({
         }}
       >
         Oxirgi yangilanish:{" "}
-        {format(new Date(section.lastUpdated), "MMM dd, HH:mm")}
+        {format(new Date(section.lastUpdated), "PPp", { locale: dateLocale() })}
       </Typography>
     </Card>
   );

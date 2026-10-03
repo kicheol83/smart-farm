@@ -25,6 +25,7 @@ import {
   LOGIN_BG_LIGHT,
   LOGIN_BG_DARK,
 } from "@/theme/theme";
+import { t } from "@/i18n/core";
 
 const LOGIN_MUTATION = gql`
   mutation Login($input: LoginMemberInput!) {
@@ -77,11 +78,11 @@ export function LoginPage() {
 
     let hasError = false;
     if (!EMAIL_REGEX.test(email)) {
-      setEmailError("Wrong email address. Please check again.");
+      setEmailError(t("txt.wrong_email_address_please_check_again"));
       hasError = true;
     }
     if (password.length < 8) {
-      setPasswordError("Incorrect password. Please try again.");
+      setPasswordError(t("txt.incorrect_password_please_try_again"));
       hasError = true;
     }
     if (hasError) return;
@@ -104,7 +105,7 @@ export function LoginPage() {
 
       navigate("/dashboard");
     } catch (err: any) {
-      setPasswordError("Incorrect password. Please try again.");
+      setPasswordError(t("txt.incorrect_password_please_try_again"));
       setServerError(err.message ?? null);
     }
   }
@@ -179,7 +180,7 @@ export function LoginPage() {
                   color: "text.primary",
                 }}
               >
-                Hi, Welcome Back
+                {t("txt.hi_welcome_back")}
               </Typography>
               <Typography
                 sx={{
@@ -191,7 +192,7 @@ export function LoginPage() {
                   color: "text.secondary",
                 }}
               >
-                Access your farm data, devices, and insights securely.
+                {t("txt.access_your_farm_data_devices_and_insights_secur")}
               </Typography>
             </Box>
 
@@ -214,7 +215,7 @@ export function LoginPage() {
                 }}
               >
                 <AuthTextField
-                  label="Email"
+                  label={t("txt.email")}
                   type="email"
                   required
                   autoComplete="email"
@@ -228,11 +229,11 @@ export function LoginPage() {
                 />
 
                 <AuthTextField
-                  label="Password"
+                  label={t("txt.password")}
                   type={showPassword ? "text" : "password"}
                   required
                   autoComplete="current-password"
-                  placeholder="Must contain at least 8 characters"
+                  placeholder={t("txt.must_contain_at_least_8_characters")}
                   value={password}
                   errorText={passwordError ?? undefined}
                   onChange={(e) => {
@@ -295,7 +296,7 @@ export function LoginPage() {
                         color: "text.secondary",
                       }}
                     >
-                      Remember me
+                      {t("txt.remember_me")}
                     </Typography>
                   </Box>
 
@@ -312,7 +313,7 @@ export function LoginPage() {
                       "&:hover": { textDecoration: "underline" },
                     }}
                   >
-                    Forgot Password?
+                    {t("txt.forgot_password")}
                   </Link>
                 </Box>
               </Box>
@@ -349,7 +350,7 @@ export function LoginPage() {
                   },
                 }}
               >
-                {loading ? "Kirilmoqda..." : "Log in"}
+                {loading ? t("txt.logging_in") : t("txt.log_in")}
               </Button>
             </Box>
           </Box>
@@ -364,7 +365,7 @@ export function LoginPage() {
                 color: "text.secondary",
               }}
             >
-              or
+              {t("txt.or")}
             </Typography>
           </Divider>
 
@@ -396,7 +397,7 @@ export function LoginPage() {
                 "&:hover": { bgcolor: "rgba(255,255,255,0.6)" },
               }}
             >
-              Log in with Google
+              {t("txt.log_in_with_google")}
             </Button>
 
             <Button
@@ -419,7 +420,7 @@ export function LoginPage() {
                 "&:hover": { bgcolor: "rgba(255,255,255,0.6)" },
               }}
             >
-              Log in with Apple
+              {t("txt.log_in_with_apple")}
             </Button>
 
             <Box
@@ -440,7 +441,7 @@ export function LoginPage() {
                   color: "text.secondary",
                 }}
               >
-                Don't have an account?
+                {t("txt.don_t_have_an_account")}
               </Typography>
               <Link
                 component={RouterLink}
@@ -455,7 +456,7 @@ export function LoginPage() {
                   "&:hover": { textDecoration: "underline" },
                 }}
               >
-                Sign up
+                {t("txt.sign_up")}
               </Link>
             </Box>
           </Box>
@@ -464,8 +465,8 @@ export function LoginPage() {
 
       <AuthOnboardingPanel
         image={ONBOARDING_IMAGE}
-        heading="Grow Smarter, Farm Better"
-        subtitle="Track soil health, moisture, and vegetation to make data-driven decisions."
+        heading={t("txt.grow_smarter_farm_better")}
+        subtitle={t("txt.track_soil_health_moisture_and_vegetation_to_mak")}
         activeStep={0}
       />
     </Box>

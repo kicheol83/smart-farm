@@ -11,6 +11,7 @@ import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import RadioButtonUncheckedRoundedIcon from "@mui/icons-material/RadioButtonUncheckedRounded";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
+import { dateLocale, t as tr } from "@/i18n/core";
 
 type TaskStatus = "TODO" | "IN_PROGRESS" | "DONE";
 
@@ -59,7 +60,7 @@ export function DashboardTaskPanel({
           color: "text.primary",
         }}
       >
-        Task
+        {tr("dash.tasks.title")}
       </Typography>
 
       {/* Progress bar */}
@@ -155,7 +156,7 @@ export function DashboardTaskPanel({
                     color: "text.secondary",
                   }}
                 >
-                  Due: {format(new Date(t.dueDate), "MMM dd, yyyy")}
+                  {tr("dash.tasks.due", { date: format(new Date(t.dueDate), "PP", { locale: dateLocale() }) })}
                 </Typography>
               </Box>
             </Box>
@@ -172,7 +173,7 @@ export function DashboardTaskPanel({
               py: 2,
             }}
           >
-            Hali vazifa yo'q
+            {tr("dash.tasks.empty")}
           </Typography>
         )}
       </Stack>

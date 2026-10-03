@@ -1,6 +1,7 @@
 import { Box, Card, Typography, Chip } from "@mui/material";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { format } from "date-fns";
+import { t } from "@/i18n/core";
 
 interface DataPoint {
   date: string;
@@ -44,7 +45,7 @@ export function MemberGrowthChart({
               color: "text.primary",
             }}
           >
-            Member Growth
+            {t("txt.member_growth")}
           </Typography>
           <Typography
             sx={{
@@ -75,7 +76,7 @@ export function MemberGrowthChart({
           series={[
             {
               data: counts,
-              label: "New Members",
+              label: t("txt.new_members"),
               color: "#35C56E",
               area: true,
               showMark: false,
@@ -95,7 +96,7 @@ export function MemberGrowthChart({
             color: "text.secondary",
           }}
         >
-          Ma'lumot yo'q
+          {t("txt.no_data")}
         </Box>
       )}
     </Card>
