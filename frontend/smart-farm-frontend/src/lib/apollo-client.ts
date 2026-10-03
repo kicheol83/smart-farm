@@ -16,7 +16,8 @@ const GRAPHQL_WS_URL =
 // ─── Auth token ──────────────────────────────────────────────────────────────
 
 function getAuthToken(): string | null {
-  return localStorage.getItem("accessToken");
+  const token = localStorage.getItem("accessToken");
+  return token && token !== "undefined" && token !== "null" ? token : null;
 }
 
 // ─── HTTP + GraphQL Upload ────────────────────────────────────────────────────
