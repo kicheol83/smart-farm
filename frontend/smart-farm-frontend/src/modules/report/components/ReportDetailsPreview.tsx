@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { GET_REPORT_ENTRIES } from "../graphql/queries";
 import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
+import { t } from "@/i18n/core";
+import { dateLocale } from "@/i18n/core";
 
 type EntryStatus = "DONE" | "OPTIMAL" | "ATTENTION";
 
@@ -12,10 +14,10 @@ const STATUS_STYLE: Record<
   EntryStatus,
   { label: string; color: string; bg: string }
 > = {
-  DONE: { label: "Done", color: "#1a7a4c", bg: "rgba(53,197,110,0.14)" },
-  OPTIMAL: { label: "Optimal", color: "#a06a0a", bg: "rgba(249,173,25,0.14)" },
+  DONE: { label: t("txt.done"), color: "#1a7a4c", bg: "rgba(53,197,110,0.14)" },
+  OPTIMAL: { label: t("txt.optimal"), color: "#a06a0a", bg: "rgba(249,173,25,0.14)" },
   ATTENTION: {
-    label: "Attention",
+    label: t("txt.attention"),
     color: "#c62828",
     bg: "rgba(229,57,53,0.14)",
   },
@@ -51,7 +53,7 @@ export function ReportDetailsPreview() {
           mb: 1.5,
         }}
       >
-        Report Details
+        {t("txt.report_details")}
       </Typography>
 
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
@@ -87,7 +89,7 @@ export function ReportDetailsPreview() {
                     color: "text.secondary",
                   }}
                 >
-                  {format(new Date(e.entryDate), "MMM dd, yyyy")} • Health{" "}
+                  {format(new Date(e.entryDate), "PP", { locale: dateLocale() })} • Health{" "}
                   {Math.round(e.healthIndex)}%
                 </Typography>
               </Box>
@@ -115,7 +117,7 @@ export function ReportDetailsPreview() {
               py: 3,
             }}
           >
-            Hali report entry yo'q
+            {t("txt.no_report_entries_yet")}
           </Typography>
         )}
       </Box>

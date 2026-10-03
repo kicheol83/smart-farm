@@ -8,6 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 import { LOGOUT_MUTATION } from "../graphql/queries";
+import { t } from "@/i18n/core";
 
 interface LogoutConfirmDialogProps {
   open: boolean;
@@ -36,7 +37,7 @@ export function LogoutConfirmDialog({
           textAlign: "center",
         }}
       >
-        Are you sure want to log out?
+        {t("txt.are_you_sure_you_want_to_log_out")}
       </DialogTitle>
       <DialogContent>
         <Typography
@@ -47,8 +48,7 @@ export function LogoutConfirmDialog({
             textAlign: "center",
           }}
         >
-          Logging out won't affect your saved data. You can sign in anytime
-          securely.
+          {t("txt.logging_out_won_t_affect_your_saved_data_you_can")}
         </Typography>
       </DialogContent>
       <DialogActions sx={{ p: 2, gap: 1 }}>
@@ -58,7 +58,7 @@ export function LogoutConfirmDialog({
           onClick={onClose}
           sx={{ textTransform: "none", borderRadius: 2 }}
         >
-          Cancel
+          {t("txt.cancel")}
         </Button>
         <Button
           fullWidth
@@ -67,7 +67,7 @@ export function LogoutConfirmDialog({
           onClick={handleLogout}
           sx={{ textTransform: "none", borderRadius: 2 }}
         >
-          Log out
+          {t("txt.log_out")}
         </Button>
       </DialogActions>
     </Dialog>

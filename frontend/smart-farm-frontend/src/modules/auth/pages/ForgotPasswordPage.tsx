@@ -12,6 +12,7 @@ import {
   LOGIN_BG_LIGHT,
   LOGIN_BG_DARK,
 } from "@/theme/theme";
+import { t } from "@/i18n/core";
 
 const FORGOT_PASSWORD_MUTATION = gql`
   mutation ForgotPassword($input: ForgotPasswordInput!) {
@@ -41,7 +42,7 @@ export function ForgotPasswordPage() {
     setError(null);
 
     if (!EMAIL_REGEX.test(email)) {
-      setError("Wrong email address. Please check again.");
+      setError(t("txt.wrong_email_address_please_check_again"));
       return;
     }
 
@@ -49,7 +50,7 @@ export function ForgotPasswordPage() {
       await forgotPassword({ variables: { input: { memberEmail: email } } });
       navigate("/forgot-password/verify", { state: { email } });
     } catch (err: any) {
-      setError(err.message ?? "Xatolik yuz berdi.");
+      setError(err.message ?? t("txt.something_went_wrong"));
     }
   }
 
@@ -122,7 +123,7 @@ export function ForgotPasswordPage() {
                 color: "text.primary",
               }}
             >
-              Forgot Your Password?
+              {t("txt.forgot_your_password")}
             </Typography>
             <Typography
               sx={{
@@ -134,13 +135,12 @@ export function ForgotPasswordPage() {
                 color: "text.secondary",
               }}
             >
-              If you've forgotten your password, please enter your email to
-              reset it.
+              {t("txt.if_you_ve_forgotten_your_password_please_enter_y")}
             </Typography>
           </Box>
 
           <AuthTextField
-            label="Email"
+            label={t("txt.email")}
             type="email"
             required
             autoComplete="email"
@@ -175,15 +175,15 @@ export function ForgotPasswordPage() {
               "&.Mui-disabled": { bgcolor: "#cecece", color: "#a4a4a4" },
             }}
           >
-            {loading ? "Yuborilmoqda..." : "Send"}
+            {loading ? t("txt.sending") : t("txt.send")}
           </Button>
         </Box>
       </Box>
 
       <AuthOnboardingPanel
         image={ONBOARDING_IMAGE}
-        heading="Real-Time Insights Access"
-        subtitle="Analyze field metrics quickly with intuitive charts and visual reports."
+        heading={t("txt.real_time_insights_access")}
+        subtitle={t("txt.analyze_field_metrics_quickly_with_intuitive_cha")}
         activeStep={2}
       />
     </Box>

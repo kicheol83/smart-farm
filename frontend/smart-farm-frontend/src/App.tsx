@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ProtectedRoute } from "@/components/layout/ProtectedRoute";
 import { AppLayout } from "@/components/layout/AppLayout";
 
@@ -32,9 +32,29 @@ import { WaterUsageAnalyticsPage } from "./modules/report/pages/WaterUsageAnalyt
 import { SoilMoistureTrendPage } from "./modules/report/pages/SoilMoistureTrendPage";
 import { OverallPlantHealthPage } from "./modules/report/pages/OverallPlantHealthPage";
 import { AutomationPage } from "./modules/automation/pages/AutomationPage";
+import { useI18n } from "@/i18n/I18nProvider";
+import { LanguageSwitcher } from "@/i18n/LanguageSwitcher";
+import { Box } from "@mui/material";
+
+const PUBLIC_PATHS = ["/login", "/signup", "/forgot-password", "/reset-password", "/password-changed"];
+
+function PublicLanguageSwitcher() {
+  const { pathname } = useLocation();
+  if (!PUBLIC_PATHS.some((path) => pathname.startsWith(path))) {
+    return null;
+  }
+  return (
+    <Box sx={{ position: "fixed", top: 16, right: 16, zIndex: 1300, bgcolor: "background.paper", borderRadius: 2 }}>
+      <LanguageSwitcher />
+    </Box>
+  );
+}
 
 export default function App() {
+  useI18n();
   return (
+    <>
+    <PublicLanguageSwitcher />
     <Routes>
       <Route path="/" element={<SplashScreenPage />} />
       <Route path="/login" element={<LoginPage />} />
@@ -98,5 +118,6 @@ export default function App() {
       </Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
+    </>
   );
 }

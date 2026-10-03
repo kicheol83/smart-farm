@@ -20,6 +20,7 @@ import {
 } from "../graphql/queries";
 import { GET_GREENHOUSE_DEVICE_OVERVIEW } from "@/modules/device/graphql/queries";
 import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
+import { t } from "@/i18n/core";
 
 export function AutomationPage() {
   const { greenHouseId } = useActiveGreenhouse();
@@ -122,7 +123,7 @@ export function AutomationPage() {
   if (!hasGreenhouse) {
     return (
       <>
-        <Header title="Automation" />
+        <Header title={t("txt.automation")} />
         <Box
           sx={{
             display: "flex",
@@ -132,7 +133,7 @@ export function AutomationPage() {
           }}
         >
           <Typography color="text.secondary">
-            Hali greenhouse tanlanmagan
+            {t("txt.no_greenhouse_selected_yet")}
           </Typography>
         </Box>
       </>
@@ -141,7 +142,7 @@ export function AutomationPage() {
 
   return (
     <>
-      <Header title="Automation" />
+      <Header title={t("txt.automation")} />
 
       <Tabs
         value={tab}
@@ -157,8 +158,8 @@ export function AutomationPage() {
           },
         }}
       >
-        <Tab label="Actuators" value="actuators" />
-        <Tab label="Automation Rules" value="rules" />
+        <Tab label={t("txt.actuators")} value="actuators" />
+        <Tab label={t("txt.automation_rules")} value="rules" />
       </Tabs>
 
       {tab === "actuators" && (
@@ -170,7 +171,7 @@ export function AutomationPage() {
               onClick={() => setActuatorDialogOpen(true)}
               sx={{ textTransform: "none", borderRadius: 2 }}
             >
-              Add Actuator
+              {t("txt.add_actuator")}
             </Button>
           </Box>
 
@@ -212,8 +213,7 @@ export function AutomationPage() {
                 py: 6,
               }}
             >
-              Hali actuator qo'shilmagan. Relay, suv nasosi, valve, lampa yoki
-              ventilyator qo'shing.
+              {t("txt.no_actuators_yet_add_a_relay_water_pump_valve_gr")}
             </Typography>
           )}
         </Box>
@@ -229,7 +229,7 @@ export function AutomationPage() {
               disabled={actuators.length === 0}
               sx={{ textTransform: "none", borderRadius: 2 }}
             >
-              Add Rule
+              {t("txt.add_rule")}
             </Button>
           </Box>
 
@@ -261,8 +261,8 @@ export function AutomationPage() {
               }}
             >
               {actuators.length === 0
-                ? "Avval kamida bitta actuator qo'shing, keyin qoida yaratish mumkin bo'ladi."
-                : "Hali avtomatlashtirish qoidasi yo'q."}
+                ? t("txt.add_at_least_one_actuator_first_then_you_can_cre")
+                : t("txt.no_automation_rules_yet")}
             </Typography>
           )}
         </Box>

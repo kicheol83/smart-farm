@@ -1,6 +1,7 @@
 import { Box, Typography, IconButton } from "@mui/material";
 import ArrowOutwardRoundedIcon from "@mui/icons-material/ArrowOutwardRounded";
 import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
+import { t } from "@/i18n/core";
 
 type DeviceStatus = "ONLINE" | "OFFLINE" | "MAINTENANCE" | "ERROR";
 
@@ -23,15 +24,15 @@ const STATUS_COLOR: Record<DeviceStatus, string> = {
 function typeLabel(deviceType: string): string {
   switch (deviceType) {
     case "CAMERA":
-      return "Camera";
+      return t("txt.camera");
     case "SENSOR_HUB":
-      return "Sensor";
+      return t("txt.sensor");
     case "CONTROLLER":
-      return "Controller";
+      return t("txt.controller");
     case "GATEWAY":
-      return "Gateway";
+      return t("txt.gateway");
     case "WEATHER_STATION":
-      return "Weather Station";
+      return t("txt.weather_station");
     default:
       return deviceType;
   }
@@ -124,7 +125,7 @@ export function DeviceListItem({
               color: "#a06a0a",
             }}
           >
-            Signal issue detected
+            {t("txt.signal_issue_detected")}
           </Typography>
         </Box>
       )}

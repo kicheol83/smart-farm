@@ -25,12 +25,13 @@ import {
   UPDATE_MEMBER_STATUS,
   DELETE_MEMBER,
 } from "../graphql/queries";
+import { t } from "@/i18n/core";
 
 const TABS = [
-  { key: "overview", label: "Overview" },
-  { key: "members", label: "Members" },
-  { key: "devices", label: "Devices" },
-  { key: "alerts", label: "System Alerts" },
+  { key: "overview", label: t("txt.overview") },
+  { key: "members", label: t("txt.members") },
+  { key: "devices", label: t("txt.devices") },
+  { key: "alerts", label: t("txt.system_alerts") },
 ];
 
 export function AdminDashboardPage() {
@@ -113,7 +114,7 @@ export function AdminDashboardPage() {
 
   return (
     <>
-      <Header title="Admin Panel" />
+      <Header title={t("txt.admin_panel")} />
 
       <Tabs
         value={tab}
@@ -140,47 +141,47 @@ export function AdminDashboardPage() {
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
             <AdminStatCard
               icon={GroupRoundedIcon}
-              label="Total Members"
+              label={t("txt.total_members")}
               value={stats.totalMembers}
               subLabel={`${stats.activeMembers} active`}
             />
             <AdminStatCard
               icon={AgricultureRoundedIcon}
-              label="Total Farms"
+              label={t("txt.total_farms")}
               value={stats.totalFarms}
             />
             <AdminStatCard
               icon={YardRoundedIcon}
-              label="Greenhouses"
+              label={t("txt.greenhouses")}
               value={stats.totalGreenhouses}
             />
             <AdminStatCard
               icon={MemoryRoundedIcon}
-              label="Total Devices"
+              label={t("txt.total_devices")}
               value={stats.totalDevices}
             />
             <AdminStatCard
               icon={WifiRoundedIcon}
-              label="Online Devices"
+              label={t("txt.online_devices")}
               value={stats.onlineDevices}
               color="#35C56E"
             />
             <AdminStatCard
               icon={WifiOffRoundedIcon}
-              label="Offline Devices"
+              label={t("txt.offline_devices")}
               value={stats.offlineDevices}
               color="#9c9c9c"
             />
             <AdminStatCard
               icon={NotificationsActiveRoundedIcon}
-              label="Critical Alerts"
+              label={t("txt.critical_alerts")}
               value={stats.criticalAlertsCount}
               color="#e53935"
               subLabel={`${stats.alertsLast24h} in last 24h`}
             />
             <AdminStatCard
               icon={AssignmentTurnedInRoundedIcon}
-              label="Total Tasks"
+              label={t("txt.total_tasks")}
               value={stats.totalTasks}
               subLabel={`${stats.completedTasks} done, ${stats.overdueTasks} overdue`}
             />

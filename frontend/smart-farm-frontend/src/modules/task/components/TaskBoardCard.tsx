@@ -11,6 +11,8 @@ import {
 import MoreHorizRoundedIcon from "@mui/icons-material/MoreHorizRounded";
 import CalendarTodayRoundedIcon from "@mui/icons-material/CalendarTodayRounded";
 import { format } from "date-fns";
+import { t } from "@/i18n/core";
+import { dateLocale } from "@/i18n/core";
 
 type TaskStatus = "TODO" | "IN_PROGRESS" | "DONE";
 
@@ -33,9 +35,9 @@ const PROGRESS_BY_STATUS: Record<TaskStatus, number> = {
 };
 
 const STATUS_LABEL: Record<TaskStatus, string> = {
-  TODO: "Not Started",
-  IN_PROGRESS: "In Progress",
-  DONE: "Done",
+  TODO: t("txt.not_started"),
+  IN_PROGRESS: t("txt.in_progress"),
+  DONE: t("txt.done"),
 };
 
 function formatTime(hhmm: string): string {
@@ -146,7 +148,7 @@ export function TaskBoardCard({
         >
           {startTime && endTime
             ? `${formatTime(startTime)} - ${formatTime(endTime)}`
-            : `Due: ${format(new Date(dueDate), "MMM dd, yyyy")}`}
+            : t("task.due", { date: format(new Date(dueDate), "PP", { locale: dateLocale() }) })}
         </Typography>
       </Box>
 

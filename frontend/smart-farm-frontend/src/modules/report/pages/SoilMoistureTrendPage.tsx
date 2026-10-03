@@ -8,17 +8,26 @@ import { SoilMoistureGauge } from "../components/SoilMoistureGauge";
 import { SoilMoistureOverviewCard } from "../components/SoilMoistureOverviewCard";
 import { GET_FULL_GREENHOUSE_REPORT } from "../graphql/queries";
 import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
+import { lastDaysLabel } from "@/lib/dateRange";
+import { t } from "@/i18n/core";
 
 function gradeFromValue(value: number): {
   label: string;
   color: string;
   bg: string;
 } {
-  if (value < 40)
-    return { label: "Low", color: "#a06a0a", bg: "rgba(249,173,25,0.14)" };
+  if (value < 35)
+    return { label: t("ph.grade.low"), color: "#a06a0a", bg: "rgba(249,173,25,0.14)" };
   if (value > 70)
-    return { label: "High", color: "#c62828", bg: "rgba(229,57,53,0.14)" };
-  return { label: "Optimal", color: "#1a7a4c", bg: "rgba(53,197,110,0.14)" };
+    return { label: t("ph.grade.high"), color: "#c62828", bg: "rgba(229,57,53,0.14)" };
+  return { label: t("ph.grade.optimal"), color: "#1a7a4c", bg: "rgba(53,197,110,0.14)" };
+}
+
+function soilDescription(value: number | undefined): string {
+  if (value === undefined) return "—";
+  if (value < 35) return t("soil.desc.low");
+  if (value > 70) return t("soil.desc.high");
+  return t("soil.desc.optimal");
 }
 
 export function SoilMoistureTrendPage() {
@@ -38,7 +47,7 @@ export function SoilMoistureTrendPage() {
   if (!hasGreenhouse) {
     return (
       <>
-        <Header title="Soil Moisture Trend" />
+        <Header title={t("txt.soil_moisture_trend")} />
         <Box
           sx={{
             display: "flex",
@@ -48,7 +57,7 @@ export function SoilMoistureTrendPage() {
           }}
         >
           <Typography color="text.secondary">
-            Hali greenhouse tanlanmagan
+            {t("txt.no_greenhouse_selected_yet")}
           </Typography>
         </Box>
       </>
@@ -57,7 +66,7 @@ export function SoilMoistureTrendPage() {
 
   return (
     <>
-      <Header title="Soil Moisture Trend" />
+      <Header title={t("txt.soil_moisture_trend")} />
 
       <Box
         sx={{
@@ -78,7 +87,7 @@ export function SoilMoistureTrendPage() {
               color: "text.primary",
             }}
           >
-            Soil Moisture Trend (Last 7 Days)
+            {t("txt.soil_moisture_trend_last_7_days")}
           </Typography>
           <Typography
             sx={{
@@ -87,8 +96,7 @@ export function SoilMoistureTrendPage() {
               color: "text.secondary",
             }}
           >
-            Average soil moisture levels over time to support precise watering
-            decisions.
+            {t("txt.average_soil_moisture_levels_over_time_to_suppor")}
           </Typography>
         </Box>
         <Button
@@ -96,7 +104,7 @@ export function SoilMoistureTrendPage() {
           startIcon={<CalendarTodayRoundedIcon fontSize="small" />}
           sx={{ textTransform: "none", borderRadius: 2 }}
         >
-          08 - 14 September 2024
+          {lastDaysLabel(7)}
         </Button>
       </Box>
 
@@ -131,7 +139,7 @@ export function SoilMoistureTrendPage() {
               color: "text.primary",
             }}
           >
-            Soil Moisture Overview
+            {t("txt.soil_moisture_overview")}
           </Typography>
           <Typography
             sx={{
@@ -140,8 +148,7 @@ export function SoilMoistureTrendPage() {
               color: "text.secondary",
             }}
           >
-            Real-time readings and weekly insights to support precise watering
-            decisions.
+            {t("txt.real_time_readings_and_weekly_insights_to_suppor")}
           </Typography>
         </Box>
         <Box sx={{ display: "flex", gap: 1 }}>
@@ -149,21 +156,21 @@ export function SoilMoistureTrendPage() {
             variant="outlined"
             sx={{ textTransform: "none", borderRadius: 2 }}
           >
-            Sort By
+            {t("txt.sort_by")}
           </Button>
           <Button
             variant="outlined"
             startIcon={<TuneRoundedIcon fontSize="small" />}
             sx={{ textTransform: "none", borderRadius: 2 }}
           >
-            Filter
+            {t("txt.filter")}
           </Button>
         </Box>
       </Box>
 
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
         <SoilMoistureOverviewCard
-          label="Current Reading"
+          label={t("txt.current_reading")}
           value={
             currentValue !== undefined ? `${Math.round(currentValue)}%` : "--"
           }
@@ -172,37 +179,32 @@ export function SoilMoistureTrendPage() {
               ? gradeFromValue(currentValue)
               : undefined
           }
-          description="Current moisture level is within the safe range for plant growth and supports root."
-          lastUpdated="Today"
+          description={soilDescription(currentValue)}
+          lastUpdated={t("txt.today")}
         />
         <SoilMoistureOverviewCard
-          label="Today Comparison"
+          label={t("txt.7_day_change")}
           value={
             soilMoisture
               ? `${soilMoisture.changePercent > 0 ? "+" : ""}${soilMoisture.changePercent.toFixed(0)}%`
               : "--"
           }
-          description="Watering adjustment may be reduced to maintain optimal balance."
-          lastUpdated="Recorded"
+          description={t("soil.desc.change")}
+          lastUpdated={t("txt.recorded")}
         />
         <SoilMoistureOverviewCard
-          label="7-Day Average"
+          label={t("txt.7_day_average")}
           value={soilMoisture ? `${Math.round(soilMoisture.average)}%` : "--"}
           badge={
             soilMoisture ? gradeFromValue(soilMoisture.average) : undefined
           }
-          description="Soil moisture is within the optimal range, supporting growth and reducing stress."
-          lastUpdated="Updated"
+          description={soilDescription(soilMoisture?.average)}
+          lastUpdated={t("txt.updated")}
         />
         <SoilMoistureOverviewCard
-          label="Optimal Range"
-          value="35 - 65%"
-          badge={{
-            label: "Fair",
-            color: "#a06a0a",
-            bg: "rgba(249,173,25,0.14)",
-          }}
-          description="System will notify if soil moisture is below or above, ensuring adjustments for growth."
+          label={t("txt.optimal_range")}
+          value="35 - 70%"
+          description={t("soil.desc.range")}
         />
       </Box>
     </>

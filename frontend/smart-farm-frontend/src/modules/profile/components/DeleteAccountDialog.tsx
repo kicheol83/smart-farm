@@ -14,6 +14,7 @@ import {
   GET_DELETE_ACCOUNT_REASONS,
   DELETE_ACCOUNT_MUTATION,
 } from "../graphql/queries";
+import { t } from "@/i18n/core";
 
 interface DeleteAccountDialogProps {
   open: boolean;
@@ -57,7 +58,7 @@ export function DeleteAccountDialog({
               textAlign: "center",
             }}
           >
-            Delete Account
+            {t("txt.delete_account")}
           </DialogTitle>
           <DialogContent>
             <Typography
@@ -69,8 +70,7 @@ export function DeleteAccountDialog({
                 mb: 2,
               }}
             >
-              If you need to delete an account and you're prompted to provide a
-              reason.
+              {t("txt.please_tell_us_why_you_want_to_delete_your_accou")}
             </Typography>
 
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
@@ -121,7 +121,7 @@ export function DeleteAccountDialog({
               onClick={resetAndClose}
               sx={{ textTransform: "none", borderRadius: 2 }}
             >
-              Cancel
+              {t("txt.cancel")}
             </Button>
             <Button
               fullWidth
@@ -130,7 +130,7 @@ export function DeleteAccountDialog({
               onClick={() => setStep("confirm")}
               sx={{ textTransform: "none", borderRadius: 2 }}
             >
-              Continue
+              {t("txt.continue")}
             </Button>
           </DialogActions>
         </>
@@ -143,7 +143,7 @@ export function DeleteAccountDialog({
               textAlign: "center",
             }}
           >
-            Delete Account
+            {t("txt.delete_account")}
           </DialogTitle>
           <DialogContent>
             <Typography
@@ -154,9 +154,7 @@ export function DeleteAccountDialog({
                 textAlign: "center",
               }}
             >
-              You want to delete your account permanently. Ensuring that the
-              user understands the consequences of deleting their account (loss
-              of data, etc).
+              {t("txt.your_account_and_all_of_its_data_will_be_deleted")}
             </Typography>
           </DialogContent>
           <DialogActions sx={{ p: 2, gap: 1 }}>
@@ -172,7 +170,7 @@ export function DeleteAccountDialog({
                 borderColor: "error.main",
               }}
             >
-              Delete
+              {t("txt.delete")}
             </Button>
             <Button
               fullWidth
@@ -180,7 +178,7 @@ export function DeleteAccountDialog({
               onClick={resetAndClose}
               sx={{ textTransform: "none", borderRadius: 2 }}
             >
-              Keep Account
+              {t("txt.keep_account")}
             </Button>
           </DialogActions>
         </>

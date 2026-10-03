@@ -18,6 +18,7 @@ import { useLive } from "@/lib/live/LiveProvider";
 import { GET_PIPELINE_OVERVIEW } from "../graphql/queries";
 import { PipelineFlow } from "../components/PipelineFlow";
 import { ClosedLoopCard } from "../components/ClosedLoopCard";
+import { locale, t } from "@/i18n/core";
 
 type PipelineSensor = {
   sensorId: string;
@@ -52,9 +53,9 @@ type PipelineDevice = {
 
 type ThroughputPoint = { hour: string; readings: number; anomalies: number };
 
-const number = new Intl.NumberFormat();
 
 function formatValue(value: number | null | undefined, digits = 2): string {
+  const number = new Intl.NumberFormat(locale());
   return value === null || value === undefined ? "—" : number.format(Number(value.toFixed(digits)));
 }
 
@@ -94,72 +95,73 @@ export function PipelinePage() {
     pollInterval: 30000,
   });
 
+  const number = new Intl.NumberFormat(locale());
   const overview = data?.pipelineOverview;
   const throughput: ThroughputPoint[] = overview?.throughput ?? [];
   const hours = throughput.map((point) =>
-    new Date(point.hour).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    new Date(point.hour).toLocaleTimeString(locale(), { hour: "2-digit", minute: "2-digit" }),
   );
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-      <Header title="IoT Pipeline" />
+      <Header title={t("pipe.title")} />
 
       <Paper sx={{ p: 2.5, borderRadius: 3 }} elevation={0}>
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 1 }}>
           <Typography variant="h6" sx={{ fontWeight: 700 }}>
-            Data flow
+            {t("pipe.flow")}
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            {connected ? `${number.format(messageCount)} readings received in this session` : "Realtime connection offline"}
+            {connected ? t("pipe.sessionCount", { count: number.format(messageCount) }) : t("live.tooltip.offline")}
           </Typography>
         </Box>
         <PipelineFlow pulseKey={lastUpdate} active={connected} />
       </Paper>
 
       <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-        <MetricCard label="LIVE THROUGHPUT" value={`${messagesPerMinute}/min`} hint="sensor readings pushed over WebSocket" accent="#35C56E" />
-        <MetricCard label="READINGS · 24H" value={overview ? number.format(overview.readingsLast24h) : "—"} hint={overview ? `${number.format(overview.readingsLastHour)} in the last hour` : undefined} />
-        <MetricCard label="ANOMALIES · 24H" value={overview ? number.format(overview.anomaliesLast24h) : "—"} hint="Z-score ≥ 2 against rolling stats" accent={overview?.anomaliesLast24h ? "#F5A524" : undefined} />
-        <MetricCard label="PIPELINE ERRORS · 24H" value={overview ? number.format(overview.errorsLast24h) : "—"} hint="auth, parse and storage failures" accent={overview?.errorsLast24h ? "#E5484D" : undefined} />
+        <MetricCard label={t("pipe.kpi.live")} value={t("pipe.perMinute", { count: messagesPerMinute })} hint={t("pipe.kpi.liveHint")} accent="#35C56E" />
+        <MetricCard label={t("pipe.kpi.readings")} value={overview ? number.format(overview.readingsLast24h) : "—"} hint={overview ? t("pipe.kpi.lastHour", { count: number.format(overview.readingsLastHour) }) : undefined} />
+        <MetricCard label={t("pipe.kpi.anomalies")} value={overview ? number.format(overview.anomaliesLast24h) : "—"} hint={t("pipe.kpi.anomaliesHint")} accent={overview?.anomaliesLast24h ? "#F5A524" : undefined} />
+        <MetricCard label={t("pipe.kpi.errors")} value={overview ? number.format(overview.errorsLast24h) : "—"} hint={t("pipe.kpi.errorsHint")} accent={overview?.errorsLast24h ? "#E5484D" : undefined} />
       </Box>
 
       <ClosedLoopCard greenHouseId={greenHouseId} />
 
       <Paper sx={{ p: 2.5, borderRadius: 3 }} elevation={0}>
         <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
-          Throughput · last 24 hours
+          {t("pipe.throughput")}
         </Typography>
         {throughput.length > 0 ? (
           <BarChart
             height={260}
             series={[
-              { data: throughput.map((point) => point.readings), label: "Readings", color: "#35C56E" },
-              { data: throughput.map((point) => point.anomalies), label: "Anomalies", color: "#F5A524" },
+              { data: throughput.map((point) => point.readings), label: t("pipe.series.readings"), color: "#35C56E" },
+              { data: throughput.map((point) => point.anomalies), label: t("pipe.series.anomalies"), color: "#F5A524" },
             ]}
             xAxis={[{ data: hours, scaleType: "band" }]}
             margin={{ left: 50, right: 20, top: 40, bottom: 30 }}
             grid={{ horizontal: true }}
           />
         ) : (
-          <Typography color="text.secondary">{loading ? "Loading…" : "No readings yet."}</Typography>
+          <Typography color="text.secondary">{loading ? t("pipe.loading") : t("pipe.noReadings")}</Typography>
         )}
       </Paper>
 
       <Paper sx={{ p: 2.5, borderRadius: 3 }} elevation={0}>
         <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
-          Sensors · live value vs. rolling statistics
+          {t("pipe.sensors")}
         </Typography>
         <TableContainer>
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>Sensor</TableCell>
-                <TableCell>Device</TableCell>
-                <TableCell align="right">Live value</TableCell>
-                <TableCell align="right">Mean ± σ</TableCell>
+                <TableCell>{t("pipe.col.sensor")}</TableCell>
+                <TableCell>{t("pipe.col.device")}</TableCell>
+                <TableCell align="right">{t("pipe.col.live")}</TableCell>
+                <TableCell align="right">{t("pipe.col.mean")}</TableCell>
                 <TableCell align="right">Z-score</TableCell>
-                <TableCell align="right">Samples</TableCell>
-                <TableCell align="right">Anomalies 24h</TableCell>
+                <TableCell align="right">{t("pipe.col.samples")}</TableCell>
+                <TableCell align="right">{t("pipe.col.anomalies")}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -174,7 +176,7 @@ export function PipelinePage() {
                     <TableCell>{sensor.deviceName}</TableCell>
                     <TableCell align="right">
                       {formatValue(value)} {sensor.unit ?? ""}
-                      {live && <Chip label="live" size="small" color="success" sx={{ ml: 1, height: 18 }} />}
+                      {live && <Chip label={t("pipe.liveChip")} size="small" color="success" sx={{ ml: 1, height: 18 }} />}
                     </TableCell>
                     <TableCell align="right">
                       {sensor.mean != null ? `${formatValue(sensor.mean)} ± ${formatValue(sensor.std)}` : "—"}
@@ -195,10 +197,10 @@ export function PipelinePage() {
       <Box sx={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
         <Paper sx={{ p: 2.5, borderRadius: 3, flex: "2 1 420px" }} elevation={0}>
           <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
-            Recent anomalies
+            {t("pipe.recent")}
           </Typography>
           {(overview?.recentAnomalies ?? []).length === 0 && (
-            <Typography color="text.secondary">No anomalies detected.</Typography>
+            <Typography color="text.secondary">{t("pipe.noAnomalies")}</Typography>
           )}
           {(overview?.recentAnomalies ?? []).map((anomaly: PipelineAnomaly) => (
             <Box
@@ -212,10 +214,10 @@ export function PipelinePage() {
               />
               <Typography sx={{ fontWeight: 600, minWidth: 130 }}>{anomaly.sensorType}</Typography>
               <Typography variant="body2" color="text.secondary" sx={{ flex: 1 }}>
-                {formatValue(anomaly.value)} (mean {formatValue(anomaly.meanValue)}, z = {anomaly.zScore.toFixed(2)})
+                {t("pipe.anomalyDetail", { value: formatValue(anomaly.value), mean: formatValue(anomaly.meanValue), z: anomaly.zScore.toFixed(2) })}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {new Date(anomaly.detectedAt).toLocaleString()}
+                {new Date(anomaly.detectedAt).toLocaleString(locale())}
               </Typography>
             </Box>
           ))}
@@ -223,7 +225,7 @@ export function PipelinePage() {
 
         <Paper sx={{ p: 2.5, borderRadius: 3, flex: "1 1 280px" }} elevation={0}>
           <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
-            Devices
+            {t("pipe.devices")}
           </Typography>
           {(overview?.devices ?? []).map((device: PipelineDevice) => (
             <Box key={device.deviceId} sx={{ py: 1, borderBottom: 1, borderColor: "divider" }}>
@@ -236,8 +238,10 @@ export function PipelinePage() {
                 />
               </Box>
               <Typography variant="caption" color="text.secondary">
-                {device.sensorCount} sensors · last seen{" "}
-                {device.lastSeenAt ? new Date(device.lastSeenAt).toLocaleString() : "—"}
+                {t("pipe.deviceLine", {
+                  count: device.sensorCount,
+                  time: device.lastSeenAt ? new Date(device.lastSeenAt).toLocaleString(locale()) : "—",
+                })}
               </Typography>
             </Box>
           ))}

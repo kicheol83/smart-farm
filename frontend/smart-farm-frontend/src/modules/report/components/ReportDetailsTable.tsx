@@ -13,6 +13,8 @@ import {
 } from "@mui/material";
 import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded";
 import { format } from "date-fns";
+import { t } from "@/i18n/core";
+import { dateLocale } from "@/i18n/core";
 
 type EntryStatus = "DONE" | "OPTIMAL" | "ATTENTION";
 
@@ -44,26 +46,26 @@ const STATUS_STYLE: Record<
   EntryStatus,
   { label: string; color: string; bg: string }
 > = {
-  DONE: { label: "Done", color: "#1a7a4c", bg: "rgba(53,197,110,0.14)" },
-  OPTIMAL: { label: "Optimal", color: "#a06a0a", bg: "rgba(249,173,25,0.14)" },
+  DONE: { label: t("txt.done"), color: "#1a7a4c", bg: "rgba(53,197,110,0.14)" },
+  OPTIMAL: { label: t("txt.optimal"), color: "#a06a0a", bg: "rgba(249,173,25,0.14)" },
   ATTENTION: {
-    label: "Attention",
+    label: t("txt.attention"),
     color: "#c62828",
     bg: "rgba(229,57,53,0.14)",
   },
 };
 
 const COLUMNS = [
-  "Date",
-  "Plant",
-  "Area",
-  "Health",
-  "Status",
-  "Harvest Prediction",
-  "Moisture",
-  "Humidity",
-  "Pest Disease",
-  "Description",
+  t("txt.date"),
+  t("txt.plant"),
+  t("txt.area"),
+  t("txt.health"),
+  t("txt.status"),
+  t("txt.harvest_prediction"),
+  t("txt.moisture"),
+  t("txt.humidity"),
+  t("txt.pest_disease"),
+  t("txt.description"),
 ];
 
 export function ReportDetailsTable({
@@ -115,7 +117,7 @@ export function ReportDetailsTable({
                       whiteSpace: "nowrap",
                     }}
                   >
-                    {format(new Date(e.entryDate), "dd MMM yy")}
+                    {format(new Date(e.entryDate), "PP", { locale: dateLocale() })}
                   </TableCell>
                   <TableCell
                     sx={{
@@ -168,7 +170,7 @@ export function ReportDetailsTable({
                     }}
                   >
                     {e.harvestPrediction
-                      ? format(new Date(e.harvestPrediction), "dd MMM yy")
+                      ? format(new Date(e.harvestPrediction), "PP", { locale: dateLocale() })
                       : "—"}
                   </TableCell>
                   <TableCell
@@ -203,7 +205,7 @@ export function ReportDetailsTable({
                       borderColor: "divider",
                     }}
                   >
-                    {e.pestDisease ?? "No pest"}
+                    {e.pestDisease ?? t("txt.no_pest")}
                   </TableCell>
                   <TableCell
                     sx={{
@@ -237,7 +239,7 @@ export function ReportDetailsTable({
                       color: "text.secondary",
                     }}
                   >
-                    Hali report entry yo'q
+                    {t("txt.no_report_entries_yet")}
                   </Typography>
                 </TableCell>
               </TableRow>
@@ -265,7 +267,7 @@ export function ReportDetailsTable({
               color: "text.secondary",
             }}
           >
-            Showing
+            {t("txt.showing")}
           </Typography>
           <Select
             size="small"
@@ -292,7 +294,7 @@ export function ReportDetailsTable({
 
         <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
           <PageButton
-            label="Back"
+            label={t("txt.back")}
             disabled={page === 1}
             onClick={() => onPageChange(page - 1)}
           />
@@ -317,7 +319,7 @@ export function ReportDetailsTable({
             />
           )}
           <PageButton
-            label="Next"
+            label={t("txt.next")}
             disabled={page === totalPages}
             onClick={() => onPageChange(page + 1)}
           />

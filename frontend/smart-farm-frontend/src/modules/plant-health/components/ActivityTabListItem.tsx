@@ -1,5 +1,6 @@
 import { Box, Typography, Chip } from "@mui/material";
 import { format } from "date-fns";
+import { dateLocale } from "@/i18n/core";
 
 type ActionType =
   | "CREATE"
@@ -80,7 +81,7 @@ export function ActivityTabListItem({
         }}
       >
         {memberFullName} &nbsp;•&nbsp; {actionResource} &nbsp;•&nbsp;{" "}
-        {format(new Date(createdAt), "MMM dd, hh:mm a")}
+        {format(new Date(createdAt), "PPp", { locale: dateLocale() })}
       </Typography>
     </Box>
   );

@@ -27,6 +27,7 @@ import { GET_TODAY_TEMPERATURE_RANGE } from "../graphql/queries";
 import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
 import { useLive } from "@/lib/live/LiveProvider";
 import { FEATURES } from "@/lib/features";
+import { t } from "@/i18n/core";
 
 export function DashboardPage() {
   const { greenHouseId } = useActiveGreenhouse();
@@ -97,12 +98,12 @@ export function DashboardPage() {
       : undefined;
   const healthDescription =
     healthIndex === undefined
-      ? "Health is calculated from the last 24 hours of sensor readings"
+      ? t("dash.health.calculated")
       : healthIndex >= 80
-        ? "Your plants are thriving and showing excellent health"
+        ? t("dash.health.good")
         : healthIndex >= 50
-          ? "Some conditions are drifting outside the optimal range"
-          : "Several conditions are outside the optimal range";
+          ? t("dash.health.warning")
+          : t("dash.health.critical");
   const weather = weatherData?.currentWeather;
   const compass = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
   const windFrom = weather ? compass[Math.round(weather.windDirection / 45) % 8] : undefined;
@@ -128,7 +129,7 @@ export function DashboardPage() {
   if (!hasGreenhouse) {
     return (
       <>
-        <Header title="Greenhouse Monitoring" />
+        <Header title={t("dash.title")} />
         <Box
           sx={{
             display: "flex",
@@ -142,10 +143,10 @@ export function DashboardPage() {
           }}
         >
           <Typography variant="subtitle1" color="text.primary">
-            Hali greenhouse tanlanmagan
+            {t("dash.noGreenhouse")}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Sector selectordan greenhouse tanlang yoki avval bittasini yarating.
+            {t("dash.noGreenhouseHint")}
           </Typography>
         </Box>
       </>
@@ -154,7 +155,7 @@ export function DashboardPage() {
 
   return (
     <>
-      <Header title="Greenhouse Monitoring" />
+      <Header title={t("dash.title")} />
 
       <Box
         sx={{
@@ -187,7 +188,7 @@ export function DashboardPage() {
           >
             <PlantReportCard
               icon={SpaRoundedIcon}
-              label="Plant Health"
+              label={t("dash.card.plantHealth")}
               value={healthIndex ?? "--"}
               unit="%"
               badge={undefined}
@@ -196,41 +197,41 @@ export function DashboardPage() {
             />
             <PlantReportCard
               icon={AirRoundedIcon}
-              label="Wind"
+              label={t("dash.card.wind")}
               value={weather ? weather.windSpeed.toFixed(1) : "--"}
               unit="m/s"
               description={
                 weather
-                  ? `Outdoor wind from ${windFrom} · ${weather.source}`
-                  : "Make sure there is still adequate airflow"
+                  ? t("dash.card.windFrom", { direction: windFrom ?? "", source: weather.source })
+                  : t("dash.card.windDefault")
               }
             />
             <PlantReportCard
               icon={DeviceThermostatRoundedIcon}
-              label="Temperature"
+              label={t("dash.card.temperature")}
               value={summary?.temperature ?? "--"}
               unit="°C"
-              description="Maintain consistent between 15°C and 20°C"
+              description={t("dash.card.temperatureHint")}
             />
             <PlantReportCard
               icon={ScienceOutlinedIcon}
-              label="pH Level"
+              label={t("dash.card.ph")}
               value={summary?.ph ?? "--"}
-              description="Add acidic compost to balance the pH"
+              description={t("dash.card.phHint")}
             />
             <PlantReportCard
               icon={WaterDropOutlinedIcon}
-              label="Humidity"
+              label={t("dash.card.humidity")}
               value={summary?.humidity ?? "--"}
               unit="%"
-              description="Sufficient to prevent mold growth"
+              description={t("dash.card.humidityHint")}
             />
             <PlantReportCard
               icon={GrassOutlinedIcon}
-              label="Soil Moisture"
+              label={t("dash.card.soil")}
               value={summary?.soilMoisture ?? "--"}
               unit="%"
-              description="Keep monitoring to ensure it remains consistent"
+              description={t("dash.card.soilHint")}
             />
           </Box>
         </Box>

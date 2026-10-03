@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Box, Typography, TextField, MenuItem } from "@mui/material";
 import { NotificationToggleRow } from "./NotificationToggleRow";
+import { t } from "@/i18n/core";
 
 interface NotificationChannels {
   email: boolean;
@@ -58,7 +59,7 @@ export function NotificationsSettingsTab({
           color: "text.secondary",
         }}
       >
-        Yuklanmoqda...
+        {t("txt.loading")}
       </Typography>
     );
   }
@@ -74,23 +75,23 @@ export function NotificationsSettingsTab({
           mb: 1,
         }}
       >
-        Device Notifications
+        {t("txt.device_notifications")}
       </Typography>
 
       <NotificationToggleRow
-        label="Connection status notification"
+        label={t("txt.connection_status_notification")}
         checked={data.deviceOfflineAlerts}
         onChange={(v) => onUpdate({ deviceOfflineAlerts: v })}
       />
       <NotificationToggleRow
-        label="Floating Notifications"
-        description="Allow notifications to appear as floating pop-ups on top of other screens for faster visibility."
+        label={t("txt.floating_notifications")}
+        description={t("txt.allow_notifications_to_appear_as_floating_pop_up")}
         checked={data.floatingNotifications ?? true}
         onChange={(v) => onUpdate({ floatingNotifications: v })}
       />
       <NotificationToggleRow
-        label="Lock Screen Notifications"
-        description="Allow notifications to appear on the lock screen for quick access and visibility."
+        label={t("txt.lock_screen_notifications")}
+        description={t("txt.allow_notifications_to_appear_on_the_lock_screen")}
         checked={data.lockScreenNotifications ?? true}
         onChange={(v) => onUpdate({ lockScreenNotifications: v })}
       />
@@ -105,24 +106,24 @@ export function NotificationsSettingsTab({
           mb: 1,
         }}
       >
-        Event Alerts Notifications
+        {t("txt.event_alerts_notifications")}
       </Typography>
 
       <NotificationToggleRow
-        label="Deliver push notifications as alerts"
-        description="When turned on, push notification will use critical alerts sounds."
+        label={t("txt.deliver_push_notifications_as_alerts")}
+        description={t("txt.when_turned_on_push_notifications_use_critical_a")}
         checked={data.channels.push}
         onChange={(v) => onUpdate({ channels: { push: v } })}
       />
       <NotificationToggleRow
-        label="Notifications Management"
-        description="When turned ON, end-users will access advanced notification management for this event."
+        label={t("txt.notifications_management")}
+        description={t("txt.when_turned_on_advanced_notification_management_")}
         checked={data.notificationsManagement ?? false}
         onChange={(v) => onUpdate({ notificationsManagement: v })}
       />
       <NotificationToggleRow
-        label="Email Notifications"
-        description="We will send you notification to inform you of any updates/changes as events occur for you."
+        label={t("txt.email_notifications")}
+        description={t("txt.we_will_email_you_when_relevant_events_occur")}
         checked={data.channels.email}
         onChange={(v) => onUpdate({ channels: { email: v } })}
       />
@@ -137,25 +138,25 @@ export function NotificationsSettingsTab({
           mb: 1,
         }}
       >
-        Alert Severity (backend'da qo'shimcha mavjud)
+        {t("txt.alert_severity")}
       </Typography>
       <NotificationToggleRow
-        label="Critical Alerts"
+        label={t("txt.critical_alerts")}
         checked={data.criticalAlerts}
         onChange={(v) => onUpdate({ criticalAlerts: v })}
       />
       <NotificationToggleRow
-        label="Warning Alerts"
+        label={t("txt.warning_alerts")}
         checked={data.warningAlerts}
         onChange={(v) => onUpdate({ warningAlerts: v })}
       />
       <NotificationToggleRow
-        label="Info Alerts"
+        label={t("txt.info_alerts")}
         checked={data.infoAlerts}
         onChange={(v) => onUpdate({ infoAlerts: v })}
       />
       <NotificationToggleRow
-        label="Report Ready Alerts"
+        label={t("txt.report_ready_alerts")}
         checked={data.reportReadyAlerts}
         onChange={(v) => onUpdate({ reportReadyAlerts: v })}
       />
@@ -176,7 +177,7 @@ export function NotificationsSettingsTab({
             color: "text.secondary",
           }}
         >
-          Every
+          {t("txt.every")}
         </Typography>
         <TextField
           size="small"
@@ -197,7 +198,7 @@ export function NotificationsSettingsTab({
             color: "text.secondary",
           }}
         >
-          Message will trigger the event
+          {t("txt.message_will_trigger_the_event")}
         </Typography>
       </Box>
 
@@ -217,7 +218,7 @@ export function NotificationsSettingsTab({
             color: "text.secondary",
           }}
         >
-          Event will be sent to user only once per
+          {t("txt.event_will_be_sent_only_once_per")}
         </Typography>
         <TextField
           select
@@ -230,9 +231,9 @@ export function NotificationsSettingsTab({
           }}
           sx={{ width: 110 }}
         >
-          <MenuItem value={1}>1 day</MenuItem>
-          <MenuItem value={2}>2 days</MenuItem>
-          <MenuItem value={7}>7 days</MenuItem>
+          <MenuItem value={1}>{t("txt.1_day")}</MenuItem>
+          <MenuItem value={2}>{t("txt.2_days")}</MenuItem>
+          <MenuItem value={7}>{t("txt.7_days")}</MenuItem>
         </TextField>
       </Box>
     </Box>

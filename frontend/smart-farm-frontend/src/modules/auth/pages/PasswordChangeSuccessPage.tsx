@@ -11,6 +11,7 @@ import {
   LOGIN_BG_LIGHT,
   LOGIN_BG_DARK,
 } from "@/theme/theme";
+import { t } from "@/i18n/core";
 
 export function PasswordChangeSuccessPage() {
   const navigate = useNavigate();
@@ -99,7 +100,7 @@ export function PasswordChangeSuccessPage() {
                 color: "text.primary",
               }}
             >
-              Password Change
+              {t("txt.password_change")}
             </Typography>
             <Typography
               sx={{
@@ -111,7 +112,7 @@ export function PasswordChangeSuccessPage() {
                 color: "text.secondary",
               }}
             >
-              You have successfully changed your password
+              {t("txt.you_have_successfully_changed_your_password")}
             </Typography>
           </Box>
 
@@ -138,15 +139,15 @@ export function PasswordChangeSuccessPage() {
               },
             }}
           >
-            Login
+            {t("txt.login")}
           </Button>
         </Box>
       </Box>
 
       <AuthOnboardingPanel
         image="https://picsum.photos/seed/smartfarm-forgot/800/1200"
-        heading="Real-Time Insights Access"
-        subtitle="Analyze field metrics quickly with intuitive charts and visual reports."
+        heading={t("txt.real_time_insights_access")}
+        subtitle={t("txt.analyze_field_metrics_quickly_with_intuitive_cha")}
         activeStep={2}
       />
     </Box>

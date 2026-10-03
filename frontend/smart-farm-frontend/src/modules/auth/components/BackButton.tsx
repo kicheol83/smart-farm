@@ -1,5 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded";
+import { t } from "@/i18n/core";
 
 interface BackButtonProps {
   onClick: () => void;
@@ -44,7 +45,7 @@ export function BackButton({ onClick }: BackButtonProps) {
           color: "text.primary",
         }}
       >
-        Back
+        {t("txt.back")}
       </Typography>
     </Box>
   );

@@ -2,6 +2,8 @@ import { Box, Card, Typography, IconButton, Chip } from "@mui/material";
 import ArrowOutwardRoundedIcon from "@mui/icons-material/ArrowOutwardRounded";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
+import { t } from "@/i18n/core";
+import { dateLocale } from "@/i18n/core";
 
 interface AlertItem {
   alertsType: string;
@@ -42,7 +44,7 @@ export function AlertsSummaryPreview({ items }: AlertsSummaryPreviewProps) {
           mb: 1.5,
         }}
       >
-        Alerts Summary
+        {t("txt.alerts_summary")}
       </Typography>
 
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
@@ -78,7 +80,7 @@ export function AlertsSummaryPreview({ items }: AlertsSummaryPreviewProps) {
                     color: "text.secondary",
                   }}
                 >
-                  {format(new Date(a.lastOccurred), "MMM dd, HH:mm")}
+                  {format(new Date(a.lastOccurred), "PPp", { locale: dateLocale() })}
                 </Typography>
               </Box>
               <Chip
@@ -105,7 +107,7 @@ export function AlertsSummaryPreview({ items }: AlertsSummaryPreviewProps) {
               py: 2,
             }}
           >
-            Faol alertlar yo'q
+            {t("txt.no_active_alerts")}
           </Typography>
         )}
       </Box>

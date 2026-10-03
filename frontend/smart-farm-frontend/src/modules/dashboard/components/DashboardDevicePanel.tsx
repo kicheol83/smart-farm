@@ -2,6 +2,7 @@ import { Box, Card, Typography, IconButton, Stack } from "@mui/material";
 import ArrowOutwardRoundedIcon from "@mui/icons-material/ArrowOutwardRounded";
 import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
 import { useNavigate } from "react-router-dom";
+import { t } from "@/i18n/core";
 
 type DeviceStatus = "ONLINE" | "OFFLINE" | "MAINTENANCE" | "ERROR";
 
@@ -33,15 +34,15 @@ const STATUS_COLORS: Record<DeviceStatus, string> = {
 function typeLabel(deviceType: string): string {
   switch (deviceType) {
     case "CAMERA":
-      return "Camera";
+      return t("device.type.camera");
     case "SENSOR_HUB":
-      return "Sensor";
+      return t("device.type.sensor");
     case "CONTROLLER":
-      return "Controller";
+      return t("device.type.controller");
     case "GATEWAY":
-      return "Gateway";
+      return t("device.type.gateway");
     case "WEATHER_STATION":
-      return "Weather";
+      return t("device.type.weather");
     default:
       return deviceType;
   }
@@ -83,7 +84,7 @@ export function DashboardDevicePanel({
             color: "text.primary",
           }}
         >
-          Device
+          {t("dash.devices.title")}
         </Typography>
 
         <Box sx={{ display: "flex", gap: 4 }}>
@@ -95,7 +96,7 @@ export function DashboardDevicePanel({
                 color: "text.secondary",
               }}
             >
-              Sensor
+              {t("device.type.sensor")}
             </Typography>
             <Typography
               sx={{
@@ -116,7 +117,7 @@ export function DashboardDevicePanel({
                 color: "text.secondary",
               }}
             >
-              Camera
+              {t("device.type.camera")}
             </Typography>
             <Typography
               sx={{
@@ -200,8 +201,8 @@ export function DashboardDevicePanel({
                     }}
                   >
                     {d.deviceStatus === "ERROR"
-                      ? "Signal issue detected"
-                      : "Under maintenance"}
+                      ? t("dash.devices.signalIssue")
+                      : t("dash.devices.maintenance")}
                   </Typography>
                 </Box>
               )}
@@ -219,7 +220,7 @@ export function DashboardDevicePanel({
               py: 3,
             }}
           >
-            Hali qurilma qo'shilmagan
+            {t("dash.devices.empty")}
           </Typography>
         )}
       </Stack>

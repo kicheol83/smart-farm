@@ -1,6 +1,7 @@
 import { Box, Card, Typography, Switch, IconButton } from "@mui/material";
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
 import { formatDistanceToNow } from "date-fns";
+import { dateLocale, t } from "@/i18n/core";
 
 interface AutomationRuleCardProps {
   ruleName: string;
@@ -60,12 +61,12 @@ export function AutomationRuleCard({
               mt: 0.5,
             }}
           >
-            If {typeLabel(triggerSensorType)} is{" "}
-            {triggerCondition === "BELOW" ? "below" : "above"}{" "}
-            {triggerThreshold}
-            {actionDurationMinutes
-              ? ` → run for ${actionDurationMinutes} min`
-              : ""}
+            {t("auto.ruleSentence", {
+              sensor: typeLabel(triggerSensorType),
+              condition: triggerCondition === "BELOW" ? t("auto.cond.below") : t("auto.cond.above"),
+              threshold: triggerThreshold,
+            })}
+            {actionDurationMinutes ? t("auto.runFor", { minutes: actionDurationMinutes }) : ""}
           </Typography>
           {lastTriggeredAt && (
             <Typography
@@ -76,10 +77,7 @@ export function AutomationRuleCard({
                 mt: 0.5,
               }}
             >
-              Last triggered{" "}
-              {formatDistanceToNow(new Date(lastTriggeredAt), {
-                addSuffix: true,
-              })}
+              {t("auto.lastTriggered", { time: formatDistanceToNow(new Date(lastTriggeredAt), { addSuffix: true, locale: dateLocale() }) })}
             </Typography>
           )}
         </Box>

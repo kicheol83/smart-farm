@@ -13,6 +13,7 @@ import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { format } from "date-fns";
+import { t } from "@/i18n/core";
 
 type Period = "LAST_7_DAYS" | "LAST_30_DAYS" | "LAST_90_DAYS";
 
@@ -28,9 +29,9 @@ interface WaterUsageDistributionChartProps {
 }
 
 const PERIOD_LABEL: Record<Period, string> = {
-  LAST_7_DAYS: "Last 7 Days",
-  LAST_30_DAYS: "Last 30 Days",
-  LAST_90_DAYS: "Last 90 Days",
+  LAST_7_DAYS: t("txt.last_7_days"),
+  LAST_30_DAYS: t("txt.last_30_days"),
+  LAST_90_DAYS: t("txt.last_90_days"),
 };
 
 export function WaterUsageDistributionChart({
@@ -64,7 +65,7 @@ export function WaterUsageDistributionChart({
             color: "text.primary",
           }}
         >
-          Water Usage Distribution
+          {t("txt.water_usage_distribution")}
         </Typography>
         <Button
           size="small"
@@ -105,7 +106,7 @@ export function WaterUsageDistributionChart({
         <BarChart
           height={280}
           series={[
-            { data: amounts, label: "Water Usage (L)", color: "#35C56E" },
+            { data: amounts, label: t("txt.water_usage_l"), color: "#35C56E" },
           ]}
           xAxis={[{ data: dates, scaleType: "band" }]}
           margin={{ left: 40, right: 20, top: 20, bottom: 30 }}
@@ -120,7 +121,7 @@ export function WaterUsageDistributionChart({
             justifyContent: "center",
           }}
         >
-          <Typography color="text.secondary">Ma'lumot yo'q</Typography>
+          <Typography color="text.secondary">{t("txt.no_data")}</Typography>
         </Box>
       )}
     </Card>

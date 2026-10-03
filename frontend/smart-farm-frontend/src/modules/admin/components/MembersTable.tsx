@@ -19,6 +19,8 @@ import {
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded";
 import { format } from "date-fns";
+import { t } from "@/i18n/core";
+import { dateLocale } from "@/i18n/core";
 
 interface Member {
   _id: string;
@@ -83,7 +85,7 @@ export function MembersTable({
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5, mb: 2 }}>
         <TextField
           size="small"
-          placeholder="Search by name or email"
+          placeholder={t("txt.search_by_name_or_email")}
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
           InputProps={{
@@ -98,27 +100,27 @@ export function MembersTable({
         <TextField
           select
           size="small"
-          label="Role"
+          label={t("txt.role")}
           value={roleFilter}
           onChange={(e) => onRoleFilterChange(e.target.value)}
           sx={{ minWidth: 140 }}
         >
-          <MenuItem value="">All Roles</MenuItem>
-          <MenuItem value="ADMIN">Admin</MenuItem>
-          <MenuItem value="WORKER">Worker</MenuItem>
+          <MenuItem value="">{t("txt.all_roles")}</MenuItem>
+          <MenuItem value="ADMIN">{t("txt.admin")}</MenuItem>
+          <MenuItem value="WORKER">{t("txt.worker")}</MenuItem>
         </TextField>
         <TextField
           select
           size="small"
-          label="Status"
+          label={t("txt.status")}
           value={statusFilter}
           onChange={(e) => onStatusFilterChange(e.target.value)}
           sx={{ minWidth: 140 }}
         >
-          <MenuItem value="">All Status</MenuItem>
-          <MenuItem value="ACTIVE">Active</MenuItem>
-          <MenuItem value="INACTIVE">Inactive</MenuItem>
-          <MenuItem value="SUSPENDED">Suspended</MenuItem>
+          <MenuItem value="">{t("txt.all_status")}</MenuItem>
+          <MenuItem value="ACTIVE">{t("txt.active")}</MenuItem>
+          <MenuItem value="INACTIVE">{t("txt.inactive")}</MenuItem>
+          <MenuItem value="SUSPENDED">{t("txt.suspended")}</MenuItem>
         </TextField>
       </Box>
 
@@ -126,7 +128,7 @@ export function MembersTable({
         <Table size="small">
           <TableHead>
             <TableRow>
-              {["Member", "Role", "Status", "Farms", "Joined", ""].map((c) => (
+              {[t("txt.member"), t("txt.role"), t("txt.status"), t("txt.farms"), t("txt.joined"), ""].map((c) => (
                 <TableCell
                   key={c}
                   sx={{
@@ -222,7 +224,7 @@ export function MembersTable({
                       borderColor: "divider",
                     }}
                   >
-                    {format(new Date(m.createdAt), "MMM dd, yyyy")}
+                    {format(new Date(m.createdAt), "PP", { locale: dateLocale() })}
                   </TableCell>
                   <TableCell sx={{ borderColor: "divider" }}>
                     <IconButton
@@ -252,7 +254,7 @@ export function MembersTable({
                       color: "text.secondary",
                     }}
                   >
-                    A'zo topilmadi
+                    {t("txt.no_members_found")}
                   </Typography>
                 </TableCell>
               </TableRow>
@@ -284,7 +286,7 @@ export function MembersTable({
               setMenuAnchor(null);
             }}
           >
-            Make Admin
+            {t("txt.make_admin")}
           </MenuItem>
         )}
         {menuMember?.memberRole !== "WORKER" && (
@@ -294,7 +296,7 @@ export function MembersTable({
               setMenuAnchor(null);
             }}
           >
-            Make Worker
+            {t("txt.make_worker")}
           </MenuItem>
         )}
         {menuMember?.memberStatus !== "ACTIVE" && (
@@ -304,7 +306,7 @@ export function MembersTable({
               setMenuAnchor(null);
             }}
           >
-            Activate
+            {t("txt.activate")}
           </MenuItem>
         )}
         {menuMember?.memberStatus !== "SUSPENDED" && (
@@ -314,7 +316,7 @@ export function MembersTable({
               setMenuAnchor(null);
             }}
           >
-            Suspend
+            {t("txt.suspend")}
           </MenuItem>
         )}
         <MenuItem
@@ -324,7 +326,7 @@ export function MembersTable({
           }}
           sx={{ color: "error.main" }}
         >
-          Delete Member
+          {t("txt.delete_member")}
         </MenuItem>
       </Menu>
     </Box>

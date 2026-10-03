@@ -1,6 +1,7 @@
 import { Box, Card, Typography, IconButton, Stack } from "@mui/material";
 import ArrowOutwardRoundedIcon from "@mui/icons-material/ArrowOutwardRounded";
 import WarningRoundedIcon from "@mui/icons-material/WarningRounded";
+import { t } from "@/i18n/core";
 
 interface Device {
   _id: string;
@@ -37,13 +38,13 @@ export function DeviceListCard({ devices, sensorCount, cameraCount }: DeviceList
       }}
     >
       <Typography variant="subtitle1" sx={{ color: "text.primary" }}>
-        Device
+        {t("dash.devices.title")}
       </Typography>
 
       <Box sx={{ display: "flex", gap: 3 }}>
         <Box>
           <Typography variant="body2" sx={{ color: "text.secondary" }}>
-            Sensor
+            {t("device.type.sensor")}
           </Typography>
           <Typography variant="body1" sx={{ color: "text.primary" }}>
             {sensorCount}
@@ -51,7 +52,7 @@ export function DeviceListCard({ devices, sensorCount, cameraCount }: DeviceList
         </Box>
         <Box>
           <Typography variant="body2" sx={{ color: "text.secondary" }}>
-            Camera
+            {t("device.type.camera")}
           </Typography>
           <Typography variant="body1" sx={{ color: "text.primary" }}>
             {cameraCount}
@@ -87,7 +88,7 @@ export function DeviceListCard({ devices, sensorCount, cameraCount }: DeviceList
             variant="body2"
             sx={{ color: "text.secondary", textAlign: "center", py: 3 }}
           >
-            Hali qurilma qo'shilmagan
+            {t("dash.devices.empty")}
           </Typography>
         )}
       </Stack>

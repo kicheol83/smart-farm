@@ -21,6 +21,7 @@ import {
   REQUEST_SENSITIVE_UPDATE,
   CONFIRM_SENSITIVE_UPDATE,
 } from "../graphql/queries";
+import { t } from "@/i18n/core";
 
 interface ChangePasswordDialogProps {
   open: boolean;
@@ -74,11 +75,11 @@ export function ChangePasswordDialog({
   async function handleRequestChange() {
     setError(null);
     if (!PASSWORD_VALID_REGEX.test(password)) {
-      setError("Password does not meet the requirements.");
+      setError(t("txt.password_does_not_meet_the_requirements"));
       return;
     }
     if (password !== confirmPassword) {
-      setError("Passwords do not match.");
+      setError(t("txt.passwords_do_not_match"));
       return;
     }
 
@@ -87,7 +88,7 @@ export function ChangePasswordDialog({
       setStep("otp");
       setSecondsLeft(60);
     } catch (err: any) {
-      setError(err.message ?? "Xatolik yuz berdi");
+      setError(err.message ?? t("txt.something_went_wrong_6609"));
     }
   }
 
@@ -100,7 +101,7 @@ export function ChangePasswordDialog({
       onSuccess();
       resetAndClose();
     } catch (err: any) {
-      setError(err.message ?? "Incorrect OTP. Please try again");
+      setError(err.message ?? t("txt.incorrect_otp_please_try_again"));
     }
   }
 
@@ -116,7 +117,7 @@ export function ChangePasswordDialog({
           textAlign: "center",
         }}
       >
-        Change Password
+        {t("txt.change_password")}
       </DialogTitle>
 
       {step === "form" ? (
@@ -133,13 +134,13 @@ export function ChangePasswordDialog({
                   mb: 0.5,
                 }}
               >
-                Enter new password
+                {t("txt.enter_new_password")}
               </Typography>
               <TextField
                 fullWidth
                 size="small"
                 type={showPassword ? "text" : "password"}
-                placeholder="New password"
+                placeholder={t("txt.new_password")}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 InputProps={{
@@ -171,13 +172,13 @@ export function ChangePasswordDialog({
                   mb: 0.5,
                 }}
               >
-                Confirm new password
+                {t("txt.confirm_new_password")}
               </Typography>
               <TextField
                 fullWidth
                 size="small"
                 type={showConfirm ? "text" : "password"}
-                placeholder="Confirm new password"
+                placeholder={t("txt.confirm_new_password")}
                 value={confirmPassword}
                 error={Boolean(error)}
                 onChange={(e) => {
@@ -213,7 +214,7 @@ export function ChangePasswordDialog({
               onClick={resetAndClose}
               sx={{ textTransform: "none", borderRadius: 2 }}
             >
-              Cancel
+              {t("txt.cancel")}
             </Button>
             <Button
               fullWidth
@@ -222,7 +223,7 @@ export function ChangePasswordDialog({
               onClick={handleRequestChange}
               sx={{ textTransform: "none", borderRadius: 2 }}
             >
-              Change
+              {t("txt.change")}
             </Button>
           </DialogActions>
         </>
@@ -270,7 +271,7 @@ export function ChangePasswordDialog({
                       color: "text.secondary",
                     }}
                   >
-                    Didn't receive code?
+                    {t("txt.didn_t_receive_code")}
                   </Typography>
                   {secondsLeft > 0 ? (
                     <Typography
@@ -291,7 +292,7 @@ export function ChangePasswordDialog({
                       onClick={handleRequestChange}
                       sx={{ fontSize: 13, color: "#17b26a" }}
                     >
-                      Resend
+                      {t("txt.resend")}
                     </Link>
                   )}
                 </>
@@ -306,7 +307,7 @@ export function ChangePasswordDialog({
               onClick={handleVerify}
               sx={{ textTransform: "none", borderRadius: 2 }}
             >
-              Verify
+              {t("txt.verify")}
             </Button>
           </DialogActions>
         </>

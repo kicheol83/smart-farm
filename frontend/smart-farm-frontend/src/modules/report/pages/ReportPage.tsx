@@ -15,6 +15,7 @@ import { GET_FULL_GREENHOUSE_REPORT } from "../graphql/queries";
 import { GET_CAMERAS_BY_GREENHOUSE } from "@/modules/camera/graphql/queries";
 import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
 import { FEATURES } from "@/lib/features";
+import { t } from "@/i18n/core";
 
 export function ReportPage() {
   const { greenHouseId } = useActiveGreenhouse();
@@ -36,7 +37,7 @@ export function ReportPage() {
   if (!hasGreenhouse) {
     return (
       <>
-        <Header title="Greenhouse Report" />
+        <Header title={t("txt.greenhouse_report")} />
         <Box
           sx={{
             display: "flex",
@@ -46,7 +47,7 @@ export function ReportPage() {
           }}
         >
           <Typography color="text.secondary">
-            Hali greenhouse tanlanmagan
+            {t("txt.no_greenhouse_selected_yet")}
           </Typography>
         </Box>
       </>
@@ -55,7 +56,7 @@ export function ReportPage() {
 
   return (
     <>
-      <Header title="Greenhouse Report" />
+      <Header title={t("txt.greenhouse_report")} />
 
       {/* Import + sana oralig'i */}
       <Box
@@ -72,14 +73,14 @@ export function ReportPage() {
           startIcon={<FileUploadOutlinedIcon fontSize="small" />}
           sx={{ textTransform: "none", borderRadius: 2 }}
         >
-          Import
+          {t("txt.export")}
         </Button>
         <Button
           variant="outlined"
           startIcon={<CalendarTodayRoundedIcon fontSize="small" />}
           sx={{ textTransform: "none", borderRadius: 2 }}
         >
-          Last 7 Days
+          {t("txt.last_7_days")}
         </Button>
       </Box>
 
@@ -94,37 +95,29 @@ export function ReportPage() {
       >
         <ReportSummaryCard
           icon={SpaRoundedIcon}
-          label="Overall Plant Health"
+          label={t("txt.overall_plant_health")}
           value={
             report
               ? `${Math.round(report.plantHealth.currentHealthIndex)}%`
               : "--"
           }
-          badge={
-            report?.plantHealth.status === "good"
-              ? "Good"
-              : report?.plantHealth.status
-          }
-          description={
-            report
-              ? "Plants showing vigorous growth and balanced nutrition."
-              : "—"
-          }
+          badge={report ? t(`ph.status.${report.plantHealth.status}`) : undefined}
+          description={report ? t(`report.health.${report.plantHealth.status}`) : "—"}
           variant="highlight"
           onExpand={() => (window.location.href = "/report/plant-health")}
         />
         <ReportSummaryCard
           icon={WaterDropOutlinedIcon}
-          label="Average Soil Moisture"
+          label={t("txt.average_soil_moisture")}
           value={report ? `${Math.round(report.soilMoisture.average)}%` : "--"}
-          description="Maintaining steady hydration ensures sustained plant health."
+          description={t("txt.maintaining_steady_hydration_ensures_sustained_p")}
           onExpand={() => (window.location.href = "/report/soil-moisture")}
         />
         <ReportSummaryCard
           icon={OpacityRoundedIcon}
-          label="Average Water Usage"
+          label={t("txt.average_water_usage")}
           value={report ? report.waterUsage.dailyAverage.toFixed(1) : "--"}
-          description="Shows the average volume of water received by each plant daily."
+          description={t("txt.shows_the_average_volume_of_water_used_per_day")}
           onExpand={() => (window.location.href = "/report/water-usage")}
         />
         {FEATURES.camera && <ReportCameraCard cameras={cameras} />}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Box, TextField, MenuItem, Button, Typography } from "@mui/material";
+import { t } from "@/i18n/core";
 
 const TIMEZONES = [
   "Europe/Berlin",
@@ -59,14 +60,14 @@ export function GeneralSettingsTab({
             mb: 0.5,
           }}
         >
-          Farm Profile
+          {t("txt.farm_profile")}
         </Typography>
         <TextField
           fullWidth
           size="small"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="My Smart Farm"
+          placeholder={t("txt.my_smart_farm")}
         />
       </Box>
 
@@ -86,14 +87,14 @@ export function GeneralSettingsTab({
               mb: 0.5,
             }}
           >
-            Farm Location
+            {t("txt.farm_location")}
           </Typography>
           <TextField
             fullWidth
             size="small"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            placeholder="Address"
+            placeholder={t("txt.address")}
           />
         </Box>
         <Box>
@@ -105,7 +106,7 @@ export function GeneralSettingsTab({
               mb: 0.5,
             }}
           >
-            Time Zone
+            {t("txt.time_zone")}
           </Typography>
           <TextField
             select
@@ -132,7 +133,7 @@ export function GeneralSettingsTab({
             mb: 0.5,
           }}
         >
-          Farm Description
+          {t("txt.farm_description")}
         </Typography>
         <TextField
           fullWidth
@@ -149,7 +150,7 @@ export function GeneralSettingsTab({
           variant="outlined"
           sx={{ textTransform: "none", borderRadius: 2 }}
         >
-          Cancel
+          {t("txt.cancel")}
         </Button>
         <Button
           variant="contained"
@@ -164,7 +165,7 @@ export function GeneralSettingsTab({
           }
           sx={{ textTransform: "none", borderRadius: 2 }}
         >
-          Save
+          {t("txt.save")}
         </Button>
       </Box>
     </Box>

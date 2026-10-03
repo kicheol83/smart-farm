@@ -1,5 +1,6 @@
 import { Box, Card, Typography } from "@mui/material";
 import type { SvgIconComponent } from "@mui/icons-material";
+import { t } from "@/i18n/core";
 
 interface SubMetric {
   icon: SvgIconComponent;
@@ -64,7 +65,7 @@ export function DeviceSummaryCard({
           component="span"
           sx={{ fontSize: 16, fontWeight: 400, color: "text.secondary" }}
         >
-          Device
+          {t("txt.device")}
         </Typography>
       </Typography>
 

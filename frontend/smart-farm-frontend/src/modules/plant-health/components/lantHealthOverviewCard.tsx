@@ -1,4 +1,5 @@
 import { Box, Typography, Chip } from "@mui/material";
+import { t } from "@/i18n/core";
 
 interface PlantHealthOverviewCardProps {
   overallHealthIndex?: number;
@@ -10,10 +11,10 @@ function gradeFromValue(value: number): {
   bg: string;
 } {
   if (value >= 90)
-    return { label: "Good", color: "#1a7a4c", bg: "rgba(53,197,110,0.16)" };
+    return { label: t("txt.good"), color: "#1a7a4c", bg: "rgba(53,197,110,0.16)" };
   if (value >= 75)
-    return { label: "Fair", color: "#a06a0a", bg: "rgba(249,173,25,0.16)" };
-  return { label: "At Risk", color: "#c62828", bg: "rgba(229,57,53,0.16)" };
+    return { label: t("txt.fair"), color: "#a06a0a", bg: "rgba(249,173,25,0.16)" };
+  return { label: t("txt.at_risk"), color: "#c62828", bg: "rgba(229,57,53,0.16)" };
 }
 
 export function PlantHealthOverviewCard({
@@ -34,7 +35,7 @@ export function PlantHealthOverviewCard({
           mb: 0.5,
         }}
       >
-        Overall health:
+        {t("txt.overall_health")}
       </Typography>
 
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
@@ -73,7 +74,7 @@ export function PlantHealthOverviewCard({
           color: "text.secondary",
         }}
       >
-        Your plants are thriving and showing excellent health
+        {t("txt.your_plants_are_thriving_and_showing_excellent_h")}
       </Typography>
     </Box>
   );

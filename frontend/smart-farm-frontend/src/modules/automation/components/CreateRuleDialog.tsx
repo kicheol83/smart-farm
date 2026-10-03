@@ -9,6 +9,7 @@ import {
   MenuItem,
   Box,
 } from "@mui/material";
+import { t } from "@/i18n/core";
 
 interface Actuator {
   _id: string;
@@ -75,23 +76,23 @@ export function CreateRuleDialog({
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle sx={{ fontFamily: "Satoshi, sans-serif", fontWeight: 700 }}>
-        Add Automation Rule
+        {t("txt.add_automation_rule")}
       </DialogTitle>
       <DialogContent
         sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 1 }}
       >
         <TextField
-          label="Rule Name"
+          label={t("txt.rule_name")}
           fullWidth
           size="small"
-          placeholder="Auto-water when soil is dry"
+          placeholder={t("txt.auto_water_when_soil_is_dry")}
           value={ruleName}
           onChange={(e) => setRuleName(e.target.value)}
         />
 
         <TextField
           select
-          label="Actuator to trigger"
+          label={t("txt.actuator_to_trigger")}
           fullWidth
           size="small"
           value={actuatorId}
@@ -109,7 +110,7 @@ export function CreateRuleDialog({
         >
           <TextField
             select
-            label="Sensor"
+            label={t("txt.sensor")}
             size="small"
             value={sensorType}
             onChange={(e) => setSensorType(e.target.value)}
@@ -122,16 +123,16 @@ export function CreateRuleDialog({
           </TextField>
           <TextField
             select
-            label="Condition"
+            label={t("txt.condition")}
             size="small"
             value={condition}
             onChange={(e) => setCondition(e.target.value)}
           >
-            <MenuItem value="BELOW">Below</MenuItem>
-            <MenuItem value="ABOVE">Above</MenuItem>
+            <MenuItem value="BELOW">{t("txt.below")}</MenuItem>
+            <MenuItem value="ABOVE">{t("txt.above")}</MenuItem>
           </TextField>
           <TextField
-            label="Threshold"
+            label={t("txt.threshold")}
             type="number"
             size="small"
             value={threshold}
@@ -140,17 +141,17 @@ export function CreateRuleDialog({
         </Box>
 
         <TextField
-          label="Auto-off after (minutes, optional)"
+          label={t("txt.auto_off_after_minutes_optional")}
           type="number"
           size="small"
           value={duration}
           onChange={(e) => setDuration(e.target.value)}
-          helperText="Bo'sh qoldirsangiz, qoida ishga tushgach actuator qo'lda o'chirilmaguncha ON qoladi"
+          helperText={t("txt.if_left_empty_the_actuator_stays_on_after_the_ru")}
         />
       </DialogContent>
       <DialogActions sx={{ p: 2 }}>
         <Button onClick={onClose} sx={{ textTransform: "none" }}>
-          Cancel
+          {t("txt.cancel")}
         </Button>
         <Button
           onClick={handleSubmit}
@@ -158,7 +159,7 @@ export function CreateRuleDialog({
           disabled={!ruleName || !actuatorId}
           sx={{ textTransform: "none" }}
         >
-          Create
+          {t("txt.create")}
         </Button>
       </DialogActions>
     </Dialog>

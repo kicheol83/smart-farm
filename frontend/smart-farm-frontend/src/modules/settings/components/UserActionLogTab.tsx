@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded";
 import { format } from "date-fns";
+import { t } from "@/i18n/core";
 
 interface ActionLogItem {
   _id: string;
@@ -32,12 +33,12 @@ interface UserActionLogTabProps {
 }
 
 const COLUMNS = [
-  "User Name",
-  "Time",
-  "Device",
-  "Action Code",
-  "IP Address",
-  "Action Name",
+  t("txt.user_name"),
+  t("txt.time"),
+  t("txt.device"),
+  t("txt.action_code"),
+  t("txt.ip_address"),
+  t("txt.action_name"),
 ];
 const PAGE_SIZE = 10;
 
@@ -157,7 +158,7 @@ export function UserActionLogTab({
                       color: "text.secondary",
                     }}
                   >
-                    Hali faoliyat yozuvi yo'q
+                    {t("txt.no_activity_yet")}
                   </Typography>
                 </TableCell>
               </TableRow>

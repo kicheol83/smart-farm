@@ -1,5 +1,6 @@
 import { Box, Card, Typography } from "@mui/material";
 import SpaRoundedIcon from "@mui/icons-material/SpaRounded";
+import { t } from "@/i18n/core";
 
 interface PlantHealthHeroCardProps {
   score?: number;
@@ -7,9 +8,9 @@ interface PlantHealthHeroCardProps {
 }
 
 const STATUS_LABEL: Record<string, string> = {
-  good: "Good",
-  warning: "Warning",
-  critical: "Critical",
+  good: t("txt.good"),
+  warning: t("txt.warning"),
+  critical: t("txt.critical"),
 };
 
 export function PlantHealthHeroCard({
@@ -41,7 +42,7 @@ export function PlantHealthHeroCard({
           color: "#fff",
         }}
       >
-        Overall Plant Health
+        {t("txt.overall_plant_health")}
       </Typography>
 
       <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
@@ -79,7 +80,7 @@ export function PlantHealthHeroCard({
           color: "rgba(255,255,255,0.9)",
         }}
       >
-        Plants showing vigorous growth and balanced nutrition.
+        {t("txt.plants_showing_vigorous_growth_and_balanced_nutr")}
       </Typography>
     </Card>
   );

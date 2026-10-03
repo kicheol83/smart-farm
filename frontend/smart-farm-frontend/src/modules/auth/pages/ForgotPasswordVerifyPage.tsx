@@ -13,6 +13,7 @@ import {
   LOGIN_BG_LIGHT,
   LOGIN_BG_DARK,
 } from "@/theme/theme";
+import { t } from "@/i18n/core";
 
 const FORGOT_PASSWORD_MUTATION = gql`
   mutation ForgotPassword($input: ForgotPasswordInput!) {
@@ -128,7 +129,7 @@ export function ForgotPasswordVerifyPage() {
                 color: "text.primary",
               }}
             >
-              Forgot Your Password?
+              {t("txt.forgot_your_password")}
             </Typography>
             <Typography
               sx={{
@@ -140,8 +141,7 @@ export function ForgotPasswordVerifyPage() {
                 color: "text.secondary",
               }}
             >
-              If you've forgotten your password, please enter your email to
-              reset it.
+              {t("txt.if_you_ve_forgotten_your_password_please_enter_y")}
             </Typography>
           </Box>
 
@@ -158,7 +158,7 @@ export function ForgotPasswordVerifyPage() {
                 color: "text.secondary",
               }}
             >
-              Didn't receive code?
+              {t("txt.didn_t_receive_code")}
             </Typography>
             <Link
               component="button"
@@ -175,7 +175,7 @@ export function ForgotPasswordVerifyPage() {
                 "&:hover": { textDecoration: "underline" },
               }}
             >
-              Resend
+              {t("txt.resend")}
             </Link>
           </Box>
 
@@ -201,15 +201,15 @@ export function ForgotPasswordVerifyPage() {
               "&.Mui-disabled": { bgcolor: "#cecece", color: "#a4a4a4" },
             }}
           >
-            Verify
+            {t("txt.verify")}
           </Button>
         </Box>
       </Box>
 
       <AuthOnboardingPanel
         image="https://picsum.photos/seed/smartfarm-forgot/800/1200"
-        heading="Real-Time Insights Access"
-        subtitle="Analyze field metrics quickly with intuitive charts and visual reports."
+        heading={t("txt.real_time_insights_access")}
+        subtitle={t("txt.analyze_field_metrics_quickly_with_intuitive_cha")}
         activeStep={2}
       />
     </Box>

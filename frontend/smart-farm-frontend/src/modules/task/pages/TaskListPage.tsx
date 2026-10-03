@@ -19,6 +19,7 @@ import {
   DELETE_TASK_MUTATION,
 } from "../graphql/queries";
 import { useActiveGreenhouse } from "@/lib/useActiveGreenhouse";
+import { t } from "@/i18n/core";
 
 type TaskStatus = "TODO" | "IN_PROGRESS" | "DONE";
 
@@ -96,7 +97,7 @@ export function TaskListPage() {
   if (!hasGreenhouse) {
     return (
       <>
-        <Header title="Task Overview" />
+        <Header title={t("txt.task_overview")} />
         <Box
           sx={{
             display: "flex",
@@ -106,7 +107,7 @@ export function TaskListPage() {
           }}
         >
           <Typography color="text.secondary">
-            Hali greenhouse tanlanmagan
+            {t("txt.no_greenhouse_selected_yet")}
           </Typography>
         </Box>
       </>
@@ -115,31 +116,31 @@ export function TaskListPage() {
 
   return (
     <>
-      <Header title="Task Overview" />
+      <Header title={t("txt.task_overview")} />
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, mb: 3 }}>
         <TaskSummaryCard
           icon={FormatListBulletedRoundedIcon}
-          label="Total Task"
+          label={t("txt.total_tasks")}
           value={overview?.totalTasks ?? 0}
-          caption="Created in this task"
+          caption={t("txt.created_in_this_greenhouse")}
         />
         <TaskSummaryCard
           icon={CheckCircleOutlineRoundedIcon}
-          label="Completed Tasks"
+          label={t("txt.completed_tasks")}
           value={overview?.completedTasks ?? 0}
-          caption="Marked as all done"
+          caption={t("txt.marked_as_done")}
         />
         <TaskSummaryCard
           icon={PendingActionsRoundedIcon}
-          label="In Progress Tasks"
+          label={t("txt.in_progress_tasks")}
           value={overview?.inProgressTasks ?? 0}
-          caption="Created in today task"
+          caption={t("txt.currently_being_worked_on")}
         />
         <TaskSummaryCard
           icon={HourglassEmptyRoundedIcon}
-          label="Not Started Tasks"
+          label={t("txt.not_started_tasks")}
           value={notStartedCount}
-          caption="Created in today task"
+          caption={t("txt.currently_being_worked_on")}
         />
       </Box>
 
@@ -166,8 +167,8 @@ export function TaskListPage() {
             },
           }}
         >
-          <Tab label="Board" value="board" />
-          <Tab label="List" value="list" />
+          <Tab label={t("txt.board")} value="board" />
+          <Tab label={t("txt.list")} value="list" />
         </Tabs>
 
         <Box sx={{ display: "flex", gap: 1 }}>
@@ -175,13 +176,13 @@ export function TaskListPage() {
             variant="outlined"
             sx={{ textTransform: "none", borderRadius: 2 }}
           >
-            Sort By
+            {t("txt.sort_by")}
           </Button>
           <Button
             variant="outlined"
             sx={{ textTransform: "none", borderRadius: 2 }}
           >
-            Filter
+            {t("txt.filter")}
           </Button>
           <Button
             variant="contained"
@@ -189,7 +190,7 @@ export function TaskListPage() {
             onClick={() => handleAddTask("TODO")}
             sx={{ textTransform: "none", borderRadius: 2 }}
           >
-            New Task
+            {t("txt.new_task")}
           </Button>
         </Box>
       </Box>
