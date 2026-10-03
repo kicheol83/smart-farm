@@ -82,10 +82,14 @@ export function EmailVerificationPage() {
         variables: { input: { memberEmail: email, emailCode: otp.join("") } },
       });
 
-      setAuth(data.verifyEmail.member, data.verifyEmail.accessToken);
-      navigate("/dashboard");
+      const state = location.state as { member?: Parameters<typeof setAuth>[0]; accessToken?: string } | null;
+      if (data?.verifyEmail && state?.member && state.accessToken) {
+        setAuth(state.member, state.accessToken);
+        navigate("/dashboard");
+      } else {
+        navigate("/login");
+      }
     } catch (err: any) {
-      // Figma t("txt.incorrect_otp_please_try_again")
       setError(t("txt.incorrect_otp_please_try_again"));
     }
   }

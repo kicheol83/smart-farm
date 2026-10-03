@@ -21,8 +21,13 @@ export class AuthGuard implements CanActivate {
       const bearerToken = request.headers.authorization;
       if (!bearerToken) throw new BadRequestException(Message.TOKEN_NOT_EXIST);
 
-      const token = bearerToken.split(' ')[1],
+      const token = bearerToken.split(' ')[1];
+      let authMember: any;
+      try {
         authMember = await this.authService.verifyToken(token);
+      } catch {
+        throw new UnauthorizedException(Message.NOT_AUTHENTICATED);
+      }
       if (!authMember)
         throw new UnauthorizedException(Message.NOT_AUTHENTICATED);
 

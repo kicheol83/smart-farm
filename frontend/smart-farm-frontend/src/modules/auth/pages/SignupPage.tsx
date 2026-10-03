@@ -79,7 +79,7 @@ export function SignupPage() {
     if (hasError) return;
 
     try {
-      await signup({
+      const { data } = await signup({
         variables: {
           input: {
             memberFullName: fullName,
@@ -89,7 +89,9 @@ export function SignupPage() {
         },
       });
 
-      navigate("/signup/verify", { state: { email } });
+      navigate("/signup/verify", {
+        state: { email, member: data?.signup, accessToken: data?.signup?.accessToken },
+      });
     } catch (err: any) {
       setEmailError(
         err.message?.includes("already")
