@@ -8,7 +8,7 @@ import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { from, Observable, switchMap } from 'rxjs';
 import { MemberRole } from '../libs/enums/member.enum';
-import { OWNED_BY_KEY, OwnedResource } from './owned-by.decorator';
+import { OWNED_ARGS_KEY, OWNED_BY_KEY, OwnedResource } from './owned-by.decorator';
 import { OwnershipService } from './ownership.service';
 
 const ARG_RESOURCES: Record<string, OwnedResource> = {
@@ -24,6 +24,8 @@ const ARG_RESOURCES: Record<string, OwnedResource> = {
   anomalyId: 'anomaly',
   actuatorId: 'actuator',
   taskId: 'task',
+  sectorId: 'sector',
+  fieldsId: 'field',
 };
 
 type Check = { resource: OwnedResource; id: unknown };
@@ -54,6 +56,25 @@ export class OwnershipInterceptor implements NestInterceptor {
     );
     if (idResource && args.id !== undefined) {
       checks.push({ resource: idResource, id: args.id });
+    }
+    const argResources =
+      this.reflector.get<Record<string, OwnedResource> | undefined>(
+        OWNED_ARGS_KEY,
+        context.getHandler(),
+      ) ?? {};
+    for (const [path, resource] of Object.entries(argResources)) {
+      const id = path
+        .split('.')
+        .reduce<unknown>(
+          (value, key) =>
+            value && typeof value === 'object'
+              ? (value as Record<string, unknown>)[key]
+              : undefined,
+          args,
+        );
+      if (id !== undefined && id !== null) {
+        checks.push({ resource, id });
+      }
     }
     this.collect(args, checks, 0);
 

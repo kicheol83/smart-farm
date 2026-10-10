@@ -8,12 +8,14 @@ import {
 } from '../../libs/dto/farm-context-dto/ndvi/ndvi';
 import { AuthGuard } from '../../account-context-module/auth/guards/auth.guard';
 
+import { OwnedArgs } from '../../ownership/owned-by.decorator';
 @Resolver()
 export class NdviResolver {
   constructor(private readonly ndviService: NdviService) {}
 
   @Mutation(() => NdviRecord)
   @UseGuards(AuthGuard)
+  @OwnedArgs({ 'input.fieldId': 'field' })
   public async recordNdvi(
     @Args('input') input: RecordNdviInput,
   ): Promise<NdviRecord> {
@@ -38,6 +40,7 @@ export class NdviResolver {
 
   @Query(() => [NdviRecord])
   @UseGuards(AuthGuard)
+  @OwnedArgs({ fieldId: 'field' })
   public async fieldNdviHistory(
     @Args('fieldId', { type: () => ID }) fieldId: string,
     @Args('from', { nullable: true }) from?: string,

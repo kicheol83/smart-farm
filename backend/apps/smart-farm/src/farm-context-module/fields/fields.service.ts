@@ -72,9 +72,9 @@ export class FieldsService {
     return result;
   }
 
-  public async findAll(): Promise<IField[]> {
+  public async findAll(sectionIds?: Types.ObjectId[]): Promise<IField[]> {
     return this.fieldModel
-      .find()
+      .find(sectionIds ? { sectionId: { $in: sectionIds } } : {})
       .populate('cropsId')
       .sort({ createdAt: -1 })
       .exec();
@@ -89,9 +89,15 @@ export class FieldsService {
     return result;
   }
 
-  public async findByCrop(cropsId: string): Promise<IField[]> {
+  public async findByCrop(
+    cropsId: string,
+    sectionIds?: Types.ObjectId[],
+  ): Promise<IField[]> {
     return this.fieldModel
-      .find({ cropsId: new Types.ObjectId(cropsId) })
+      .find({
+        cropsId: new Types.ObjectId(cropsId),
+        ...(sectionIds ? { sectionId: { $in: sectionIds } } : {}),
+      })
       .exec();
   }
 

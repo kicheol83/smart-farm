@@ -8,12 +8,16 @@ import {
 } from '../../libs/dto/farm-context-dto/crops/crops';
 import { AuthGuard } from '../../account-context-module/auth/guards/auth.guard';
 
+import { MemberRole } from '../../libs/enums/member.enum';
+import { RolesGuard } from '../../account-context-module/auth/guards/roles.guard';
+import { Roles } from '../../account-context-module/auth/decorators/roles.decorator';
 @Resolver(() => Crops)
 export class CropsResolver {
   constructor(private readonly cropsService: CropsService) {}
 
   @Mutation(() => Crops)
-  @UseGuards(AuthGuard)
+  @Roles(MemberRole.ADMIN)
+  @UseGuards(RolesGuard)
   public async createCrop(
     @Args('input') input: CreateCropsInput,
   ): Promise<Crops> {
@@ -41,7 +45,8 @@ export class CropsResolver {
   }
 
   @Mutation(() => Crops)
-  @UseGuards(AuthGuard)
+  @Roles(MemberRole.ADMIN)
+  @UseGuards(RolesGuard)
   public async updateCrop(
     @Args('id', { type: () => ID }) id: string,
     @Args('input') input: UpdateCropsInput,
@@ -52,7 +57,8 @@ export class CropsResolver {
   }
 
   @Mutation(() => Boolean)
-  @UseGuards(AuthGuard)
+  @Roles(MemberRole.ADMIN)
+  @UseGuards(RolesGuard)
   public async deleteCrop(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {

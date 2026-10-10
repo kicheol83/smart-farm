@@ -14,6 +14,7 @@ import {
 } from '../../libs/dto/farm-context-dto/fields/fields-map';
 import { AuthGuard } from '../../account-context-module/auth/guards/auth.guard';
 
+import { OwnedArgs, OwnedBy } from '../../ownership/owned-by.decorator';
 @Resolver()
 export class FieldMapResolver {
   constructor(private readonly fieldMapService: FieldMapService) {}
@@ -29,6 +30,7 @@ export class FieldMapResolver {
 
   @Mutation(() => FieldMap, { description: 'Field xaritasi yangilash' })
   @UseGuards(AuthGuard)
+  @OwnedBy('fieldMap')
   public async updateFieldMap(
     @Args('id', { type: () => ID }) id: string,
     @Args('input') input: UpdateFieldMapInput,
@@ -42,6 +44,7 @@ export class FieldMapResolver {
 
   @Mutation(() => Boolean, { description: "Field xaritasi o'chirish" })
   @UseGuards(AuthGuard)
+  @OwnedBy('fieldMap')
   public async deleteFieldMap(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {
@@ -53,6 +56,7 @@ export class FieldMapResolver {
     description: "Figma: Add Sector Modal — yangi sector qo'shish",
   })
   @UseGuards(AuthGuard)
+  @OwnedArgs({ 'input.fieldId': 'fieldMap' })
   public async createSector(
     @Args('input') input: CreateSectorInput,
   ): Promise<MapSector> {
@@ -62,6 +66,7 @@ export class FieldMapResolver {
 
   @Mutation(() => MapSector, { description: 'Sector yangilash' })
   @UseGuards(AuthGuard)
+  @OwnedBy('sector')
   public async updateSector(
     @Args('id', { type: () => ID }) id: string,
     @Args('input') input: UpdateSectorInput,
@@ -72,6 +77,7 @@ export class FieldMapResolver {
 
   @Mutation(() => Boolean, { description: "Sector o'chirish" })
   @UseGuards(AuthGuard)
+  @OwnedBy('sector')
   public async deleteSector(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {
@@ -103,6 +109,7 @@ export class FieldMapResolver {
     description: 'Figma: Map Area — field xaritasi barcha sectorlar bilan',
   })
   @UseGuards(AuthGuard)
+  @OwnedArgs({ fieldId: 'fieldMap' })
   public async fieldMapWithSectors(
     @Args('fieldId', { type: () => ID }) fieldId: string,
   ): Promise<FieldMap> {
@@ -115,6 +122,7 @@ export class FieldMapResolver {
       'Figma: Drone Map View / NDVI Index — sectorlar NDVI rangi bilan',
   })
   @UseGuards(AuthGuard)
+  @OwnedArgs({ fieldId: 'fieldMap' })
   public async fieldNdviMap(
     @Args('fieldId', { type: () => ID }) fieldId: string,
   ): Promise<FieldNdviMap> {
@@ -126,6 +134,7 @@ export class FieldMapResolver {
     description: 'Figma: Field Analytics — pastki grafik',
   })
   @UseGuards(AuthGuard)
+  @OwnedArgs({ fieldId: 'fieldMap' })
   public async fieldAnalytics(
     @Args('fieldId', { type: () => ID }) fieldId: string,
     @Args('from', { nullable: true }) from?: string,

@@ -12,6 +12,9 @@ import {
 import { Member } from '../../libs/dto/account-context-dto/member/member';
 import { AuthMember } from '../../account-context-module/auth/decorators/authMember.decorator';
 
+import { MemberRole } from '../../libs/enums/member.enum';
+import { RolesGuard } from '../../account-context-module/auth/guards/roles.guard';
+import { Roles } from '../../account-context-module/auth/decorators/roles.decorator';
 @Resolver()
 export class UploadResolver {
   constructor(private readonly uploadService: UploadService) {}
@@ -62,7 +65,8 @@ export class UploadResolver {
   }
 
   @Mutation(() => Boolean, { description: "S3 dan faylni o'chirish" })
-  @UseGuards(AuthGuard)
+  @Roles(MemberRole.ADMIN)
+  @UseGuards(RolesGuard)
   public async deleteFile(@Args('key') key: string): Promise<boolean> {
     return this.uploadService.deleteFile(key);
   }

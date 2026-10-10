@@ -12,14 +12,13 @@ import {
   MembersInquiry,
 } from '../../libs/dto/account-context-dto/member/member.input';
 import { ObjectId } from 'mongoose';
-import { UseGuards } from '@nestjs/common';
+import { ForbiddenException, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
 import {
   MemberProfileUpdateInput,
   MemberUpdateInput,
 } from '../../libs/dto/account-context-dto/member/member.update';
-import { WithoutGuard } from '../auth/guards/without.guard';
 import { shapeIntoMongoObjectId } from '../../libs/config';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -58,15 +57,21 @@ export class MemberResolver {
     return await this.memberService.updateMember(memberId, input);
   }
 
-  @UseGuards(WithoutGuard)
+  @UseGuards(AuthGuard)
   @Query(() => Member)
   public async getMember(
     @Args('memberId') input: string,
-    @AuthMember('_id') memberId: ObjectId,
+    @AuthMember() authMember: Member,
   ): Promise<Member> {
     console.log('Mutation: getMember');
     const targetId = shapeIntoMongoObjectId(input);
-    return await this.memberService.getMember(memberId, targetId);
+    if (
+      authMember.memberRole !== MemberRole.ADMIN &&
+      String(authMember._id) !== String(targetId)
+    ) {
+      throw new ForbiddenException('You do not have access to this resource.');
+    }
+    return await this.memberService.getMember(authMember._id as any, targetId);
   }
 
   @UseGuards(AuthGuard)

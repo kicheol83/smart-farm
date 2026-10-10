@@ -6,6 +6,7 @@ import { AuthGuard } from '../../account-context-module/auth/guards/auth.guard';
 import { Member } from '../../libs/dto/account-context-dto/member/member';
 import { AuthMember } from '../../account-context-module/auth/decorators/authMember.decorator';
 
+import { OwnedBy } from '../../ownership/owned-by.decorator';
 @Resolver(() => DeviceCommand)
 export class CommandResolver {
   constructor(private readonly commandService: CommandService) {}
@@ -38,6 +39,7 @@ export class CommandResolver {
 
   @Query(() => DeviceCommand)
   @UseGuards(AuthGuard)
+  @OwnedBy('command')
   public async deviceCommand(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<DeviceCommand> {
