@@ -13,6 +13,9 @@ import { AutoIrrigationService } from './auto-irrigation.service';
 import { AuthGuard } from '../../account-context-module/auth/guards/auth.guard';
 import { ManualIrrigationInput } from '../../libs/dto/ai.analysis.dto';
 
+import { MemberRole } from '../../libs/enums/member.enum';
+import { RolesGuard } from '../../account-context-module/auth/guards/roles.guard';
+import { Roles } from '../../account-context-module/auth/decorators/roles.decorator';
 @ObjectType()
 export class IrrigationStartResult {
   @Field(() => ID)
@@ -71,7 +74,8 @@ export class AutoIrrigationResolver {
   }
 
   @Mutation(() => AutoModeStatus)
-  @UseGuards(AuthGuard)
+  @Roles(MemberRole.ADMIN)
+  @UseGuards(RolesGuard)
   public async setAutoIrrigationMode(
     @Args('enabled') enabled: boolean,
   ): Promise<AutoModeStatus> {

@@ -11,6 +11,11 @@ import ActuatorsSchema from '../schemas/ops/Actuators.model';
 import AutomationRulesSchema from '../schemas/ops/AutomationRules.model';
 import TasksSchema from '../schemas/ops/Task.model';
 import { AnomalyLogSchema } from '../schemas/mid-iot/Anomaly-detection.model';
+import FieldsSchema from '../schemas/farm/Fields.model';
+import FieldMapSchema from '../schemas/farm/FieldsMap.model';
+import MapSectorSchema from '../schemas/farm/Map.model';
+import AlertsSchema from '../schemas/ops/Alerts.model';
+import { DeviceCommandSchema } from '../libs/dto/command.dto';
 import { OwnershipService } from './ownership.service';
 import { OwnershipInterceptor } from './ownership.interceptor';
 
@@ -28,6 +33,11 @@ import { OwnershipInterceptor } from './ownership.interceptor';
       { name: 'automationRules', schema: AutomationRulesSchema },
       { name: 'tasks', schema: TasksSchema },
       { name: 'anomalyLogs', schema: AnomalyLogSchema },
+      { name: 'fields', schema: FieldsSchema },
+      { name: 'fieldMaps', schema: FieldMapSchema },
+      { name: 'mapSectors', schema: MapSectorSchema },
+      { name: 'alerts', schema: AlertsSchema },
+      { name: 'deviceCommands', schema: DeviceCommandSchema },
     ]),
   ],
   providers: [

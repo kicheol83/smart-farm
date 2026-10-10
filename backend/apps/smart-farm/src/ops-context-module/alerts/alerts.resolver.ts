@@ -15,6 +15,7 @@ import { AuthMember } from '../../account-context-module/auth/decorators/authMem
 import { Member } from '../../libs/dto/account-context-dto/member/member';
 import { AlertsService } from './alerts.service';
 
+import { OwnedBy } from '../../ownership/owned-by.decorator';
 @Resolver()
 export class AlertsResolver {
   constructor(private readonly alertService: AlertsService) {}
@@ -39,6 +40,7 @@ export class AlertsResolver {
 
   @Mutation(() => Boolean, {})
   @UseGuards(AuthGuard)
+  @OwnedBy('alert')
   public async deleteAlert(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {

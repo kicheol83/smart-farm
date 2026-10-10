@@ -10,6 +10,9 @@ import { AuthGuard } from '../../account-context-module/auth/guards/auth.guard';
 import { AuthMember } from '../../account-context-module/auth/decorators/authMember.decorator';
 import { Member } from '../../libs/dto/account-context-dto/member/member';
 
+import { MemberRole } from '../../libs/enums/member.enum';
+import { RolesGuard } from '../../account-context-module/auth/guards/roles.guard';
+import { Roles } from '../../account-context-module/auth/decorators/roles.decorator';
 @Resolver()
 export class ActionLogResolver {
   constructor(private readonly actionLogService: ActionLogService) {}
@@ -42,7 +45,8 @@ export class ActionLogResolver {
   }
 
   @Query(() => PaginatedActionLogs)
-  @UseGuards(AuthGuard)
+  @Roles(MemberRole.ADMIN)
+  @UseGuards(RolesGuard)
   public async allActionLogs(
     @Args('input') input: GetActionLogsInput,
   ): Promise<PaginatedActionLogs> {
