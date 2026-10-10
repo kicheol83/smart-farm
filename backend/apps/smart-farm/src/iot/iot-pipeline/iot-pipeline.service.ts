@@ -6,6 +6,7 @@ import { MqttService } from '../mqtt/mqtt.service';
 import { DeviceAuthService } from '../device-auth/device-auth.service';
 import {
   MqttSensorDataPayload,
+  MqttSensorReading,
   MqttStatusPayload,
   WsAlertEvent,
   WsDeviceStatusEvent,
@@ -21,6 +22,12 @@ import {
 } from '../../prof-iot/iot-rate-limiter/iot-rate-limiter.service';
 import { IotErrorHandlerService } from '../../prof-iot/iot-error-handler/iot-error-handler.service';
 import { ActuatorService } from '../../actuator/actuator.service';
+import {
+  deviceIdFromTopic,
+  isSensorEnvelope,
+  isUsableReading,
+  resolveRecordedAt,
+} from './sensor-payload';
 
 interface ISensorData extends Document {
   sensorDataName: string;
@@ -143,6 +150,18 @@ export class IotPipelineService implements OnModuleInit {
       return;
     }
 
+    if (
+      !isSensorEnvelope(payload) ||
+      deviceIdFromTopic(topic) !== payload.deviceId
+    ) {
+      await this.errorHandler.handleMqttParseError(
+        topic,
+        '[rejected sensor payload]',
+        new Error('Sensor payload shape or topic device does not match.'),
+      );
+      return;
+    }
+
     let messageId: string;
     try {
       messageId = await this.messageBuffer.enqueue(
@@ -170,13 +189,22 @@ export class IotPipelineService implements OnModuleInit {
       return;
     }
 
-    const greenhouse = await this.greenhouseModel
-      .findById(device.greenHouseId)
-      .exec();
+    const recordedAt = resolveRecordedAt(payload.timestamp, new Date());
 
     try {
+      const greenhouse = await this.greenhouseModel
+        .findById(device.greenHouseId)
+        .exec();
+
+      const readings = await this.ownedReadings(device, payload.readings);
+      if (readings.length < payload.readings.length) {
+        this.logger.warn(
+          `Rejected ${payload.readings.length - readings.length} of ${payload.readings.length} readings | deviceId=${payload.deviceId}`,
+        );
+      }
+
       await Promise.all(
-        payload.readings.map(async (reading) => {
+        readings.map(async (reading) => {
           const calibratedValue = await this.calibrationService.apply(
             reading.sensorId,
             reading.value,
@@ -186,7 +214,7 @@ export class IotPipelineService implements OnModuleInit {
             this.sensorDataModel.create({
               sensorDataName: reading.type,
               sensorDataValue: calibratedValue,
-              recordedAt: new Date(payload.timestamp),
+              recordedAt,
               sensorId: new Types.ObjectId(reading.sensorId),
             }),
             this.timeSeriesService.insert(
@@ -195,7 +223,7 @@ export class IotPipelineService implements OnModuleInit {
               payload.deviceId,
               reading.unit,
               calibratedValue,
-              new Date(payload.timestamp),
+              recordedAt,
             ),
           ]);
 
@@ -238,7 +266,7 @@ export class IotPipelineService implements OnModuleInit {
               message: 'Z-Score anomaly: ' + anomaly.zScore,
               currentValue: calibratedValue,
               threshold: anomaly.mean,
-              timestamp: payload.timestamp,
+              timestamp: recordedAt.toISOString(),
             });
           }
 
@@ -250,7 +278,7 @@ export class IotPipelineService implements OnModuleInit {
             sensorType: reading.type,
             value: calibratedValue,
             unit: reading.unit,
-            timestamp: payload.timestamp,
+            timestamp: recordedAt.toISOString(),
           });
         }),
       );
@@ -310,6 +338,36 @@ export class IotPipelineService implements OnModuleInit {
       deviceName: device.deviceName,
       status: payload.status,
       timestamp: new Date().toISOString(),
+    });
+  }
+
+  private async ownedReadings(
+    device: IDevice,
+    readings: unknown[],
+  ): Promise<MqttSensorReading[]> {
+    const usable = readings.filter(isUsableReading);
+    if (usable.length === 0) return [];
+
+    const sensors = await this.sensorModel
+      .find({
+        _id: { $in: usable.map((r) => new Types.ObjectId(r.sensorId)) },
+        deviceId: device._id,
+      })
+      .select('_id sensorType sensorsUnit')
+      .exec();
+    const byId = new Map(sensors.map((s) => [String(s._id), s]));
+
+    return usable.flatMap((reading) => {
+      const sensor = byId.get(reading.sensorId);
+      if (!sensor) return [];
+      return [
+        {
+          sensorId: reading.sensorId,
+          type: sensor.sensorType,
+          unit: sensor.sensorsUnit ?? reading.unit,
+          value: reading.value,
+        },
+      ];
     });
   }
 

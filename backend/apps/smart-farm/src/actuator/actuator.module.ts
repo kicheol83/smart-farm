@@ -9,6 +9,7 @@ import WaterUsageSchema from '../schemas/farm/WaterUsage';
 import { ActionLogModule } from '../io-tcontext-module/action-log/action-log.module';
 import { DeviceAuthModule } from '../iot/device-auth/device-auth.module';
 import { AuthModule } from '../account-context-module/auth/auth.module';
+import { MqttModule } from '../iot/mqtt/mqtt.module';
 
 @Module({
   imports: [
@@ -20,7 +21,8 @@ import { AuthModule } from '../account-context-module/auth/auth.module';
     ]),
     ActionLogModule,
     DeviceAuthModule,
-    AuthModule
+    AuthModule,
+    MqttModule,
   ],
   providers: [ActuatorResolver, ActuatorService],
   exports: [ActuatorService],
