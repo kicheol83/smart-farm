@@ -1,6 +1,6 @@
 import {
   Injectable,
-  OnModuleInit,
+  OnApplicationBootstrap,
   OnModuleDestroy,
   Logger,
 } from '@nestjs/common';
@@ -14,7 +14,7 @@ export type MqttMessageHandler = (
 ) => Promise<void>;
 
 @Injectable()
-export class MqttService implements OnModuleInit, OnModuleDestroy {
+export class MqttService implements OnApplicationBootstrap, OnModuleDestroy {
   private readonly logger = new Logger(MqttService.name);
   private client!: MqttClient;
   private readonly handlers = new Map<string, MqttMessageHandler>();
@@ -32,7 +32,7 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
 
   constructor(private readonly config: ConfigService) {}
 
-  async onModuleInit(): Promise<void> {
+  async onApplicationBootstrap(): Promise<void> {
     await this.connect();
   }
 
@@ -45,13 +45,14 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
     const brokerUrl = this.config.getOrThrow<string>('MQTT_BROKER_URL');
     const username = this.config.get<string>('MQTT_USERNAME');
     const password = this.config.get<string>('MQTT_PASSWORD');
-    const clientId = `smart-farm-server-${Date.now()}`;
+    const clientId =
+      this.config.get<string>('MQTT_CLIENT_ID') || 'smart-farm-backend';
 
     this.client = mqtt.connect(brokerUrl, {
       clientId,
       username,
       password,
-      clean: true,
+      clean: false,
       reconnectPeriod: 5000,
       connectTimeout: 10000,
       will: {
