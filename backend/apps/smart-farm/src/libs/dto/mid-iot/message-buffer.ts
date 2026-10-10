@@ -6,6 +6,9 @@ export class BufferStats {
   pending: number;
 
   @Field(() => Int)
+  retrying: number;
+
+  @Field(() => Int)
   deadLetter: number;
 }
 
