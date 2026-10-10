@@ -15,7 +15,10 @@ import { ObjectId } from 'mongoose';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
-import { MemberUpdateInput } from '../../libs/dto/account-context-dto/member/member.update';
+import {
+  MemberProfileUpdateInput,
+  MemberUpdateInput,
+} from '../../libs/dto/account-context-dto/member/member.update';
 import { WithoutGuard } from '../auth/guards/without.guard';
 import { shapeIntoMongoObjectId } from '../../libs/config';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -48,11 +51,10 @@ export class MemberResolver {
   @UseGuards(AuthGuard)
   @Mutation(() => Member)
   public async updateMember(
-    @Args('input') input: MemberUpdateInput,
+    @Args('input') input: MemberProfileUpdateInput,
     @AuthMember('_id') memberId: ObjectId,
   ): Promise<Member> {
     console.log('Mutation: updateMember');
-    delete input._id;
     return await this.memberService.updateMember(memberId, input);
   }
 
@@ -88,6 +90,7 @@ export class MemberResolver {
   }
 
   @Roles(MemberRole.MANAGER)
+  @UseGuards(RolesGuard)
   @Query(() => Members)
   public async getManagerMember(
     @Args('input') input: ManagerInquiry,

@@ -18,7 +18,10 @@ export class RolesGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext | any): Promise<boolean> {
-    const roles = this.reflector.get<string[]>('roles', context.getHandler());
+    const roles = this.reflector.getAllAndOverride<string[]>('roles', [
+      context.getHandler(),
+      context.getClass(),
+    ]);
     if (!roles) return true;
 
     console.info(`--- @guard() Authentication [RolesGuard]: ${roles} ---`);
@@ -28,12 +31,17 @@ export class RolesGuard implements CanActivate {
       const bearerToken = request.headers.authorization;
       if (!bearerToken) throw new BadRequestException(Message.TOKEN_NOT_EXIST);
 
-      const token = bearerToken.split(' ')[1],
-        authMember = await this.authService.verifyToken(token),
-        hasRole = () => roles.indexOf(authMember.memberRole) > -1,
-        hasPermission: boolean = hasRole();
+      const token = bearerToken.split(' ')[1];
+      let authMember: any;
+      try {
+        authMember = await this.authService.verifyToken(token);
+      } catch {
+        throw new UnauthorizedException(Message.NOT_AUTHENTICATED);
+      }
+      const hasPermission =
+        !!authMember && roles.indexOf(authMember.memberRole) > -1;
 
-      if (!authMember || !hasPermission)
+      if (!hasPermission)
         throw new ForbiddenException(Message.ONLY_SPECIFIC_ROLES_ALLOWED);
 
       console.log('memberFullName[roles] =>', authMember.memberFullName);
