@@ -95,6 +95,7 @@ export const OTP = {
   TTL_MINUTES: 5,
   LENGTH: 6,
   RESEND_COOLDOWN_SECONDS: 60,
+  MAX_ATTEMPTS: 5,
 } as const;
 
 export const PENDING_PREFIX = 'pending_update:';

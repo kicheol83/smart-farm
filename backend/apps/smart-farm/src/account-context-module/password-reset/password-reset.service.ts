@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types, Document } from 'mongoose';
+import { randomInt } from 'crypto';
 import { OTP } from '../../libs/types/common';
 import { Member } from '../../libs/dto/account-context-dto/member/member';
 
@@ -13,6 +14,7 @@ export interface IPasswordReset extends Document {
   passwordToken: string;
   expiresAt: Date;
   usedAt?: Date | null;
+  attempts?: number;
   memberId: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
@@ -52,13 +54,16 @@ export class PasswordResetService {
     passwordToken: string,
   ): Promise<IPasswordReset> {
     const record = await this.passwordResetModel
-      .findOne({ memberId, usedAt: null })
-      .sort({ createdAt: -1 })
+      .findOneAndUpdate(
+        { memberId, usedAt: null, attempts: { $not: { $gte: OTP.MAX_ATTEMPTS } } },
+        { $inc: { attempts: 1 } },
+        { sort: { createdAt: -1 }, new: true },
+      )
       .exec();
 
     if (!record) {
       throw new BadRequestException(
-        'Reset code not found. Please request a new one.',
+        'Reset code not found or too many attempts. Please request a new one.',
       );
     }
 
@@ -104,10 +109,7 @@ export class PasswordResetService {
   }
 
   private generateOtp(): string {
-    const min = 10 ** (OTP.LENGTH - 1); // 100000
-    const max = 10 ** OTP.LENGTH - 1; // 999999
-    const result = String(Math.floor(min + Math.random() * (max - min + 1)));
-    return result;
+    return String(randomInt(10 ** (OTP.LENGTH - 1), 10 ** OTP.LENGTH));
   }
 
   private buildExpiresAt(): Date {

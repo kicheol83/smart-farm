@@ -36,7 +36,7 @@ import { OwnershipModule } from './ownership/ownership.module';
     OwnershipModule,
     GraphQLModule.forRoot({
       driver: ApolloDriver,
-      playground: true,
+      playground: process.env.NODE_ENV !== 'production',
       uploads: false,
       autoSchemaFile: true,
       subscriptions: {
