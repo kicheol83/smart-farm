@@ -1,3 +1,4 @@
+import { UnauthorizedException } from '@nestjs/common';
 import { Types } from 'mongoose';
 import { IotPipelineService } from './iot-pipeline.service';
 import { resolveRecordedAt } from './sensor-payload';
@@ -34,7 +35,7 @@ describe('sensor message integrity', () => {
     deviceAuth = {
       validateApiKey: jest.fn(async (key: string) => {
         if (key === 'key-a') return deviceA;
-        throw new Error('Invalid device API key.');
+        throw new UnauthorizedException('Invalid device API key.');
       }),
     };
     actuators = { evaluateRules: jest.fn(async () => undefined) };

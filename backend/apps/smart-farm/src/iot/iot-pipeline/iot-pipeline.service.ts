@@ -1,4 +1,9 @@
-import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleInit,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types, Document } from 'mongoose';
 import { Server } from 'socket.io';
@@ -13,7 +18,10 @@ import {
   WsSensorUpdateEvent,
 } from '../../libs/dto/iot-pipeline.dto';
 import { TimeseriesService } from '../../mid-iot/timeseries/timeseries.service';
-import { MessageBuffersService } from '../../mid-iot/message-buffers/message-buffers.service';
+import {
+  BufferedMessage,
+  MessageBuffersService,
+} from '../../mid-iot/message-buffers/message-buffers.service';
 import { CalibrationService } from '../../mid-iot/calibration/calibration.service';
 import { AnomalyDetectionService } from '../../mid-iot/anomaly-detection/anomaly-detection.service';
 import {
@@ -117,6 +125,8 @@ export class IotPipelineService implements OnModuleInit {
   ) {}
 
   onModuleInit(): void {
+    this.messageBuffer.setProcessor((message) => this.processBuffered(message));
+
     this.mqttService.registerHandler(
       MqttService.TOPICS.ALL_SENSORS,
       this.handleSensorData.bind(this),
@@ -162,140 +172,176 @@ export class IotPipelineService implements OnModuleInit {
       return;
     }
 
-    let messageId: string;
+    let messageId: string | null = null;
     try {
       messageId = await this.messageBuffer.enqueue(
         topic,
         payloadBuffer.toString(),
       );
-    } catch {
-      return; // Buffer to'la — drop
+    } catch (err) {
+      this.logger.error(
+        `Buffer unavailable, processing without retry | deviceId=${payload.deviceId} | ${err instanceof Error ? err.message : String(err)}`,
+      );
     }
 
-    // 3. Rate Limit tekshiruvi
     const allowed = await this.rateLimiter.isAllowed(
       payload.deviceId,
       RateLimitType.SENSOR_DATA,
     );
     if (!allowed) {
       this.logger.warn(`Rate limited | deviceId=${payload.deviceId}`);
-      await this.messageBuffer.acknowledge(messageId);
+      if (messageId) await this.messageBuffer.acknowledge(messageId);
       return;
     }
 
-    const device = await this.authorizeDevice(payload.deviceId, payload.apiKey);
-    if (!device) {
-      await this.messageBuffer.acknowledge(messageId);
-      return;
-    }
+    await this.processSensorMessage(payload, messageId, new Date(), []);
+  }
 
-    const recordedAt = resolveRecordedAt(payload.timestamp, new Date());
+  private async processBuffered(message: BufferedMessage): Promise<void> {
+    await this.processSensorMessage(
+      JSON.parse(message.payload),
+      message.id,
+      new Date(message.receivedAt),
+      message.done ?? [],
+    );
+  }
 
+  private async processSensorMessage(
+    payload: MqttSensorDataPayload,
+    messageId: string | null,
+    receivedAt: Date,
+    done: string[],
+  ): Promise<void> {
     try {
+      const device = await this.authorizeDevice(payload.deviceId, payload.apiKey);
+      if (!device) {
+        if (messageId) await this.messageBuffer.acknowledge(messageId);
+        return;
+      }
+
+      const recordedAt = resolveRecordedAt(payload.timestamp, receivedAt);
       const greenhouse = await this.greenhouseModel
         .findById(device.greenHouseId)
         .exec();
 
-      const readings = await this.ownedReadings(device, payload.readings);
-      if (readings.length < payload.readings.length) {
+      const owned = await this.ownedReadings(device, payload.readings);
+      if (owned.length < payload.readings.length) {
         this.logger.warn(
-          `Rejected ${payload.readings.length - readings.length} of ${payload.readings.length} readings | deviceId=${payload.deviceId}`,
+          `Rejected ${payload.readings.length - owned.length} of ${payload.readings.length} readings | deviceId=${payload.deviceId}`,
         );
       }
+      const readings = owned.filter((r) => !done.includes(r.sensorId));
 
-      await Promise.all(
-        readings.map(async (reading) => {
-          const calibratedValue = await this.calibrationService.apply(
-            reading.sensorId,
-            reading.value,
-          );
-
-          await Promise.all([
-            this.sensorDataModel.create({
-              sensorDataName: reading.type,
-              sensorDataValue: calibratedValue,
-              recordedAt,
-              sensorId: new Types.ObjectId(reading.sensorId),
-            }),
-            this.timeSeriesService.insert(
-              reading.sensorId,
-              reading.type,
-              payload.deviceId,
-              reading.unit,
-              calibratedValue,
-              recordedAt,
-            ),
-          ]);
-
-          await this.checkAndCreateAlert(
-            reading.sensorId,
-            calibratedValue,
-            reading.type,
-            device,
-            greenhouse,
-          );
-
-          const anomaly = await this.anomalyDetection.check(
-            reading.sensorId,
-            reading.type,
-            payload.deviceId,
-            String(device.greenHouseId),
-            calibratedValue,
-          );
-
-          this.actuatorService
-            .evaluateRules(
-              String(device.greenHouseId),
-              reading.type,
-              calibratedValue,
-              device.sectionId ? String(device.sectionId) : undefined,
-            )
-            .catch((err: Error) =>
-              this.logger.error(
-                `Automation evaluation failed | sensorId=${reading.sensorId} | ${err.message}`,
-              ),
-            );
-
-          if (anomaly.isAnomaly) {
-            this.broadcastAlert({
-              type: 'ANOMALY',
-              greenHouseId: String(device.greenHouseId),
-              alertId: reading.sensorId,
-              alertType: reading.type,
-              severity: anomaly.severity!,
-              message: 'Z-Score anomaly: ' + anomaly.zScore,
-              currentValue: calibratedValue,
-              threshold: anomaly.mean,
-              timestamp: recordedAt.toISOString(),
-            });
-          }
-
-          this.broadcastSensorUpdate({
-            type: 'SENSOR_UPDATE',
-            greenHouseId: String(device.greenHouseId),
-            deviceId: payload.deviceId,
-            sensorId: reading.sensorId,
-            sensorType: reading.type,
-            value: calibratedValue,
-            unit: reading.unit,
-            timestamp: recordedAt.toISOString(),
-          });
-        }),
+      const results = await Promise.allSettled(
+        readings.map((reading) =>
+          this.processReading(reading, payload.deviceId, device, greenhouse, recordedAt),
+        ),
+      );
+      const succeeded = readings
+        .filter((_, i) => results[i].status === 'fulfilled')
+        .map((r) => r.sensorId);
+      const failure = results.find(
+        (r): r is PromiseRejectedResult => r.status === 'rejected',
       );
 
-      // 6. Muvaffaqiyatli — buffer dan o'chirish
-      await this.messageBuffer.acknowledge(messageId);
+      if (!failure) {
+        if (messageId) await this.messageBuffer.acknowledge(messageId);
+        return;
+      }
+
+      const error =
+        failure.reason instanceof Error ? failure.reason : new Error(String(failure.reason));
+      if (messageId) await this.messageBuffer.markFailed(messageId, error.message, succeeded);
+      await this.errorHandler.handleSensorSaveError(payload.deviceId, 'batch', error);
     } catch (err) {
       const error = err instanceof Error ? err : new Error(String(err));
-
-      await this.messageBuffer.markFailed(messageId, error.message);
-
-      await this.errorHandler.handleSensorSaveError(
-        payload.deviceId,
-        'batch',
-        error,
-      );
+      if (messageId) await this.messageBuffer.markFailed(messageId, error.message);
+      await this.errorHandler.handleSensorSaveError(payload.deviceId, 'batch', error);
     }
+  }
+
+  private async processReading(
+    reading: MqttSensorReading,
+    deviceId: string,
+    device: IDevice,
+    greenhouse: IGreenhouse | null,
+    recordedAt: Date,
+  ): Promise<void> {
+    const calibratedValue = await this.calibrationService.apply(
+      reading.sensorId,
+      reading.value,
+    );
+
+    await Promise.all([
+      this.sensorDataModel.create({
+        sensorDataName: reading.type,
+        sensorDataValue: calibratedValue,
+        recordedAt,
+        sensorId: new Types.ObjectId(reading.sensorId),
+      }),
+      this.timeSeriesService.insert(
+        reading.sensorId,
+        reading.type,
+        deviceId,
+        reading.unit,
+        calibratedValue,
+        recordedAt,
+      ),
+    ]);
+
+    await this.checkAndCreateAlert(
+      reading.sensorId,
+      calibratedValue,
+      reading.type,
+      device,
+      greenhouse,
+    );
+
+    const anomaly = await this.anomalyDetection.check(
+      reading.sensorId,
+      reading.type,
+      deviceId,
+      String(device.greenHouseId),
+      calibratedValue,
+    );
+
+    this.actuatorService
+      .evaluateRules(
+        String(device.greenHouseId),
+        reading.type,
+        calibratedValue,
+        device.sectionId ? String(device.sectionId) : undefined,
+      )
+      .catch((err: Error) =>
+        this.logger.error(
+          `Automation evaluation failed | sensorId=${reading.sensorId} | ${err.message}`,
+        ),
+      );
+
+    if (anomaly.isAnomaly) {
+      this.broadcastAlert({
+        type: 'ANOMALY',
+        greenHouseId: String(device.greenHouseId),
+        alertId: reading.sensorId,
+        alertType: reading.type,
+        severity: anomaly.severity!,
+        message: 'Z-Score anomaly: ' + anomaly.zScore,
+        currentValue: calibratedValue,
+        threshold: anomaly.mean,
+        timestamp: recordedAt.toISOString(),
+      });
+    }
+
+    this.broadcastSensorUpdate({
+      type: 'SENSOR_UPDATE',
+      greenHouseId: String(device.greenHouseId),
+      deviceId,
+      sensorId: reading.sensorId,
+      sensorType: reading.type,
+      value: calibratedValue,
+      unit: reading.unit,
+      timestamp: recordedAt.toISOString(),
+    });
   }
 
   private async handleDeviceStatus(
@@ -379,6 +425,7 @@ export class IotPipelineService implements OnModuleInit {
     try {
       keyDeviceId = await this.deviceAuthService.validateApiKey(apiKey);
     } catch (err) {
+      if (!(err instanceof UnauthorizedException)) throw err;
       await this.errorHandler.handleAuthError(
         String(deviceId),
         err instanceof Error ? err.message : String(err),
