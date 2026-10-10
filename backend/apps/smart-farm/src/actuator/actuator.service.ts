@@ -14,6 +14,21 @@ import {
   ActuatorStatus,
   TriggerCondition,
 } from '../libs/dto/ops-context-dto/actuator/actuator';
+import { MqttService } from '../iot/mqtt/mqtt.service';
+
+export const WATER_ACTUATOR_TYPES = new Set(['WATER_PUMP', 'SOLENOID_VALVE']);
+
+const envMinutes = (name: string, fallback: number, min: number): number => {
+  const raw = process.env[name];
+  const value = Number(raw);
+  return raw !== undefined && raw !== '' && Number.isFinite(value) && value >= min
+    ? value
+    : fallback;
+};
+
+export const pumpMaxOnMinutes = (): number => envMinutes('PUMP_MAX_ON_MINUTES', 30, 1);
+
+export const ruleCooldownMinutes = (): number => envMinutes('RULE_COOLDOWN_MINUTES', 10, 0);
 
 export interface IActuator extends Document {
   _id: Types.ObjectId;
@@ -59,6 +74,8 @@ export class ActuatorService {
 
     @InjectModel('waterUsages')
     private readonly waterUsageModel: Model<any>,
+
+    private readonly mqttService: MqttService,
   ) {}
 
   private wsServer?: Namespace;
@@ -166,22 +183,29 @@ export class ActuatorService {
   }
 
   public async toggle(input: ToggleActuatorInput, reason?: string): Promise<IActuator> {
-    const autoOffAt = input.autoOffAfterMinutes
-      ? new Date(Date.now() + input.autoOffAfterMinutes * 60_000)
-      : undefined;
-
     const previous = await this.actuatorModel.findById(input.actuatorId).exec();
     if (!previous) throw new NotFoundException('Actuator not found.');
     const now = new Date();
 
+    const isWater = WATER_ACTUATOR_TYPES.has(previous.actuatorType);
+    const turningOn = input.status === ActuatorStatus.ON;
+    const maxOnMinutes = pumpMaxOnMinutes();
+    const onMinutes =
+      turningOn && isWater
+        ? Math.min(input.autoOffAfterMinutes || maxOnMinutes, maxOnMinutes)
+        : input.autoOffAfterMinutes;
+    const autoOffAt =
+      turningOn && onMinutes ? new Date(now.getTime() + onMinutes * 60_000) : undefined;
+
     const actuator = await this.actuatorModel
       .findByIdAndUpdate(
         input.actuatorId,
-        {
-          actuatorStatus: input.status,
-          lastToggledAt: now,
-          autoOffAt: input.status === ActuatorStatus.ON ? autoOffAt : undefined,
-        },
+        autoOffAt
+          ? { $set: { actuatorStatus: input.status, lastToggledAt: now, autoOffAt } }
+          : {
+              $set: { actuatorStatus: input.status, lastToggledAt: now },
+              $unset: { autoOffAt: 1 },
+            },
         { new: true },
       )
       .exec();
@@ -200,10 +224,31 @@ export class ActuatorService {
       });
     }
 
+    if (isWater) {
+      this.sendRelayCommand(actuator, autoOffAt);
+    }
+
     if (previous.actuatorStatus !== actuator.actuatorStatus) {
       this.emitActuatorUpdate(actuator, reason, waterAmount);
     }
     return actuator;
+  }
+
+  private sendRelayCommand(actuator: IActuator, autoOffAt?: Date): void {
+    const on = actuator.actuatorStatus === ActuatorStatus.ON;
+    this.mqttService.publish(MqttService.TOPICS.COMMAND(String(actuator.deviceId)), {
+      commandId: `${String(actuator._id)}:${actuator.lastToggledAt?.getTime() ?? Date.now()}`,
+      commandType: on ? 'RELAY_ON' : 'RELAY_OFF',
+      payload: {
+        actuatorId: String(actuator._id),
+        actuatorType: actuator.actuatorType,
+        autoOffAt: autoOffAt ? autoOffAt.toISOString() : null,
+        onSec: on && autoOffAt
+          ? Math.max(1, Math.ceil((autoOffAt.getTime() - Date.now()) / 1000))
+          : null,
+      },
+      timestamp: new Date().toISOString(),
+    });
   }
 
   public async setSpeed(input: SetActuatorSpeedInput): Promise<IActuator> {
@@ -337,6 +382,24 @@ export class ActuatorService {
       const target = await this.actuatorModel.findById(rule.actuatorId).select('actuatorStatus').exec();
       if (!target || target.actuatorStatus === ActuatorStatus.ON) continue;
 
+      const now = new Date();
+      const cooldownStart = new Date(now.getTime() - ruleCooldownMinutes() * 60_000);
+      const claimed = await this.ruleModel
+        .findOneAndUpdate(
+          {
+            _id: rule._id,
+            $or: [
+              { lastTriggeredAt: { $exists: false } },
+              { lastTriggeredAt: null },
+              { lastTriggeredAt: { $lte: cooldownStart } },
+            ],
+          },
+          { $set: { lastTriggeredAt: now } },
+          { new: true },
+        )
+        .exec();
+      if (!claimed) continue;
+
       await this.toggle(
         {
           actuatorId: String(rule.actuatorId),
@@ -346,9 +409,6 @@ export class ActuatorService {
         `${rule.ruleName}: ${sensorType} ${currentValue} ${rule.triggerCondition === TriggerCondition.BELOW ? '<' : '>'} ${rule.triggerThreshold}`,
       );
 
-      await this.ruleModel
-        .updateOne({ _id: rule._id }, { lastTriggeredAt: new Date() })
-        .exec();
       this.logger.log(
         `Automation rule triggered | ${rule.ruleName} | ${sensorType}=${currentValue} ${rule.triggerCondition} ${rule.triggerThreshold}`,
       );

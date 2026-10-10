@@ -26,6 +26,7 @@ Wiring:
 
 import ujson
 import utime
+import ntptime
 from umqtt.robust import MQTTClient
 import machine
 from machine import Pin, ADC, I2C
@@ -83,6 +84,51 @@ light_sensor = bh1750.BH1750(i2c)
 relay = Pin(RELAY_PIN, Pin.OUT)
 relay.value(0)  # boshlang'ichda o'chirilgan
 
+MAX_PUMP_ON_SEC = 1800
+PUMP_OFF_GRACE_SEC = 60
+pump_off_deadline = None
+
+
+def pump_on(seconds=None):
+    global pump_off_deadline
+    limit = MAX_PUMP_ON_SEC
+    if seconds:
+        limit = min(int(seconds) + PUMP_OFF_GRACE_SEC, MAX_PUMP_ON_SEC)
+    relay.value(1)
+    pump_off_deadline = utime.ticks_add(utime.ticks_ms(), limit * 1000)
+
+
+def pump_off():
+    global pump_off_deadline
+    relay.value(0)
+    pump_off_deadline = None
+
+
+def enforce_pump_limit():
+    if pump_off_deadline is not None and utime.ticks_diff(utime.ticks_ms(), pump_off_deadline) >= 0:
+        pump_off()
+        print("Pump OFF (local limit)")
+
+
+EPOCH_OFFSET = 946684800 if utime.gmtime(0)[0] == 2000 else 0
+NTP_RETRY_MS = 3600000
+clock_synced = False
+last_ntp_try = None
+
+
+def sync_clock():
+    global clock_synced, last_ntp_try
+    last_ntp_try = utime.ticks_ms()
+    try:
+        ntptime.settime()
+        clock_synced = True
+    except Exception as e:
+        print(f"NTP error: {e}")
+
+
+def unix_time():
+    return utime.time() + EPOCH_OFFSET if clock_synced else None
+
 # ─── Kalibrovka konstantalari (soil sensor uchun) ─────────────────────────────
 # Quruq tuproqda ADC qiymatini o'lchab SOIL_DRY ga yozing,
 # suvga botirib SOIL_WET ga yozing.
@@ -115,7 +161,19 @@ def read_light():
 
 # ─── MQTT ─────────────────────────────────────────────────────────────────────
 
-client = MQTTClient(
+class DeviceClient(MQTTClient):
+    def reconnect(self):
+        while True:
+            super().reconnect()
+            try:
+                self.subscribe(TOPIC_COMMANDS, 1)
+                return
+            except OSError as e:
+                print(f"Resubscribe error: {e}")
+                utime.sleep(self.DELAY)
+
+
+client = DeviceClient(
     CLIENT_ID,
     BROKER_URL,
     port=BROKER_PORT,
@@ -132,11 +190,11 @@ def on_command(topic, msg):
         print(f"Command: {cmd['commandType']}")
 
         if cmd['commandType'] == 'RELAY_ON':
-            relay.value(1)
+            pump_on((cmd.get('payload') or {}).get('onSec'))
             print("Pump ON")
 
         elif cmd['commandType'] == 'RELAY_OFF':
-            relay.value(0)
+            pump_off()
             print("Pump OFF")
 
         elif cmd['commandType'] == 'RESTART':
@@ -155,9 +213,11 @@ def on_command(topic, msg):
         print(f"Command error: {e}")
 
 
+sync_clock()
+
 client.set_callback(on_command)
-client.connect()
-client.subscribe(TOPIC_COMMANDS)
+client.connect(False)
+client.subscribe(TOPIC_COMMANDS, 1)
 print("Connected to MQTT broker")
 
 # ─── Status: ONLINE ──────────────────────────────────────────────────────────
@@ -179,6 +239,10 @@ uptime = 0
 while True:
     now = utime.time()
     client.check_msg()  # Incoming command tekshirish (RELAY_ON/OFF va h.k.)
+    enforce_pump_limit()
+
+    if not clock_synced and utime.ticks_diff(utime.ticks_ms(), last_ntp_try) >= NTP_RETRY_MS:
+        sync_clock()
 
     # Sensor data yuborish
     if now - last_send >= SEND_INTERVAL:
@@ -228,7 +292,7 @@ while True:
             payload = ujson.dumps({
                 "apiKey": API_KEY,
                 "deviceId": DEVICE_ID,
-                "timestamp": utime.time(),
+                "timestamp": unix_time(),
                 "readings": readings,
             })
 
@@ -247,7 +311,7 @@ while True:
         client.publish(TOPIC_HEARTBEAT, ujson.dumps({
             "apiKey": API_KEY,
             "deviceId": DEVICE_ID,
-            "timestamp": utime.time(),
+            "timestamp": unix_time(),
             "uptime": uptime,
         }))
         last_heartbeat = now
