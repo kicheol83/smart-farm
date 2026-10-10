@@ -18,9 +18,11 @@ import {
 } from '../../libs/dto/account-context-dto/member/member.input';
 import { Message, T } from '../../libs/types/common';
 import { MemberRole, MemberStatus } from '../../libs/enums/member.enum';
-import { MemberUpdateInput } from '../../libs/dto/account-context-dto/member/member.update';
+import {
+  MemberProfileUpdateInput,
+  MemberUpdateInput,
+} from '../../libs/dto/account-context-dto/member/member.update';
 import { Direction } from '../../libs/enums/common.enum';
-import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class MemberService {
@@ -30,11 +32,16 @@ export class MemberService {
   ) {}
 
   public async signup(input: CreateMemberInput): Promise<Member> {
-    input.memberPassword = await this.authService.hashPassword(
+    const memberPassword = await this.authService.hashPassword(
       input.memberPassword,
     );
     try {
-      const result = await this.memberModel.create(input);
+      const result = await this.memberModel.create({
+        memberFullName: input.memberFullName,
+        memberEmail: input.memberEmail,
+        memberPassword,
+        memberAvatar: input.memberAvatar,
+      });
       result.accessToken = await this.authService.createToken(result);
 
       await this.authService.sendOtpAfterSignup(
@@ -81,16 +88,18 @@ export class MemberService {
 
   public async updateMember(
     memberId: ObjectId,
-    input: MemberUpdateInput,
+    input: MemberProfileUpdateInput,
   ): Promise<Member> {
-    if (input.memberPassword) {
-      input.memberPassword = await bcrypt.hash(input.memberPassword, 10);
-    }
+    const changes: T = {};
+    if (input.memberFullName !== undefined)
+      changes.memberFullName = input.memberFullName;
+    if (input.memberAvatar !== undefined)
+      changes.memberAvatar = input.memberAvatar;
 
     const result: Member = await this.memberModel
       .findOneAndUpdate(
         { _id: memberId, memberStatus: MemberStatus.ACTIVE },
-        input,
+        { $set: changes },
         { new: true },
       )
       .exec();

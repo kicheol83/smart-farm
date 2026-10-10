@@ -1,6 +1,26 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { IsNotEmpty, IsOptional } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsUrl,
+  Length,
+  MaxLength,
+} from 'class-validator';
 import { ObjectId } from 'mongoose';
+
+@InputType()
+export class MemberProfileUpdateInput {
+  @IsOptional()
+  @Length(5, 50)
+  @Field(() => String, { nullable: true })
+  memberFullName?: string;
+
+  @IsOptional()
+  @IsUrl()
+  @MaxLength(200)
+  @Field(() => String, { nullable: true })
+  memberAvatar?: string;
+}
 
 @InputType()
 export class MemberUpdateInput {

@@ -42,10 +42,6 @@ export class CreateMemberInput {
   memberPassword: string;
 
   @IsOptional()
-  @Field(() => MemberRole, { nullable: true })
-  memberRole?: MemberRole;
-
-  @IsOptional()
   @Field(() => String, { nullable: true })
   @IsUrl()
   @Matches(/^(https?:\/\/)?([\w-]+(\.[\w-]+)+)(\/[\w-]*)*\/?$/, {
