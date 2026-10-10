@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types, Document, ObjectId } from 'mongoose';
+import { randomInt } from 'crypto';
 import { OTP } from '../../libs/types/common';
 import { Member } from '../../libs/dto/account-context-dto/member/member';
 
@@ -52,13 +53,16 @@ export class EmailVerificationService {
     emailCode: string,
   ): Promise<Types.ObjectId> {
     const record = await this.emailVerificationModel
-      .findOne({ memberId, verifiedAt: null })
-      .sort({ createdAt: -1 })
+      .findOneAndUpdate(
+        { memberId, verifiedAt: null, attempts: { $not: { $gte: OTP.MAX_ATTEMPTS } } },
+        { $inc: { attempts: 1 } },
+        { sort: { createdAt: -1 }, new: true },
+      )
       .exec();
 
     if (!record) {
       throw new BadRequestException(
-        'Verification code not found. Please request a new one.',
+        'Verification code not found or too many attempts. Please request a new one.',
       );
     }
 
@@ -101,9 +105,7 @@ export class EmailVerificationService {
   }
 
   private generateOtp(): string {
-    const min = 10 ** (OTP.LENGTH - 1); // 100000
-    const max = 10 ** OTP.LENGTH - 1; // 999999
-    return String(Math.floor(min + Math.random() * (max - min + 1)));
+    return String(randomInt(10 ** (OTP.LENGTH - 1), 10 ** OTP.LENGTH));
   }
 
   private buildExpiresAt(): Date {

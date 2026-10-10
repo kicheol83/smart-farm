@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { AUTH_TIMER } from '../../libs/config';
+import { jwtOptionsFactory } from './jwt-options';
 import { JwtModule } from '@nestjs/jwt/dist/jwt.module';
 import MemberSchema from '../../schemas/account/Member.model';
 import { HttpModule } from '@nestjs/axios';
@@ -15,9 +16,9 @@ import { GreenhouseModule } from '../../farm-context-module/greenhouse/greenhous
   imports: [
     MongooseModule.forFeature([{ name: 'Member', schema: MemberSchema }]),
     HttpModule,
-    JwtModule.register({
-      secret: `${process.env.SECRET_TOKEN}`,
-      signOptions: { expiresIn: `${AUTH_TIMER}d` },
+    JwtModule.registerAsync({
+      inject: [ConfigService],
+      useFactory: jwtOptionsFactory,
     }),
     MailModule,
     EmailVerificationsModule,

@@ -14,6 +14,10 @@ export const PasswordResetSchema = new Schema(
       type: Date,
       required: false,
     },
+    attempts: {
+      type: Number,
+      default: 0,
+    },
     memberId: {
       type: Schema.Types.ObjectId,
       ref: 'members',
