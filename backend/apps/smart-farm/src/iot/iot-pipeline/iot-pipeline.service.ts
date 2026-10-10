@@ -252,11 +252,21 @@ export class IotPipelineService implements OnModuleInit {
       const error =
         failure.reason instanceof Error ? failure.reason : new Error(String(failure.reason));
       if (messageId) await this.messageBuffer.markFailed(messageId, error.message, succeeded);
-      await this.errorHandler.handleSensorSaveError(payload.deviceId, 'batch', error);
+      await this.reportSaveError(payload.deviceId, error);
     } catch (err) {
       const error = err instanceof Error ? err : new Error(String(err));
       if (messageId) await this.messageBuffer.markFailed(messageId, error.message);
-      await this.errorHandler.handleSensorSaveError(payload.deviceId, 'batch', error);
+      await this.reportSaveError(payload.deviceId, error);
+    }
+  }
+
+  private async reportSaveError(deviceId: string, error: Error): Promise<void> {
+    try {
+      await this.errorHandler.handleSensorSaveError(deviceId, 'batch', error);
+    } catch (logError) {
+      this.logger.warn(
+        `Could not record sensor save error | deviceId=${deviceId} | ${logError instanceof Error ? logError.message : String(logError)}`,
+      );
     }
   }
 

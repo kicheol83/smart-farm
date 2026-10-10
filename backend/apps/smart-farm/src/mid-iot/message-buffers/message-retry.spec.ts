@@ -221,6 +221,21 @@ describe('sensor message retry and dead letter queue', () => {
     expect(dead.retryCount).toBe(3);
   });
 
+  it('counts each failed attempt once when the error log cannot be written either', async () => {
+    failingSensors.add(String(soilSensor));
+    errorHandler.handleSensorSaveError.mockRejectedValue(new Error('MongoServerSelectionError: getaddrinfo EAI_AGAIN mongo'));
+
+    await expect(send()).resolves.toBeUndefined();
+    await at(31_000);
+    await at(31_000 + 61_000);
+    expect((await buffer.getStats()).deadLetter).toBe(0);
+
+    await at(31_000 + 61_000 + 121_000);
+
+    expect(rowsFor(soilSensor)).toHaveLength(4);
+    expect(await buffer.getStats()).toEqual({ pending: 0, retrying: 0, deadLetter: 1 });
+  });
+
   it('retries a message left in flight when the process stopped mid-way', async () => {
     const payload = JSON.stringify({
       apiKey: 'key',
