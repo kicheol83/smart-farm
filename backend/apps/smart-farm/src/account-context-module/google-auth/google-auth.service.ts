@@ -34,7 +34,7 @@ export class GoogleAuthService {
         throw new UnauthorizedException('Google email is not verified.');
       }
       return {
-        googleId: payload.sub, // Google unique ID
+        googleId: payload.sub,
         memberEmail: payload.email!,
         memberFullName: payload.name ?? payload.email!,
         memberAvatar: payload.picture ?? '',

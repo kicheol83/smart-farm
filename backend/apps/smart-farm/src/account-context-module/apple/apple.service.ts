@@ -22,7 +22,7 @@ export class AppleService {
       jwksUri: 'https://appleid.apple.com/auth/keys',
       cache: true,
       cacheMaxEntries: 5,
-      cacheMaxAge: 600_000, // 10 daqiqa cache
+      cacheMaxAge: 600_000,
     });
   }
 
@@ -64,7 +64,6 @@ export class AppleService {
     }
   }
 
-  // ─── Private
   private async getSigningKey(kid: string): Promise<string> {
     return new Promise((resolve, reject) => {
       this.jwksClient.getSigningKey(kid, (err, key) => {

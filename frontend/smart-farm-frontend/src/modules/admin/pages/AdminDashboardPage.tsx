@@ -110,8 +110,6 @@ export function AdminDashboardPage() {
     refetchMembers();
   }
 
-  
-
   return (
     <>
       <Header title={t("txt.admin_panel")} />
@@ -135,7 +133,6 @@ export function AdminDashboardPage() {
         ))}
       </Tabs>
 
-      {/* ═══ OVERVIEW ═══ */}
       {tab === "overview" && stats && (
         <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>

@@ -248,7 +248,6 @@ export function ReportDetailsTable({
         </Table>
       </Box>
 
-      {/* Pastki sahifalash */}
       <Box
         sx={{
           display: "flex",

@@ -131,7 +131,6 @@ export function MapAreaPage() {
     <>
       <Header title="Map" />
 
-      {/* Import + Add Map Area */}
       <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1, mb: 2 }}>
         <Button
           variant="outlined"
@@ -159,7 +158,6 @@ export function MapAreaPage() {
           height: { lg: "calc(100vh - 200px)" },
         }}
       >
-        {/* Chap panel */}
         <Box
           sx={{
             display: "flex",
@@ -216,7 +214,6 @@ export function MapAreaPage() {
           )}
         </Box>
 
-        {/* Xarita */}
         <MapAreaView
           sectors={sectors}
           selectedSector={selectedSector}
@@ -230,7 +227,6 @@ export function MapAreaPage() {
         />
       </Box>
 
-      {/* Sana tanlagich + trend grafigi */}
       {fieldId && (
         <Box sx={{ mt: 2 }}>
           <DateSelectorRow

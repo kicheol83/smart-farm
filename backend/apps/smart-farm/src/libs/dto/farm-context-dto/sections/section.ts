@@ -19,8 +19,6 @@ import {
   Max,
 } from 'class-validator';
 
-// ─── Enums ────────────────────────────────────────────────────────────────────
-
 export enum SectionStatus {
   HEALTHY = 'HEALTHY',
   WARNING = 'WARNING',

@@ -37,7 +37,7 @@ export class TimeseriesService implements OnModuleInit {
           metaField: 'metadata',
           granularity: 'seconds',
         },
-        expireAfterSeconds: 90 * 24 * 60 * 60, // 90 kun
+        expireAfterSeconds: 90 * 24 * 60 * 60,
       });
       this.logger.log('Time-series collection created');
     }

@@ -13,20 +13,14 @@ const GRAPHQL_HTTP_URL =
 const GRAPHQL_WS_URL =
   import.meta.env.VITE_GRAPHQL_WS_URL ?? "ws://localhost:3010/graphql";
 
-// ─── Auth token ──────────────────────────────────────────────────────────────
-
 function getAuthToken(): string | null {
   const token = localStorage.getItem("accessToken");
   return token && token !== "undefined" && token !== "null" ? token : null;
 }
 
-// ─── HTTP + GraphQL Upload ────────────────────────────────────────────────────
-
 const uploadLink = createUploadLink({
   uri: GRAPHQL_HTTP_URL,
 });
-
-// ─── Auth ────────────────────────────────────────────────────────────────────
 
 const authLink = setContext((_, { headers }) => {
   const token = getAuthToken();
@@ -35,7 +29,6 @@ const authLink = setContext((_, { headers }) => {
     headers: {
       ...headers,
 
-      // Apollo Server CSRF protection uchun
       "apollo-require-preflight": "true",
 
       ...(token
@@ -46,8 +39,6 @@ const authLink = setContext((_, { headers }) => {
     },
   };
 });
-
-// ─── WebSocket ────────────────────────────────────────────────────────────────
 
 const wsLink = new GraphQLWsLink(
   createClient({
@@ -68,9 +59,6 @@ const wsLink = new GraphQLWsLink(
   }),
 );
 
-// ─── Subscription → WS
-// ─── Query/Mutation → HTTP + Upload
-
 const splitLink = split(
   ({ query }) => {
     const definition = getMainDefinition(query);
@@ -83,8 +71,6 @@ const splitLink = split(
   wsLink,
   authLink.concat(uploadLink),
 );
-
-// ─── Apollo Client ────────────────────────────────────────────────────────────
 
 export const apolloClient = new ApolloClient({
   link: splitLink,

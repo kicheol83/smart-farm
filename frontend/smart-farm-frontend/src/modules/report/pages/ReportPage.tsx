@@ -58,7 +58,6 @@ export function ReportPage() {
     <>
       <Header title={t("txt.greenhouse_report")} />
 
-      {/* Import + sana oralig'i */}
       <Box
         sx={{
           display: "flex",
@@ -84,7 +83,6 @@ export function ReportPage() {
         </Button>
       </Box>
 
-      {/* Yuqori qator: 3 summary karta + kamera */}
       <Box
         sx={{
           display: "grid",
@@ -123,12 +121,10 @@ export function ReportPage() {
         {FEATURES.camera && <ReportCameraCard cameras={cameras} />}
       </Box>
 
-      {/* Plants Health Trends grafigi */}
       <Box sx={{ mb: 2 }}>
         <PlantsHealthTrendsChart trend={report?.plantHealth.trend ?? []} />
       </Box>
 
-      {/* Pastki qator: Report Details + Alerts Summary */}
       <Box
         sx={{
           display: "grid",

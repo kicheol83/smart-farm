@@ -13,10 +13,6 @@ interface PlantReportCardProps {
   badge?: string;
 }
 
-/**
- * Figma "Card Plant Report" komponenti.
- * Birinchi karta (Plant Health) - gradient-green highlight variant.
- */
 export function PlantReportCard({
   icon: Icon,
   label,

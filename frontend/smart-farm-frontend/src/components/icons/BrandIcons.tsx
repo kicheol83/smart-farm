@@ -1,11 +1,5 @@
 import { SvgIcon, type SvgIconProps } from "@mui/material";
 
-/**
- * @mui/icons-material da rasmiy Google/Apple brand ikonalari yo'q
- * (litsenziya siyosati tufayli), shuning uchun rasmiy SVG lardan
- * qo'lda SvgIcon sifatida yaratildi.
- */
-
 export function GoogleIcon(props: SvgIconProps) {
   return (
     <SvgIcon {...props} viewBox="0 0 24 24">

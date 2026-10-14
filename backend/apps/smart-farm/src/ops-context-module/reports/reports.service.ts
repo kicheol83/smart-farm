@@ -233,7 +233,6 @@ export class ReportsService implements OnApplicationBootstrap {
     const healthIndex = section.currentHealthIndex ?? 0;
     const status = this.resolveEntryStatus(healthIndex);
 
-    // Oxirgi soil moisture / humidity o'qishlari - shu greenhouse sensorlaridan
     const { soilMoisture, humidity } = await this.getLatestMoistureHumidity(
       String(section.greenHouseId),
     );
@@ -506,7 +505,6 @@ export class ReportsService implements OnApplicationBootstrap {
     const days = dailyResult.length || 1;
     const dailyAverage = Math.round((totalUsage / days) * 10) / 10;
 
-    // Oldingi davr
     const periodLen = to.getTime() - from.getTime();
     const prevFrom = new Date(from.getTime() - periodLen);
     const prevResult = await this.waterUsageModel.aggregate([
@@ -625,8 +623,6 @@ export class ReportsService implements OnApplicationBootstrap {
 
     return charts;
   }
-
-  // ─── Helpers ─────────────────────────────────────────────────────────────
 
   private async getSensorIds(greenHouseId: string): Promise<Types.ObjectId[]> {
     const devices = await this.deviceModel

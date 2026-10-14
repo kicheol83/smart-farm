@@ -8,7 +8,6 @@ interface NotificationToggleRowProps {
   disabled?: boolean;
 }
 
-/** Figma "Notifications and sounds" - bitta toggle qatori. */
 export function NotificationToggleRow({
   label,
   description,

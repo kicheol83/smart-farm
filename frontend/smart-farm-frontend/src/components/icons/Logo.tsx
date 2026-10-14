@@ -5,10 +5,6 @@ interface LogoProps {
   sx?: SxProps<Theme>;
 }
 
-/**
- * Figma "Logo" komponenti - yashil gradient doira + oq gul/asterisk belgisi.
- * Fayl sifatida emas, inline SVG sifatida - hech qanday tashqi rasm kerak emas.
- */
 export function Logo({ size = 46, sx }: LogoProps) {
   return (
     <Box
@@ -23,7 +19,6 @@ export function Logo({ size = 46, sx }: LogoProps) {
         </linearGradient>
       </defs>
       <circle cx="23" cy="23" r="23" fill="url(#logo-gradient)" />
-      {/* Gul/asterisk belgisi - 6 ta bargcha */}
       <g fill="#fff">
         {[0, 60, 120, 180, 240, 300].map((angle) => (
           <ellipse

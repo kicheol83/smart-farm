@@ -15,8 +15,7 @@ interface IDevice extends Document {
   greenHouseId: Types.ObjectId;
 }
 
-// Redis TTL - heartbeat kelib turmasin: qurilma offline
-const HEARTBEAT_TTL_SECONDS = 90; // 90 soniya - qurilma 30-60s da ping yuboradi
+const HEARTBEAT_TTL_SECONDS = 90;
 const HEARTBEAT_KEY = (deviceId: string) => `hb:${deviceId}`;
 
 @Injectable()
@@ -35,25 +34,12 @@ export class HeartBeatService implements OnModuleInit {
   ) {}
 
   onModuleInit(): void {
-    // MQTT heartbeat handlerni ro'yxatdan o'tkazish
     this.mqttService.registerHandler(
       MqttService.TOPICS.ALL_HEARTBEATS,
       this.handleHeartbeat.bind(this),
     );
   }
 
-  // ─── MQTT Handler: Heartbeat ──────────────────────────────────────────────
-
-  /**
-   * Qurilma ping yuborganda:
-   * 1. API key tekshirish
-   * 2. Redis da TTL yangilash (90 soniya)
-   * 3. Device status ONLINE ga o'zgartirish (agar OFFLINE bo'lsa)
-   *
-   * Qurilma MQTT publish qilishi:
-   * topic: sf/devices/{deviceId}/heartbeat
-   * payload: { "apiKey": "sf_...", "deviceId": "...", "timestamp": "..." }
-   */
   private async handleHeartbeat(
     topic: string,
     payloadBuffer: Buffer,
@@ -85,7 +71,6 @@ export class HeartBeatService implements OnModuleInit {
       return;
     }
 
-    // Redis da heartbeat TTL yangilash
     await this.redis.setex(
       HEARTBEAT_KEY(deviceId),
       HEARTBEAT_TTL_SECONDS,
@@ -97,7 +82,6 @@ export class HeartBeatService implements OnModuleInit {
       }),
     );
 
-    // Agar qurilma OFFLINE edi - ONLINE ga o'tkazish
     const device = await this.deviceModel.findById(deviceId).exec();
     if (device && device.deviceStatus !== 'ONLINE') {
       await this.deviceModel.findByIdAndUpdate(deviceId, {
@@ -107,12 +91,6 @@ export class HeartBeatService implements OnModuleInit {
     }
   }
 
-  // ─── Cron: Offline Detection ──────────────────────────────────────────────
-
-  /**
-   * Har 60 soniyada barcha ONLINE qurilmalarni tekshiradi.
-   * Agar Redis da heartbeat yo'q bo'lsa - qurilma OFFLINE deb belgilanadi.
-   */
   @Cron(CronExpression.EVERY_MINUTE)
   async detectOfflineDevices(): Promise<void> {
     const onlineDevices = await this.deviceModel
@@ -132,7 +110,6 @@ export class HeartBeatService implements OnModuleInit {
 
     if (!offlineIds.length) return;
 
-    // Batch update
     await this.deviceModel.updateMany(
       { _id: { $in: offlineIds.map((id) => new Types.ObjectId(id)) } },
       { deviceStatus: 'OFFLINE' },
@@ -141,11 +118,6 @@ export class HeartBeatService implements OnModuleInit {
     this.logger.warn(`${offlineIds.length} device(s) went offline`);
   }
 
-  // ─── Heartbeat info ───────────────────────────────────────────────────────
-
-  /**
-   * Qurilmaning oxirgi heartbeat ma'lumotlari
-   */
   async getHeartbeatInfo(deviceId: string): Promise<{
     isAlive: boolean;
     ttl: number;

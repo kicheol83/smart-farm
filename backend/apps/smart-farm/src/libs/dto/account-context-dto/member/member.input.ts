@@ -129,7 +129,6 @@ export class ManagerInquiry {
   search?: AIsearch;
 }
 
-/** ADMIN  MEMBERS **/
 @InputType()
 class MIsearch {
   @IsOptional()

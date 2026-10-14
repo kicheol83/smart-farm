@@ -22,7 +22,6 @@ function getInitialTheme(): Theme {
   const stored = localStorage.getItem("smart-farm-theme");
   if (stored === "dark" || stored === "light") return stored;
 
-  // Tizim afzalligi (prefers-color-scheme)
   return window.matchMedia("(prefers-color-scheme: dark)").matches
     ? "dark"
     : "light";
@@ -47,17 +46,12 @@ export const useThemeStore = create<ThemeState>()(
     {
       name: "smart-farm-theme",
       onRehydrateStorage: () => (state) => {
-        // Sahifa qayta yuklanganda <html> ga class qo'yiladi
         if (state) applyThemeClass(state.theme);
       },
     },
   ),
 );
 
-/**
- * main.tsx da ilova ishga tushishidan oldin chaqiring -
- * flicker (oq/qora ko'zga tashlanib ketishi) oldini oladi.
- */
 export function initTheme() {
   applyThemeClass(getInitialTheme());
 }

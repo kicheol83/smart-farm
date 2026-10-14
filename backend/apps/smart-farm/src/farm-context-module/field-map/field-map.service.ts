@@ -119,7 +119,6 @@ export class FieldMapService {
     const result = await this.fieldMapModel.deleteOne({ _id: id }).exec();
     if (result.deletedCount === 0)
       throw new NotFoundException('FieldMap not found.');
-    // Bog'liq sectorlarni ham o'chirish
     await this.sectorModel.deleteMany({ fieldId: new Types.ObjectId(id) });
     return true;
   }
@@ -322,11 +321,11 @@ export class FieldMapService {
   }
 
   private getNdviColor(value: number): string {
-    if (value >= 0.8) return '#1a7a1a'; // to'q yashil
-    if (value >= 0.6) return '#4caf50'; // yashil
-    if (value >= 0.4) return '#8bc34a'; // och yashil
-    if (value >= 0.2) return '#ffeb3b'; // sariq
-    return '#f44336'; // qizil
+    if (value >= 0.8) return '#1a7a1a';
+    if (value >= 0.6) return '#4caf50';
+    if (value >= 0.4) return '#8bc34a';
+    if (value >= 0.2) return '#ffeb3b';
+    return '#f44336';
   }
 
   private daysAgo(days: number): Date {

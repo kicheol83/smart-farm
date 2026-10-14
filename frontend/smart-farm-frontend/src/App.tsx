@@ -2,7 +2,6 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ProtectedRoute } from "@/components/layout/ProtectedRoute";
 import { AppLayout } from "@/components/layout/AppLayout";
 
-// Auth (layout siz)
 import { LoginPage } from "@/modules/auth/pages/LoginPage";
 import { PipelinePage } from "@/modules/pipeline/pages/PipelinePage";
 import { FEATURES } from "@/lib/features";
@@ -14,7 +13,6 @@ import { ForgotPasswordVerifyPage } from "@/modules/auth/pages/ForgotPasswordVer
 import { CreateNewPasswordPage } from "@/modules/auth/pages/CreateNewPasswordPage";
 import { PasswordChangeSuccessPage } from "@/modules/auth/pages/PasswordChangeSuccessPage";
 
-// Asosiy sahifalar (AppLayout ichida - Sidebar + Header bilan)
 import { DashboardPage } from "@/modules/dashboard/pages/DashboardPage";
 import { DeviceListPage } from "@/modules/device/pages/DeviceListPage";
 import { ReportPage } from "@/modules/report/pages/ReportPage";

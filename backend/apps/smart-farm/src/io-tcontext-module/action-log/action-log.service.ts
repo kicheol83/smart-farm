@@ -37,10 +37,6 @@ export class ActionLogService {
     });
   }
 
-  /**
-   * Figma: Settings / User Actions Log sahifasi
-   * Pagination + filter bilan
-   */
   async findAll(
     memberId: Types.ObjectId,
     input: GetActionLogsInput,

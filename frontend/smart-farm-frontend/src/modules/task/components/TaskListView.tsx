@@ -115,7 +115,6 @@ function TaskListGroup({
         {title}
       </Typography>
 
-      {/* Jadval sarlavhasi - faqat desktop */}
       <Box
         sx={{
           display: { xs: "none", md: "grid" },

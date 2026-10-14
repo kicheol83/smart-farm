@@ -261,8 +261,6 @@ export class UpdateAutomationRuleInput {
   triggerThreshold?: number;
 }
 
-// ─── ESP32 Polling - "Menda qanday holat bo'lishi kerak?" ─────────────────────
-
 @ObjectType()
 export class DeviceActuatorState {
   @Field(() => ID)

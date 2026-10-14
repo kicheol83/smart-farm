@@ -17,7 +17,7 @@ interface MapAreaTrendChartProps {
 export function MapAreaTrendChart({ points }: MapAreaTrendChartProps) {
   const dates = points.map((p) => format(new Date(p.date), "d MMM"));
   const soilMoisture = points.map((p) => p.soilMoisture ?? 0);
-  const ndvi = points.map((p) => (p.ndviValue ?? 0) * 100); // 0-1 → 0-100 shkalaga moslash
+  const ndvi = points.map((p) => (p.ndviValue ?? 0) * 100);
   const health = points.map((p) => p.healthIndex ?? 0);
 
   return (
