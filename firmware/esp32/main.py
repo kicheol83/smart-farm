@@ -1,29 +1,3 @@
-"""
-Smart Farm IoT Device - MicroPython (ESP32)
-=============================================
-To'liq versiya: DHT22, Capacitive Soil Moisture, BH1750,
-Water Level Sensor, Relay (Water Pump), MQTT Command handling.
-
-O'rnatish:
-  pip install micropython-umqtt.robust
-  BH1750 kutubxonasi: bh1750.py faylini ESP32 ga yuklang
-  (https://github.com/PinkInk/upylib/blob/master/bh1750/bh1750.py)
-
-Sozlash:
-  DEVICE_ID     → MongoDB dagi device _id
-  API_KEY       → NestJS dan generateDeviceApiKey bilan olingan sf_xxx key
-  BROKER_URL    → Mosquitto broker IP
-  SENSOR_ID_*   → MongoDB dagi har bir sensor _id
-
-Wiring:
-  ESP32 → DHT22:                3.3V→VCC, GND→GND, GPIO4→DATA
-  ESP32 → Soil Moisture:        3.3V→VCC, GND→GND, GPIO35→AOUT
-  ESP32 → BH1750:                3.3V→VCC, GND→GND, GPIO22→SCL, GPIO21→SDA
-  ESP32 → Water Level Sensor:    5V→VCC,   GND→GND, GPIO34→SIGNAL
-  ESP32 → Relay Module:          5V→VCC,   GND→GND, GPIO26→IN
-  Relay → Water Pump:            12V Adapter→COM, Pump(+)→NO, Pump(-)→GND
-"""
-
 import ujson
 import utime
 import ntptime
@@ -33,32 +7,28 @@ from machine import Pin, ADC, I2C
 import dht
 import bh1750
 
-# ─── Sozlamalar ───────────────────────────────────────────────────────────────
+from config import (
+    DEVICE_ID,
+    API_KEY,
+    SENSOR_ID_TEMP,
+    SENSOR_ID_HUM,
+    SENSOR_ID_SOIL,
+    SENSOR_ID_LIGHT,
+    SENSOR_ID_WATER,
+    SENSOR_ID_CO2,
+    BROKER_URL,
+    BROKER_PORT,
+)
 
-DEVICE_ID = "6a3c32956555c15ceb739f26"           # MongoDB device _id
-API_KEY = "sf_4e803144da19616f10cfbbf9e8dbca18"          # NestJS dan olingan API key
-
-SENSOR_ID_TEMP = "6a4bebeef6473b15c2b2edae"      # TEMPERATURE sensor _id
-SENSOR_ID_HUM = "6a4bec17f6473b15c2b2edcf"       # HUMIDITY sensor _id
-SENSOR_ID_SOIL = "6a4560c139bc6b8d680739be"      # SOIL_MOISTURE sensor _id
-SENSOR_ID_LIGHT = "6a4bec3af6473b15c2b2edd2"     # LIGHT sensor _id
-SENSOR_ID_WATER = "6a4bf0e9fcf82258efcd64e2"     # WATER_LEVEL sensor _id
-SENSOR_ID_CO2 = "6a455ffb39bc6b8d680739a7"
-
-BROKER_URL = b"192.168.45.131"  # Mosquitto broker IP
-BROKER_PORT = 1883
-BROKER_USER = API_KEY.encode()       # API key = MQTT username
-BROKER_PASS = b""                    # Password bo'sh
+BROKER_USER = API_KEY.encode()
+BROKER_PASS = b""
 
 CLIENT_ID = f"device_{DEVICE_ID}".encode()
 
-# Topics
 TOPIC_SENSORS = f"sf/devices/{DEVICE_ID}/sensors".encode()
 TOPIC_HEARTBEAT = f"sf/devices/{DEVICE_ID}/heartbeat".encode()
 TOPIC_STATUS = f"sf/devices/{DEVICE_ID}/status".encode()
 TOPIC_COMMANDS = f"sf/devices/{DEVICE_ID}/commands".encode()
-
-# ─── Pin sozlamalari ──────────────────────────────────────────────────────────
 
 DHT_PIN = 4
 SOIL_MOISTURE_PIN = 35
@@ -67,12 +37,10 @@ RELAY_PIN = 26
 I2C_SCL_PIN = 22
 I2C_SDA_PIN = 21
 
-# ─── Sensorlar ────────────────────────────────────────────────────────────────
-
 sensor = dht.DHT22(Pin(DHT_PIN))
 
 soil_adc = ADC(Pin(SOIL_MOISTURE_PIN))
-soil_adc.atten(ADC.ATTN_11DB)  # 0-3.3V diapazon
+soil_adc.atten(ADC.ATTN_11DB)
 
 water_adc = ADC(Pin(WATER_LEVEL_PIN))
 water_adc.atten(ADC.ATTN_11DB)
@@ -80,14 +48,12 @@ water_adc.atten(ADC.ATTN_11DB)
 i2c = I2C(0, scl=Pin(I2C_SCL_PIN), sda=Pin(I2C_SDA_PIN))
 light_sensor = bh1750.BH1750(i2c)
 
-# Relay - Water Pump boshqaruvi
 relay = Pin(RELAY_PIN, Pin.OUT)
-relay.value(0)  # boshlang'ichda o'chirilgan
+relay.value(0)
 
 MAX_PUMP_ON_SEC = 1800
 PUMP_OFF_GRACE_SEC = 60
 pump_off_deadline = None
-
 
 def pump_on(seconds=None):
     global pump_off_deadline
@@ -97,24 +63,20 @@ def pump_on(seconds=None):
     relay.value(1)
     pump_off_deadline = utime.ticks_add(utime.ticks_ms(), limit * 1000)
 
-
 def pump_off():
     global pump_off_deadline
     relay.value(0)
     pump_off_deadline = None
-
 
 def enforce_pump_limit():
     if pump_off_deadline is not None and utime.ticks_diff(utime.ticks_ms(), pump_off_deadline) >= 0:
         pump_off()
         print("Pump OFF (local limit)")
 
-
 EPOCH_OFFSET = 946684800 if utime.gmtime(0)[0] == 2000 else 0
 NTP_RETRY_MS = 3600000
 clock_synced = False
 last_ntp_try = None
-
 
 def sync_clock():
     global clock_synced, last_ntp_try
@@ -125,41 +87,28 @@ def sync_clock():
     except Exception as e:
         print(f"NTP error: {e}")
 
-
 def unix_time():
     return utime.time() + EPOCH_OFFSET if clock_synced else None
 
-# ─── Kalibrovka konstantalari (soil sensor uchun) ─────────────────────────────
-# Quruq tuproqda ADC qiymatini o'lchab SOIL_DRY ga yozing,
-# suvga botirib SOIL_WET ga yozing.
-SOIL_DRY = 3000   # quruq holatdagi raw ADC qiymati
-SOIL_WET = 1200   # suvga to'yingan holatdagi raw ADC qiymati
-
+SOIL_DRY = 3000
+SOIL_WET = 1200
 
 def read_soil_moisture():
-    """Capacitive soil moisture - foizga (0-100%) aylantirish"""
     raw = soil_adc.read()
     percent = (SOIL_DRY - raw) / (SOIL_DRY - SOIL_WET) * 100
     return round(max(0, min(100, percent)), 1)
 
-
 def read_water_level():
-    """Water level sensor - foizga (0-100%) aylantirish"""
-    raw = water_adc.read()  # 0-4095
+    raw = water_adc.read()
     percent = (raw / 4095) * 100
     return round(percent, 1)
 
-
 def read_light():
-    """BH1750 - lux qiymatini o'qish"""
     try:
         return round(light_sensor.luminance(bh1750.BH1750.ONCE_HIRES_1), 1)
     except Exception as e:
         print(f"BH1750 error: {e}")
         return None
-
-
-# ─── MQTT ─────────────────────────────────────────────────────────────────────
 
 class DeviceClient(MQTTClient):
     def reconnect(self):
@@ -172,7 +121,6 @@ class DeviceClient(MQTTClient):
                 print(f"Resubscribe error: {e}")
                 utime.sleep(self.DELAY)
 
-
 client = DeviceClient(
     CLIENT_ID,
     BROKER_URL,
@@ -182,9 +130,7 @@ client = DeviceClient(
     keepalive=60,
 )
 
-
 def on_command(topic, msg):
-    """Backend dan buyruq keldi (relay, restart, interval, calibrate)"""
     try:
         cmd = ujson.loads(msg)
         print(f"Command: {cmd['commandType']}")
@@ -207,11 +153,9 @@ def on_command(topic, msg):
 
         elif cmd['commandType'] == 'CALIBRATE':
             print("Calibrating sensor...")
-            # Kalibrovka logikasi (kerak bo'lsa)
 
     except Exception as e:
         print(f"Command error: {e}")
-
 
 sync_clock()
 
@@ -220,31 +164,26 @@ client.connect(False)
 client.subscribe(TOPIC_COMMANDS, 1)
 print("Connected to MQTT broker")
 
-# ─── Status: ONLINE ──────────────────────────────────────────────────────────
-
 client.publish(TOPIC_STATUS, ujson.dumps({
     "apiKey": API_KEY,
     "deviceId": DEVICE_ID,
     "status": "ONLINE",
 }))
 
-# ─── Main loop ────────────────────────────────────────────────────────────────
-
-SEND_INTERVAL = 30          # 30 soniyada bir sensor data
-HEARTBEAT_INTERVAL = 60     # 60 soniyada bir heartbeat
+SEND_INTERVAL = 30
+HEARTBEAT_INTERVAL = 60
 last_send = 0
 last_heartbeat = 0
 uptime = 0
 
 while True:
     now = utime.time()
-    client.check_msg()  # Incoming command tekshirish (RELAY_ON/OFF va h.k.)
+    client.check_msg()
     enforce_pump_limit()
 
     if not clock_synced and utime.ticks_diff(utime.ticks_ms(), last_ntp_try) >= NTP_RETRY_MS:
         sync_clock()
 
-    # Sensor data yuborish
     if now - last_send >= SEND_INTERVAL:
         try:
             sensor.measure()
@@ -306,7 +245,6 @@ while True:
         except Exception as e:
             print(f"Sensor error: {e}")
 
-    # Heartbeat yuborish
     if now - last_heartbeat >= HEARTBEAT_INTERVAL:
         client.publish(TOPIC_HEARTBEAT, ujson.dumps({
             "apiKey": API_KEY,

@@ -2,3 +2,4 @@
 deploy/mosquitto/passwd
 .env
 backend/.env.production
+firmware/esp32/config.py
