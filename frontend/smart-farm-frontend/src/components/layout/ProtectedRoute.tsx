@@ -6,13 +6,6 @@ interface ProtectedRouteProps {
   requireAdmin?: boolean;
 }
 
-/**
- * Himoyalangan route wrapper.
- *
- * - Login qilinmagan bo'lsa → /login ga yo'naltiradi
- * - requireAdmin=true va role ADMIN bo'lmasa → /dashboard ga yo'naltiradi
- *   (backend dagi AdminGuard bilan bir xil mantiq)
- */
 export function ProtectedRoute({ children, requireAdmin }: ProtectedRouteProps) {
   const { isAuthenticated, user } = useAuthStore();
 

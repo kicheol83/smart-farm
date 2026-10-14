@@ -63,7 +63,6 @@ export function DashboardTaskPanel({
         {tr("dash.tasks.title")}
       </Typography>
 
-      {/* Progress bar */}
       <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
         <LinearProgress
           variant="determinate"
@@ -101,7 +100,6 @@ export function DashboardTaskPanel({
         </Box>
       </Box>
 
-      {/* Vazifalar ro'yxati */}
       <Stack spacing={1.5}>
         {tasks.map((t) => {
           const done = t.taskStatus === "DONE";

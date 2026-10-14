@@ -114,7 +114,6 @@ export function PlantHealthPage() {
           height: { lg: "calc(100vh - 140px)" },
         }}
       >
-        {/* Chap panel */}
         <Box
           sx={{
             display: "flex",
@@ -342,7 +341,6 @@ export function PlantHealthPage() {
           )}
         </Box>
 
-        {/* O'ng panel — xarita + popup */}
         <Box sx={{ position: "relative", minHeight: 400 }}>
           <GreenhouseMapView
             sections={mapSections}

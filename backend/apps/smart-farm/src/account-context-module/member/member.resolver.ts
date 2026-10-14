@@ -46,7 +46,6 @@ export class MemberResolver {
     return result;
   }
 
-  /** Autentacited */
   @UseGuards(AuthGuard)
   @Mutation(() => Member)
   public async updateMember(
@@ -105,8 +104,6 @@ export class MemberResolver {
     return await this.memberService.getManagerMember(memberId, input);
   }
 
-  /**  ADMIN  **/
-
   @Roles(MemberRole.ADMIN)
   @UseGuards(RolesGuard)
   @Query(() => Members)
@@ -117,7 +114,6 @@ export class MemberResolver {
     return await this.memberService.getAllMembersByAdmin(input);
   }
 
-  // Authorization: ADMIN
   @Roles(MemberRole.ADMIN)
   @UseGuards(RolesGuard)
   @Mutation(() => Member)

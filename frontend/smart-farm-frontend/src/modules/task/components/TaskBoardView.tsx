@@ -117,7 +117,6 @@ export function TaskBoardView({
               </Box>
             </Box>
 
-            {/* Kartalar */}
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
               {column?.tasks.map((t) => (
                 <TaskBoardCard

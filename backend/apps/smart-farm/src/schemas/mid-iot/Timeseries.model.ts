@@ -17,7 +17,7 @@ export const TimeSeriesSensorSchema = new Schema(
     timeseries: {
       timeField: 'timestamp',
       metaField: 'metadata',
-      granularity: 'seconds', // 'seconds' | 'minutes' | 'hours'
+      granularity: 'seconds',
     },
     expireAfterSeconds: 90 * 24 * 60 * 60,
     collection: 'timeSeriesSensorData',

@@ -16,10 +16,6 @@ interface DeviceListCardProps {
   cameraCount: number;
 }
 
-/**
- * Figma "Device Card" komponenti — sensor/camera soni + Card List ro'yxati.
- * Backend: module5/device.resolver.ts → devices(greenHouseId)
- */
 export function DeviceListCard({ devices, sensorCount, cameraCount }: DeviceListCardProps) {
   return (
     <Card

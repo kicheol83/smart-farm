@@ -96,7 +96,6 @@ export function ProfilePage() {
           gap: 2,
         }}
       >
-        {/* Chap: Profil */}
         <Card
           elevation={0}
           sx={{
@@ -196,7 +195,6 @@ export function ProfilePage() {
           </Box>
         </Card>
 
-        {/* O'ng: Account Security + Support Access */}
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <Card
             elevation={0}

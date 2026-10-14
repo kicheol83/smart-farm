@@ -1,10 +1,10 @@
-# Smart Farm — Real-time IoT Greenhouse Monitoring & Automated Irrigation
+# Smart Farm: Real-time IoT Greenhouse Monitoring & Automated Irrigation
 
 [한국어](./README.md) | **English** | [O'zbekcha](./README.uz.md)
 
 A full-stack IoT platform that ingests ESP32 sensor data over MQTT, cleans, stores and checks it for anomalies, streams the results to a web dashboard in real time, and drives the irrigation pump automatically when the soil dries out.
 
-The goal was to build the entire **closed loop** — sensor → pipeline → rule → actuator → back to the sensor — inside one system.
+The goal was to build the entire **closed loop** (sensor → pipeline → rule → actuator → back to the sensor) inside one system.
 
 ## Features
 

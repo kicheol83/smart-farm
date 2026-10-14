@@ -135,7 +135,6 @@ export function LoginPage() {
           py: { xs: 4, sm: "60px" },
         }}
       >
-        {/* Logo */}
         <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <Logo size={46} />
           <Typography
@@ -159,7 +158,6 @@ export function LoginPage() {
             width: "100%",
           }}
         >
-          {/* Form Input card */}
           <Box
             sx={{
               display: "flex",
@@ -267,7 +265,6 @@ export function LoginPage() {
                   </Typography>
                 )}
 
-                {/* Remember Me row */}
                 <Box
                   sx={{
                     display: "flex",

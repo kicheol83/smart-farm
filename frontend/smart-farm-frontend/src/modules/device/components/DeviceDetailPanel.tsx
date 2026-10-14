@@ -186,7 +186,6 @@ export function DeviceDetailPanel({
         </Menu>
       </Box>
 
-      {/* Xarita */}
       <DeviceMapPlaceholder
         deviceName={device.deviceName}
         latitude={device.latitude}
@@ -289,7 +288,6 @@ export function DeviceDetailPanel({
         </Box>
       )}
 
-      {/* Recent Activity */}
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
         <Typography
           sx={{

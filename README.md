@@ -1,4 +1,4 @@
-# Smart Farm — 실시간 IoT 온실 모니터링 & 자동 관수
+# Smart Farm: 실시간 IoT 온실 모니터링 & 자동 관수
 
 **한국어** | [English](./README.en.md) | [O'zbekcha](./README.uz.md)
 

@@ -72,7 +72,6 @@ export class HealthService {
     const start = Date.now();
     try {
       const state = this.mongoConnection.readyState;
-      // 1 = connected, 2 = connecting, 3 = disconnecting, 0 = disconnected
       if (state !== 1) {
         return {
           name: 'mongodb',

@@ -16,7 +16,6 @@ import {
 } from "@/theme/theme";
 import { t } from "@/i18n/core";
 
-
 const SIGNUP_MUTATION = gql`
   mutation Signup($input: CreateMemberInput!) {
     signup(input: $input) {
@@ -114,7 +113,6 @@ export function SignupPage() {
         <ThemeToggle />
       </Box>
 
-      {/* ── Chap: Signup form ──────────────────────────────────────────────── */}
       <Box
         sx={{
           display: "flex",

@@ -195,7 +195,6 @@ export function EmailVerificationPage() {
 
           <OtpInput value={otp} onChange={setOtp} error={Boolean(error)} />
 
-          {/* Xato matni yoki countdown/resend — Figma ikkala holati */}
           {error ? (
             <Box sx={{ display: "flex", gap: 0.5, alignItems: "center" }}>
               <Typography

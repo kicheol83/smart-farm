@@ -1,10 +1,10 @@
-# Smart Farm — real vaqtli IoT issiqxona monitoringi va avtomatik sug'orish
+# Smart Farm: real vaqtli IoT issiqxona monitoringi va avtomatik sug'orish
 
 [한국어](./README.md) | [English](./README.en.md) | **O'zbekcha**
 
 ESP32 sensorlaridan MQTT orqali ma'lumot yig'ib, uni tozalaydigan, saqlaydigan va anomaliyalarni aniqlaydigan, natijani veb-dashboard'ga real vaqtda uzatadigan hamda tuproq quriganda nasosni avtomatik boshqaradigan full-stack IoT platforma.
 
-Maqsad — sensor → pipeline → qoida → aktuator → yana sensor zanjirini, ya'ni **yopiq zanjirni (closed loop)** bitta tizim ichida to'liq qurish.
+Maqsad: sensor → pipeline → qoida → aktuator → yana sensor zanjirini, ya'ni **yopiq zanjirni (closed loop)** bitta tizim ichida to'liq qurish.
 
 ## Asosiy imkoniyatlar
 
@@ -14,7 +14,7 @@ Maqsad — sensor → pipeline → qoida → aktuator → yana sensor zanjirini,
 - **Real vaqtli dashboard**: JWT bilan himoyalangan Socket.IO kanali orqali sensor qiymatlari, alert'lar, qurilma holati va aktuator o'zgarishlari uzatiladi
 - **IoT Pipeline sahifasi**: ma'lumot oqimi animatsiyasi, minutiga o'lchovlar soni, 24 soatlik throughput grafigi, har bir sensorning jonli Z-score'i, oxirgi anomaliyalar, qurilmalar holati
 - **Yopiq zanjirli sug'orish**: `SOIL_MOISTURE < 35` kabi avtomatlashtirish qoidasi nasosni yoqadi, taymer uni o'chiradi, suv sarfi esa ishlagan vaqt va oqim tezligidan avtomatik hisoblanib yoziladi
-- **O'simlik salomatligi indeksi**: har soatda avtomatik hisoblanadi — so'nggi 24 soat davomida harorat, namlik, tuproq namligi, pH, CO₂ va EC optimal diapazonda bo'lgan vaqt ulushi
+- **O'simlik salomatligi indeksi**: har soatda avtomatik hisoblanadi: so'nggi 24 soat davomida harorat, namlik, tuproq namligi, pH, CO₂ va EC optimal diapazonda bo'lgan vaqt ulushi
 - **Tashqi ob-havo**: shamol tezligi, yo'nalishi va ob-havo holati Open-Meteo'dan olinadi va 10 daqiqa keshlanadi
 - **Ko'p tilli interfeys**: koreyscha (standart) · inglizcha · o'zbekcha, sanalar va nisbiy vaqtlar ham tanlangan tilda
 - **Hisobotlar**: section'lar bo'yicha kunlik salomatlik indeksi, tuproq namligi trendi, suv sarfi tahlili, alert'lar xulosasi
